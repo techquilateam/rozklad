@@ -31,5 +31,8 @@ class Room(models.Model):
     name = models.CharField(max_length=10)
     building = models.ForeignKey(Building)
 
+    def full_name(self):
+        return self.name + '-' + str(self.building.number)
+
     class Meta:
         unique_together = (('name', 'building'))

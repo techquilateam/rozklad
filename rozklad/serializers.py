@@ -14,4 +14,4 @@ class BuildingSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name', 'building')
+        fields = ('id', 'name', 'full_name', 'building')
