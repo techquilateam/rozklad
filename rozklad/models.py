@@ -2,14 +2,14 @@ from django.db import models
 
 class Group(models.Model):
     OKR_CHOICES = (
-        (0, "bachelor"),
-        (1, "magister"),
-        (2, "specialist"),
+        (0, 'bachelor'),
+        (1, 'magister'),
+        (2, 'specialist'),
     )
 
     TYPE_CHOICES = (
-        (0, "daily"),
-        (1, "extramural"),
+        (0, 'daily'),
+        (1, 'extramural'),
     )
 
     name = models.CharField(max_length=20, unique=True)
@@ -38,11 +38,14 @@ class Room(models.Model):
         return self.full_name()
 
     class Meta:
-        unique_together = (('name', 'building'))
+        unique_together = (('name', 'building'),)
 
 class Discipline(models.Model):
     name = models.TextField()
     full_name = models.TextField()
+
+    def __str__(self):
+        return self.name
 
 class Teacher(models.Model):
     last_name = models.TextField()
@@ -75,3 +78,45 @@ class Teacher(models.Model):
 
     def __str__(self):
         return self.name()
+
+class Lesson(models.Model):
+    NUMBER_CHOICES = (
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+        (6, '6'),
+    )
+
+    DAY_CHOICES = (
+        (1, 'Monday'),
+        (2, 'Tuesday'),
+        (3, 'Wednesday'),
+        (4, 'Thursday'),
+        (5, 'Friday'),
+        (6, 'Saturday'),
+    )
+
+    WEEK_CHOICES = (
+        (1, 'Week 1'),
+        (2, 'Week 2'),
+    )
+
+    TYPE_CHOICES = (
+        (0, 'lecture'),
+        (1, 'practical'),
+        (2, 'laboratory'),
+    )
+
+    number = models.IntegerField(choices=NUMBER_CHOICES)
+    day = models.IntegerField(choices=DAY_CHOICES)
+    week = models.IntegerField(choices=WEEK_CHOICES)
+    type = models.IntegerField(choices=TYPE_CHOICES)
+    discipline = models.ForeignKey(Discipline)
+    groups = models.ManyToManyField(Group)
+    teachers = models.ManyToManyField(Teacher, blank=True)
+    rooms = models.ManyToManyField(Room, blank=True)
+
+    def __str__(self):
+        return self.discipline.name

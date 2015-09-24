@@ -9,6 +9,7 @@ router.register(r'buildings', views.BuildingViewSet)
 router.register(r'rooms', views.RoomViewSet)
 router.register(r'disciplines', views.DisciplineViewSet)
 router.register(r'teachers', views.TeacherViewSet)
+router.register(r'lessons', views.LessonViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),

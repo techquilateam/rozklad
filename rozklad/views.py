@@ -1,6 +1,6 @@
 from rest_framework import viewsets, pagination
-from .models import Group, Building, Room, Discipline, Teacher
-from .serializers import GroupSerializer, BuildingSerializer, RoomSerializer, DisciplineSerializer, TeacherSerializer
+from .models import Group, Building, Room, Discipline, Teacher, Lesson
+from .serializers import GroupSerializer, BuildingSerializer, RoomSerializer, DisciplineSerializer, TeacherSerializer, LessonSerializer
 
 class GlobalViewPagination(pagination.LimitOffsetPagination):
     default_limit = 10
@@ -29,4 +29,9 @@ class DisciplineViewSet(viewsets.ModelViewSet):
 class TeacherViewSet(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
+    pagination_class = GlobalViewPagination
+
+class LessonViewSet(viewsets.ModelViewSet):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
     pagination_class = GlobalViewPagination

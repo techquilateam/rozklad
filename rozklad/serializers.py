@@ -1,5 +1,6 @@
+from django.db.models import Q
 from rest_framework import serializers
-from .models import Group, Building, Room, Discipline, Teacher
+from .models import Group, Building, Room, Discipline, Teacher, Lesson
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,3 +26,36 @@ class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
         fields = ('id', 'last_name', 'first_name', 'middle_name', 'name', 'full_name', 'short_name', 'degree')
+
+class LessonSerializer(serializers.HyperlinkedModelSerializer):
+    def validate(self, data):
+        lessons = Lesson.objects.all()
+
+        if self.instance:
+            lessons = lessons.filter(~Q(id=self.instance.id))
+
+        lessons = lessons.filter(
+            number=data['number'] if 'number' in data.keys() else self.instance.number,
+            day=data['day'] if 'day' in data.keys() else self.instance.day,
+            week=data['week'] if 'week' in data.keys() else self.instance.week)
+
+        if 'groups' in data.keys():
+            for group in data['groups']:
+                if lessons.filter(groups=group).count() > 0:
+                    raise serializers.ValidationError('ХУЙ НА 1')
+
+        if 'teachers' in data.keys():
+            for teacher in data['teachers']:
+                if lessons.filter(teachers=teacher).count() > 0:
+                    raise serializers.ValidationError('ХУЙ НА 2')
+
+        if 'rooms' in data.keys():
+            for room in data['rooms']:
+                if lessons.filter(rooms=room).count() > 0:
+                    raise serializers.ValidationError('ХУЙ НА 3')
+
+        return data
+
+    class Meta:
+        model = Lesson
+        fields = ('id', 'number', 'day', 'week', 'type', 'discipline', 'groups', 'teachers', 'rooms')
