@@ -36,3 +36,7 @@ class Room(models.Model):
 
     class Meta:
         unique_together = (('name', 'building'))
+
+class Discipline(models.Model):
+    name = models.TextField()
+    full_name = models.TextField()

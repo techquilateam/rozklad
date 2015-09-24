@@ -7,6 +7,7 @@ router = DefaultRouter()
 router.register(r'groups', views.GroupViewSet)
 router.register(r'buildings', views.BuildingViewSet)
 router.register(r'rooms', views.RoomViewSet)
+router.register(r'disciplines', views.DisciplineViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
