@@ -34,9 +34,44 @@ class Room(models.Model):
     def full_name(self):
         return self.name + '-' + str(self.building.number)
 
+    def __str__(self):
+        return self.full_name()
+
     class Meta:
         unique_together = (('name', 'building'))
 
 class Discipline(models.Model):
     name = models.TextField()
     full_name = models.TextField()
+
+class Teacher(models.Model):
+    last_name = models.TextField()
+    first_name = models.TextField()
+    middle_name = models.TextField()
+    degree = models.TextField()
+
+    def name(self):
+        return self.last_name + ' ' + self.first_name + ' ' + self.middle_name
+
+    def full_name(self):
+        return self.degree + ' ' + self.last_name + ' ' + self.first_name + ' ' + self.middle_name
+
+    def short_name(self):
+        degree_parts = self.degree.split()
+        result = ''
+        for part in degree_parts:
+            result += part[0:2]
+            part = part[2:]
+            for ch in part:
+                if ch not in 'aeiouyAEIOUYауоыиэяюёеіїєАУОЫИЭЯЮЁЕІЇЄ':
+                    result += ch
+                else:
+                    break
+            result += '. '
+
+        result += self.last_name + ' ' + self.first_name[0] + '. ' + self.middle_name[0] + '.'
+
+        return result
+
+    def __str__(self):
+        return self.name()
