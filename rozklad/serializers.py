@@ -1,3 +1,4 @@
+import re
 from django.db.models import Q
 from rest_framework import serializers
 from .models import Group, Building, Room, Discipline, Teacher, Lesson
@@ -6,6 +7,12 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'name', 'okr', 'type')
+
+    def validate_name(self, value):
+        if not re.match('^[0-9a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ\-\(\)]*$', value):
+            raise serializers.ValidationError('This value can only contain letters, numbers or -() symbols')
+
+        return value.lower()
 
 class BuildingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,6 +30,24 @@ class DisciplineSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'full_name')
 
 class TeacherSerializer(serializers.ModelSerializer):
+    def validate_name_part(self, value):
+        if not re.match('^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ]*$', value):
+            raise serializers.ValidationError('This value can only contain letters')
+
+        value_list = list(value.lower())
+        value_list[0] = value_list[0].upper()
+        return ''.join(value_list)
+
+    validate_last_name = validate_name_part
+    validate_first_name = validate_name_part
+    validate_middle_name = validate_name_part
+
+    def validate_degree(self, value):
+        if not re.match('^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ\s]*$', value):
+            raise serializers.ValidationError('This value can only contain letters and spaces')
+
+        return value.lower()
+
     class Meta:
         model = Teacher
         fields = ('id', 'last_name', 'first_name', 'middle_name', 'name', 'full_name', 'short_name', 'degree')
@@ -50,12 +75,18 @@ class LessonSerializer(serializers.HyperlinkedModelSerializer):
         if 'teachers' in data.keys():
             for teacher in data['teachers']:
                 if lessons.filter(teachers=teacher).count() > 0:
-                    raise serializers.ValidationError('ХУЙ НА 2')
+                    lesson = lessons.get(teachers=teacher)
+                    raise serializers.ValidationError('Teacher %s already have %s lesson on %s, %s' % (
+                        teacher, lesson.get_number_display(),
+                        lesson.get_day_display(), lesson.get_week_display()))
 
         if 'rooms' in data.keys():
             for room in data['rooms']:
                 if lessons.filter(rooms=room).count() > 0:
-                    raise serializers.ValidationError('ХУЙ НА 3')
+                    lesson = lessons.get(rooms=room)
+                    raise serializers.ValidationError('Room %s %s already have %s lesson on %s, %s' % (
+                        room, lesson.get_number_display(),
+                        lesson.get_day_display(), lesson.get_week_display()))
 
         return data
 
