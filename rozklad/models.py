@@ -118,5 +118,26 @@ class Lesson(models.Model):
     teachers = models.ManyToManyField(Teacher, blank=True)
     rooms = models.ManyToManyField(Room, blank=True)
 
+    def discipline_name(self):
+        return self.discipline.name
+
+    def groups_names(self):
+        groups_names = []
+        for group in self.groups.all():
+            groups_names.append(group.name)
+        return groups_names
+
+    def teachers_short_names(self):
+        teachers_short_names = []
+        for teacher in self.teachers.all():
+            teachers_short_names.append(teacher.short_name())
+        return teachers_short_names
+
+    def rooms_full_names(self):
+        rooms_full_names = []
+        for room in self.rooms.all():
+            rooms_full_names.append(room.full_name())
+        return rooms_full_names
+
     def __str__(self):
         return self.discipline.name
