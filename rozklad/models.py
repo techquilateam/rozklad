@@ -112,7 +112,7 @@ class Lesson(models.Model):
     number = models.IntegerField(choices=NUMBER_CHOICES)
     day = models.IntegerField(choices=DAY_CHOICES)
     week = models.IntegerField(choices=WEEK_CHOICES)
-    type = models.IntegerField(choices=TYPE_CHOICES)
+    type = models.IntegerField(choices=TYPE_CHOICES, null=True)
     discipline = models.ForeignKey(Discipline)
     groups = models.ManyToManyField(Group)
     teachers = models.ManyToManyField(Teacher, blank=True)

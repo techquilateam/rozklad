@@ -42,7 +42,10 @@ class LessonSerializer(serializers.HyperlinkedModelSerializer):
         if 'groups' in data.keys():
             for group in data['groups']:
                 if lessons.filter(groups=group).count() > 0:
-                    raise serializers.ValidationError('ХУЙ НА 1')
+                    lesson = lessons.get(groups=group)
+                    raise serializers.ValidationError('Group %s already have %s lesson on %s, %s' % (
+                        group, lesson.get_number_display(),
+                        lesson.get_day_display(), lesson.get_week_display()))
 
         if 'teachers' in data.keys():
             for teacher in data['teachers']:

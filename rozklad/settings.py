@@ -80,6 +80,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'rozklad',
+        'USER': 'postgres',
+        'PASSWORD': '1812',
+        'HOST': '127.0.0.1', # Set to empty string for localhost.
+        'PORT': '5432', # Set to empty string for default.
     }
 }
 
@@ -89,7 +96,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kiev'
 
 USE_I18N = True
 
