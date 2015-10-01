@@ -12,7 +12,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     pagination_class = GlobalViewPagination
 
     filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
-    search_fields = ('name',)
+    search_fields = ('^name',)
     filter_fields = ('name', 'okr', 'type')
 
 class BuildingViewSet(viewsets.ModelViewSet):
@@ -24,6 +24,10 @@ class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     pagination_class = GlobalViewPagination
+
+    filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
+    search_fields = ('^name')
+    filter_fields = ('name', 'building')
 
 class DisciplineViewSet(viewsets.ModelViewSet):
     queryset = Discipline.objects.all()
@@ -39,7 +43,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
     pagination_class = GlobalViewPagination
 
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('last_name', 'first_name', 'middle_name')
+    search_fields = ('^last_name', '^first_name', '^middle_name')
 
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()

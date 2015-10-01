@@ -41,8 +41,8 @@ class Room(models.Model):
         unique_together = (('name', 'building'),)
 
 class Discipline(models.Model):
-    name = models.TextField()
-    full_name = models.TextField()
+    name = models.TextField(unique=True)
+    full_name = models.TextField(unique=True)
 
     def __str__(self):
         return self.name
@@ -78,6 +78,9 @@ class Teacher(models.Model):
 
     def __str__(self):
         return self.name()
+
+    class Meta:
+        unique_together = (('last_name', 'first_name', 'middle_name', 'degree'))
 
 class Lesson(models.Model):
     NUMBER_CHOICES = (
