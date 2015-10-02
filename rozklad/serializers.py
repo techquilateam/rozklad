@@ -3,10 +3,10 @@ from django.db.models import Q
 from rest_framework import serializers
 from .models import Group, Building, Room, Discipline, Teacher, Lesson
 
-class GroupSerializer(serializers.ModelSerializer):
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
-        fields = ('id', 'name', 'okr', 'type')
+        fields = ('id', 'url', 'name', 'okr', 'type')
 
     def validate_name(self, value):
         if not re.match('^[0-9a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ\-\(\)]*$', value):
@@ -14,22 +14,23 @@ class GroupSerializer(serializers.ModelSerializer):
 
         return value.lower()
 
-class BuildingSerializer(serializers.ModelSerializer):
+class BuildingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Building
-        fields = ('id', 'number', 'latitude', 'longitude')
+        fields = ('id', 'url', 'number', 'latitude', 'longitude')
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name', 'full_name', 'building')
+        fields = ('id', 'url', 'name', 'full_name', 'building')
+        depth = 1
 
-class DisciplineSerializer(serializers.ModelSerializer):
+class DisciplineSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Discipline
-        fields = ('id', 'name', 'full_name')
+        fields = ('id', 'url', 'name', 'full_name')
 
-class TeacherSerializer(serializers.ModelSerializer):
+class TeacherSerializer(serializers.HyperlinkedModelSerializer):
     def validate_name_part(self, value):
         if not re.match('^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ]*$', value):
             raise serializers.ValidationError('This value can only contain letters')
@@ -50,7 +51,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Teacher
-        fields = ('id', 'last_name', 'first_name', 'middle_name', 'name', 'full_name', 'short_name', 'degree')
+        fields = ('id', 'url', 'last_name', 'first_name', 'middle_name', 'name', 'full_name', 'short_name', 'degree')
 
 class LessonSerializer(serializers.HyperlinkedModelSerializer):
     def validate(self, data):
@@ -93,5 +94,15 @@ class LessonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Lesson
         fields = (
-            'id', 'number', 'day', 'week', 'type', 'discipline_name', 'discipline', 'groups_names',
-            'groups', 'teachers_short_names', 'teachers', 'rooms_full_names', 'rooms')
+            'id', 'url', 'number', 'day', 'week', 'type', 'discipline_name', 'discipline',
+            'groups_names', 'groups', 'teachers_short_names', 'teachers', 'rooms_full_names', 'rooms')
+
+class NestedLessonSerializer(serializers.ModelSerializer):
+    discipline = DisciplineSerializer()
+    groups = GroupSerializer(many=True)
+    teachers = TeacherSerializer(many=True)
+    rooms = RoomSerializer(many=True)
+
+    class Meta(LessonSerializer.Meta):
+        model = Lesson
+        fields = ('id', 'url', 'type', 'discipline', 'groups', 'teachers', 'rooms')
