@@ -18,9 +18,9 @@
 					<option>Аудиторія</option>
 				</select>
 				<input type="text" placeholder="Введіть запит" name="" value="КВ-32">
-				<button class="button">знайти</button>
+				<button name="submit" class="button">знайти</button>
 			</form>
-			<a href="#" class="login">Редагувати</a>
+			<a href="#" class="login">Вийти</a>
 			<div class="clear"></div>
 		</div>
 	</header>
@@ -29,7 +29,12 @@
 			<div class="week" id="w--1">
 				<div class="day holiday" id="day--1">
 					<h1 class="day__title">Понеділок</h1>
-					<ul>
+					<ul id="w-1_list-1">
+						<li>
+							<h1 class="lesson__title"></h1>
+							<p class="lesson__room"></p>
+							<p class="lesson__teacher"></p>
+						</li>
 						<li>
 							<h1 class="lesson__title"></h1>
 							<p class="lesson__room"></p>
@@ -59,7 +64,7 @@
 				</div>
 				<div class="day" id="day--2">
 					<h1 class="day__title">Вівторок</h1>
-					<ul>
+					<ul id="w-1_list-2">
 						<li>
 							<h1 class="lesson__title">Компютерна електроніка. </h1>
 							<p class="lesson__room">344-19</p>
@@ -85,11 +90,16 @@
 							<p class="lesson__room"></p>
 							<p class="lesson__teacher"></p>
 						</li>
+						<li class="nolesson">
+							<h1 class="lesson__title"></h1>
+							<p class="lesson__room"></p>
+							<p class="lesson__teacher"></p>
+						</li>
 					</ul>
 				</div>
 				<div class="day" id="day--3">
 					<h1 class="day__title">Середа</h1>
-					<ul>
+					<ul id="w-1_list-3">
 						<li class="window">
 							<h1 class="lesson__title"></h1>
 							<p class="lesson__room"></p>
@@ -115,11 +125,21 @@
 							<p class="lesson__room"></p>
 							<p class="lesson__teacher"></p>
 						</li>
+						<li class="nolesson">
+							<h1 class="lesson__title"></h1>
+							<p class="lesson__room"></p>
+							<p class="lesson__teacher"></p>
+						</li>
 					</ul>
 				</div>
 				<div class="day holiday" id="day--4">
 					<h1 class="day__title">Четвер</h1>
-					<ul>
+					<ul id="w-1_list-4">
+						<li>
+							<h1 class="lesson__title"></h1>
+							<p class="lesson__room"></p>
+							<p class="lesson__teacher"></p>
+						</li>
 						<li>
 							<h1 class="lesson__title"></h1>
 							<p class="lesson__room"></p>
@@ -149,7 +169,7 @@
 				</div>
 				<div class="day" id="day--5">
 					<h1 class="day__title">П'ятниця</h1>
-					<ul>
+					<ul id="w-1_list-5">
 						<li class="window">
 							<h1 class="lesson__title"></h1>
 							<p class="lesson__room"></p>
@@ -175,11 +195,21 @@
 							<p class="lesson__room"></p>
 							<p class="lesson__teacher"></p>
 						</li>
+						<li>
+							<h1 class="lesson__title">Компютерна електроніка. </h1>
+							<p class="lesson__room">344-19</p>
+							<p class="lesson__teacher">Сапсай Т. Г.</p>
+						</li>
 					</ul>
 				</div>
 				<div class="day holiday" id="day--6">
 					<h1 class="day__title">Субота</h1>
-					<ul>
+					<ul id="w-1_list-6">
+						<li>
+							<h1 class="lesson__title"></h1>
+							<p class="lesson__room"></p>
+							<p class="lesson__teacher"></p>
+						</li>
 						<li>
 							<h1 class="lesson__title"></h1>
 							<p class="lesson__room"></p>
@@ -208,7 +238,6 @@
 					</ul>
 				</div>
 			</div>
-			<div class="clear"></div>
 			<div class="clear"></div>
 		</div>
 	</section>
@@ -224,4 +253,28 @@
 			<div class="clear"></div>
 		</div>
 	</footer>
+	<div id="overlay">
+		<div id="modal">
+			<h1 class="maintitle">Редагування пари</h1>
+			<div class="content">
+				<form action="">
+					<select name="type">
+						<option selected="selected">Тип пари</option>
+						<option>Невідомо</option>
+						<option>Лекція</option>
+						<option>Лабораторна</option>
+						<option>Практика</option>
+					</select>
+					<input type="text" placeholder="Викладачі" name="teachers">
+					<input type="text" placeholder="Кабінет" name="room">
+					<button name="" class="button close">закрити</button>
+					<button name="submit" class="button">Зберегти</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
+	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="http://rubaxa.github.io/Sortable/jquery.binding.js"></script>
+	<script src="js/action.js"></script>
 </body>

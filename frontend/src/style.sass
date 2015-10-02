@@ -1,0 +1,260 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700,300&subset=latin,cyrillic-ext")
+$darker: #222
+$white: #fff
+$dark: #333
+$linkhover: #00B945
+$font: "Open Sans Condensed", sans-serif
+$containerwidth: 1280px
+$red: #FF6140
+.transition
+	-webkit-transition: all 0.2s
+	-moz-transition: all 0.2s
+	transition: all 0.2s
+body
+	margin: 0
+	padding: 0
+	font-family: $font
+	font-size: 20px
+	@extend .background
+.clear 
+	clear: both
+.container 
+	max-width: $containerwidth
+	margin: 0 auto
+	position: relative
+.button
+	border: 1px solid #fff
+	height: 39px
+	padding: 3px 35px 36px
+	text-transform: uppercase
+	font-size: 1.1em
+	font-family: $font
+	color: $white
+	background: transparent
+	margin-left: -3px
+	cursor: pointer
+	outline: none
+	position: relative
+	margin-left: -5px
+	@extend .transition
+.button:after
+	width: 0%
+	height: 100%
+	top: 0
+	left: 0
+	background: $white
+	content: ''
+	position: absolute
+	z-index: -1
+	@extend .transition
+.button:hover 
+	color: $dark
+.button:hover:after
+	width: 100%
+header:after
+	width: 100%
+	height: 100%
+	top: 0
+	left: 0
+	background: $dark
+	content: ''
+	position: absolute
+	z-index: -2
+header
+	color: $white
+	padding: 5px
+	text-align: center
+	position: relative
+	@extend .shadow
+	#logo
+		float: left
+		margin: 20px 0 10px 50px
+	#searchbar
+		position: absolute
+		top: 10px
+		left: 0
+		right: 0
+		width: 70%
+		overflow: auto
+		margin: auto
+		option[selected="selected"]
+			color: #e6e6e6
+		select
+			font-family: $font
+			font-size: 1em
+			padding: 5px 10px
+			outline: none
+			border: 1px solid #fff
+		input
+			@extend select
+			padding: 6px 10px
+			width: 300px
+			margin-left: -5px
+.login
+	float: right
+	padding-bottom: 0
+	margin-top: 20px
+	text-decoration: none
+	@extend .transition
+	color: #777
+	z-index: 999
+	@extend .transition
+.login:hover
+	color: $linkhover
+footer
+	background: $dark
+	width: 100%
+	padding: 10px 0
+	font-size: 0.7em
+	color: $white
+	@extend .shadow
+	.createdby
+		float: right
+		color: #777
+	.links
+		float: left
+	a
+		text-decoration: none
+		color: #777
+		@extend .transition	
+	a:hover
+		color: $linkhover
+		opacity: 1
+
+.background
+	background: rgb(255,255,255) /* Old browsers */
+	background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%) /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))) /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* IE10+ */
+	background: radial-gradient(ellipse at center,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f4f4f4',GradientType=1 ) /* IE6-9 fallback on horizontal gradient */
+.shadow
+	-webkit-box-shadow: 0px 0px 25px -5px rgba(0,0,0,0.56)
+	-moz-box-shadow: 0px 0px 25px -5px rgba(0,0,0,0.56)
+	box-shadow: 0px 0px 25px -5px rgba(0,0,0,0.56)
+.day
+	width: $containerwidth / 6.299999
+	float: left
+	margin: 0 5px
+	.day__title
+		font-size: 1.1em
+		color: $white
+		background: $dark
+		font-weight: 100
+		padding: 5px 10px
+		margin-bottom: 0
+	ul
+		margin: 0
+		padding: 0
+		li
+			list-style-type: none
+			font-size: 0.7em
+			padding: 5px 10px
+			background: $white
+			height: 70px
+			border-bottom: 1px solid #e6e6e6
+			width: $containerwidth / 6.299999 - 20
+			display: block
+			position: relative
+			h1, p
+				font-size: 1em
+				margin: 0
+			.lesson__room
+				position: absolute
+				right: 10px
+				bottom: 5px
+		li.window
+			background: #e6e6e6
+		li.nolesson
+			display: none
+.day.holiday
+	opacity: 0
+.handle
+	display: block
+	content: ' '	
+	height: 10px
+	width: 20px
+	bottom: 10px
+	opacity: 0.1
+	cursor: pointer
+	position: absolute
+	background: linear-gradient(to bottom, #000 0%, #000 20%, transparent 20%, transparent 40%, #000 40%, #000 60%, transparent 60%, transparent 80%, #000 80%, #000 100%)
+	@extend .transition
+.sortable-ghost
+	opacity: .5
+	@extend .shadow
+.moveAble
+	.handle:hover
+		opacity: 0.3
+		-ms-transform: rotate(180deg)
+		-webkit-transform: rotate(180deg)
+		transform: rotate(180deg)
+	.handle:active
+		opacity: 0.1
+		-ms-transform: rotate(0deg)
+		-webkit-transform: rotate(0deg)
+		transform: rotate(0deg)
+		background: linear-gradient(to bottom, #000 0%, #000 5%, transparent 5%, transparent 5%, #000 5%, #000 5%, transparent 5%, transparent 80%, #000 80%, #000 100%)
+	.edit
+		height: 11px
+		width: 11px
+		background: url('../img/edit.png')
+		display: block
+		position: absolute
+		opacity: 0.2
+		cursor: pointer
+		right: 10px
+		top: 10px
+		@extend .transition
+	.edit:hover
+		opacity: 0.5	
+#w--1
+	height: 650px
+#overlay
+	width: 100%
+	min-height: 100%
+	background-color: rgba(0,0,0,0.5)
+	overflow: hidden
+	position: fixed
+	top: 0px
+	display: none
+	#modal
+		margin: 100px auto 0px auto
+		width: 500px
+		background-color: $white
+		border-radius: 5px
+		@extend .shadow
+		.maintitle
+			font-size: 1.1em
+			background: $darker
+			padding: 25px 25px 15px
+			color: $white
+		.content
+			padding: 25px
+			option[selected="selected"]
+				color: #e6e6e6
+			select
+				font-family: $font
+				font-size: 1em
+				padding: 5px 10px
+				outline: none
+				border: 1px solid $dark
+				display: block
+				width: 100%
+				margin-bottom: 25px
+			input
+				@extend select
+				padding: 6px 10px
+			.button
+				background: $dark
+			.button:hover
+				color: $white
+				opacity: .9
+			.button:after
+				background: $linkhover
+			.button.close
+				float: right
+			.button.close:after
+				background: $red
