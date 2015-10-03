@@ -23,7 +23,13 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Room
         fields = ('id', 'url', 'name', 'full_name', 'building')
-        depth = 1
+
+class NestedRoomSerializer(serializers.HyperlinkedModelSerializer):
+    building = BuildingSerializer()
+
+    class Meta:
+        model = Room
+        fields = ('id', 'url', 'name', 'full_name', 'building')
 
 class DisciplineSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -101,7 +107,7 @@ class NestedLessonSerializer(serializers.ModelSerializer):
     discipline = DisciplineSerializer()
     groups = GroupSerializer(many=True)
     teachers = TeacherSerializer(many=True)
-    rooms = RoomSerializer(many=True)
+    rooms = NestedRoomSerializer(many=True)
 
     class Meta(LessonSerializer.Meta):
         model = Lesson
