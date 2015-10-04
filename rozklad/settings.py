@@ -85,8 +85,8 @@ DATABASES = {
         'NAME': 'rozklad',
         'USER': 'postgres',
         'PASSWORD': '1812',
-        'HOST': '127.0.0.1', # Set to empty string for localhost.
-        'PORT': '5432', # Set to empty string for default.
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 

@@ -1,12 +1,13 @@
 import re
 from django.db.models import Q
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Group, Building, Room, Discipline, Teacher, Lesson
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ('id', 'url', 'name', 'okr', 'type')
+        fields = ('id', 'name', 'okr', 'type')
 
     def validate_name(self, value):
         if not re.match('^[0-9a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ\-\(\)]*$', value):
@@ -14,29 +15,29 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
         return value.lower()
 
-class BuildingSerializer(serializers.HyperlinkedModelSerializer):
+class BuildingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Building
-        fields = ('id', 'url', 'number', 'latitude', 'longitude')
+        fields = ('id', 'number', 'latitude', 'longitude')
 
-class RoomSerializer(serializers.HyperlinkedModelSerializer):
+class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'url', 'name', 'full_name', 'building')
+        fields = ('id', 'name', 'full_name', 'building')
 
-class NestedRoomSerializer(serializers.HyperlinkedModelSerializer):
+class NestedRoomSerializer(serializers.ModelSerializer):
     building = BuildingSerializer()
 
     class Meta:
         model = Room
-        fields = ('id', 'url', 'name', 'full_name', 'building')
+        fields = ('id', 'name', 'full_name', 'building')
 
-class DisciplineSerializer(serializers.HyperlinkedModelSerializer):
+class DisciplineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discipline
-        fields = ('id', 'url', 'name', 'full_name')
+        fields = ('id', 'name', 'full_name')
 
-class TeacherSerializer(serializers.HyperlinkedModelSerializer):
+class TeacherSerializer(serializers.ModelSerializer):
     def validate_name_part(self, value):
         if not re.match('^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ]*$', value):
             raise serializers.ValidationError('This value can only contain letters')
@@ -57,9 +58,9 @@ class TeacherSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Teacher
-        fields = ('id', 'url', 'last_name', 'first_name', 'middle_name', 'name', 'full_name', 'short_name', 'degree')
+        fields = ('id', 'last_name', 'first_name', 'middle_name', 'name', 'full_name', 'short_name', 'degree')
 
-class LessonSerializer(serializers.HyperlinkedModelSerializer):
+class LessonSerializer(serializers.ModelSerializer):
     def validate(self, data):
         lessons = Lesson.objects.all()
 
@@ -73,25 +74,25 @@ class LessonSerializer(serializers.HyperlinkedModelSerializer):
 
         if 'groups' in data.keys():
             for group in data['groups']:
-                if lessons.filter(groups=group).count() > 0:
+                if lessons.filter(groups=group).exists():
                     lesson = lessons.get(groups=group)
-                    raise serializers.ValidationError('Group %s already have %s lesson on %s, %s' % (
+                    raise serializers.ValidationError('Group {0} already have {1} lesson on {2}, {3}'.format(
                         group, lesson.get_number_display(),
                         lesson.get_day_display(), lesson.get_week_display()))
 
         if 'teachers' in data.keys():
             for teacher in data['teachers']:
-                if lessons.filter(teachers=teacher).count() > 0:
+                if lessons.filter(teachers=teacher).exists():
                     lesson = lessons.get(teachers=teacher)
-                    raise serializers.ValidationError('Teacher %s already have %s lesson on %s, %s' % (
+                    raise serializers.ValidationError('Teacher {0} already have {1} lesson on {2}, {3}'.format(
                         teacher, lesson.get_number_display(),
                         lesson.get_day_display(), lesson.get_week_display()))
 
         if 'rooms' in data.keys():
             for room in data['rooms']:
-                if lessons.filter(rooms=room).count() > 0:
+                if lessons.filter(rooms=room).exists():
                     lesson = lessons.get(rooms=room)
-                    raise serializers.ValidationError('Room %s %s already have %s lesson on %s, %s' % (
+                    raise serializers.ValidationError('Room {0} already have {1} lesson on {2}, {3}'.format(
                         room, lesson.get_number_display(),
                         lesson.get_day_display(), lesson.get_week_display()))
 
@@ -100,7 +101,7 @@ class LessonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Lesson
         fields = (
-            'id', 'url', 'number', 'day', 'week', 'type', 'discipline_name', 'discipline',
+            'id', 'number', 'day', 'week', 'type', 'discipline_name', 'discipline',
             'groups_names', 'groups', 'teachers_short_names', 'teachers', 'rooms_full_names', 'rooms')
 
 class NestedLessonSerializer(serializers.ModelSerializer):
@@ -111,4 +112,9 @@ class NestedLessonSerializer(serializers.ModelSerializer):
 
     class Meta(LessonSerializer.Meta):
         model = Lesson
-        fields = ('id', 'url', 'type', 'discipline', 'groups', 'teachers', 'rooms')
+        fields = ('id', 'type', 'discipline', 'groups', 'teachers', 'rooms')
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email')

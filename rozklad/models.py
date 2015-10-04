@@ -1,6 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-class Group(models.Model):
+class ModeratorsModelMixin(models.Model):
+    moderators = models.ManyToManyField(User, blank=True)
+
+    class Meta:
+        abstract = True
+        ordering = ('id',)
+
+class Group(ModeratorsModelMixin):
     OKR_CHOICES = (
         (0, 'bachelor'),
         (1, 'magister'),
@@ -19,7 +27,7 @@ class Group(models.Model):
     def __str__(self):
         return self.name
 
-class Building(models.Model):
+class Building(ModeratorsModelMixin):
     number = models.IntegerField(unique=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
@@ -27,7 +35,7 @@ class Building(models.Model):
     def __str__(self):
         return str(self.number)
 
-class Room(models.Model):
+class Room(ModeratorsModelMixin):
     name = models.CharField(max_length=10)
     building = models.ForeignKey(Building)
 
@@ -37,17 +45,17 @@ class Room(models.Model):
     def __str__(self):
         return self.full_name()
 
-    class Meta:
+    class Meta(ModeratorsModelMixin.Meta):
         unique_together = (('name', 'building'),)
 
-class Discipline(models.Model):
+class Discipline(ModeratorsModelMixin):
     name = models.TextField(unique=True)
     full_name = models.TextField(unique=True)
 
     def __str__(self):
         return self.name
 
-class Teacher(models.Model):
+class Teacher(ModeratorsModelMixin):
     last_name = models.TextField()
     first_name = models.TextField()
     middle_name = models.TextField()
@@ -79,7 +87,7 @@ class Teacher(models.Model):
     def __str__(self):
         return self.name()
 
-    class Meta:
+    class Meta(ModeratorsModelMixin.Meta):
         unique_together = (('last_name', 'first_name', 'middle_name', 'degree'))
 
 class Lesson(models.Model):
@@ -144,3 +152,6 @@ class Lesson(models.Model):
 
     def __str__(self):
         return self.discipline.name
+
+    class Meta:
+        ordering = ('id',)
