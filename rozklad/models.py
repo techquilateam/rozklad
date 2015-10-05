@@ -141,11 +141,11 @@ class Lesson(models.Model):
             teachers_short_names.append(teacher.short_name())
         return teachers_short_names
 
-    def rooms_full_names(self):
-        rooms_full_names = []
+    def rooms_names(self):
+        rooms_names = []
         for room in self.rooms.all():
-            rooms_full_names.append(room.full_name())
-        return rooms_full_names
+            rooms_names.append(room.name)
+        return rooms_names
 
     def __str__(self):
         return self.discipline.name

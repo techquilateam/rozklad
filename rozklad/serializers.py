@@ -116,7 +116,7 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = (
             'id', 'number', 'day', 'week', 'type', 'discipline_name', 'discipline',
-            'groups_names', 'groups', 'teachers_short_names', 'teachers', 'rooms_full_names', 'rooms')
+            'groups_names', 'groups', 'teachers_short_names', 'teachers', 'rooms_names', 'rooms')
 
 class NestedLessonSerializer(serializers.ModelSerializer):
     discipline = DisciplineSerializer()
