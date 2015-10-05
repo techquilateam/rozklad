@@ -28,20 +28,19 @@ def timetable(request, lessons):
     result['data'] = {}
     
     for week_choice in Lesson.WEEK_CHOICES:
-        result['data'][week_choice[0]] = {}
-        result_week = result['data'][week_choice[0]]
-
         for day_choice in Lesson.DAY_CHOICES:
-            result_week[day_choice[0]] = {}
-            result_day = result_week[day_choice[0]]
-
             for number_choice in Lesson.NUMBER_CHOICES:
                 if lessons.filter(week=week_choice[0], day=day_choice[0], number=number_choice[0]).exists():
+                    if week_choice[0] not in result['data'].keys():
+                        result['data'][week_choice[0]] = {}
+                    if day_choice[0] not in result['data'][week_choice[0]].keys():
+                        result['data'][week_choice[0]][day_choice[0]] = {}
+
+                    result_day = result['data'][week_choice[0]][day_choice[0]]
+
                     lesson = lessons.get(week=week_choice[0], day=day_choice[0], number=number_choice[0])
                     lesson_serializer = serializers.NestedLessonSerializer(lesson, context={'request': request})
                     result_day[number_choice[0]] = lesson_serializer.data
-                else:
-                    result_day[number_choice[0]] = {}
 
     return Response(result)
 

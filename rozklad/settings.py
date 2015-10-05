@@ -38,10 +38,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'rozklad',
+    'frontend',
 )
 
 MIDDLEWARE_CLASSES = (
+    'middlewares.multihost.MultiHostMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -53,6 +57,13 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'rozklad.urls'
+
+HOST_MIDDLEWARE_URLCONF_MAP = {
+    'rozklad.timenko.com': 'frontend.urls',
+    'api.rozklad.timenko.com': 'rozklad.urls',
+}
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 TEMPLATES = [
     {

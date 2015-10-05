@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="timetable">
+	<div class="container">
+		<!-- <div class="week" id="w--1">
+			<div class="day holiday" id="day--1">
+				<h1 class="day__title">Понеділок</h1>
+				<ul>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+				</ul>
+			</div>
+			<div class="day" id="day--2">
+				<h1 class="day__title">Вівторок</h1>
+				<ul>
+					<li>
+						<h1 class="lesson__title">Компютерна електроніка. </h1>
+						<p class="lesson__room">344-19</p>
+						<p class="lesson__teacher">Сапсай Т. Г.</p>
+					</li>
+					<li>
+						<h1 class="lesson__title">Соціальна психологія</h1>
+						<p class="lesson__room">344-19</p>
+						<p class="lesson__teacher">Волянюк Н. Ю.</p>
+					</li>
+					<li class="window">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title">Арх. комп'ютерів</h1>
+						<p class="lesson__room">345-19</p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li class="nolesson">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+				</ul>
+			</div>
+			<div class="day" id="day--3">
+				<h1 class="day__title">Середа</h1>
+				<ul>
+					<li class="window">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title">Компютерна електроніка. </h1>
+						<p class="lesson__room">344-19</p>
+						<p class="lesson__teacher">Сапсай Т. Г.</p>
+					</li>
+					<li class="nolesson">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li class="nolesson">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li class="nolesson">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+				</ul>
+			</div>
+			<div class="day holiday" id="day--4">
+				<h1 class="day__title">Четвер</h1>
+				<ul>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+				</ul>
+			</div>
+			<div class="day" id="day--5">
+				<h1 class="day__title">П'ятниця</h1>
+				<ul>
+					<li class="window">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title">Соціальна психологія</h1>
+						<p class="lesson__room">344-19</p>
+						<p class="lesson__teacher">Волянюк Н. Ю.</p>
+					</li>
+					<li class="window">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title">Компютерна електроніка. </h1>
+						<p class="lesson__room">344-19</p>
+						<p class="lesson__teacher">Сапсай Т. Г.</p>
+					</li>
+					<li class="nolesson">
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+				</ul>
+			</div>
+			<div class="day holiday" id="day--6">
+				<h1 class="day__title">Субота</h1>
+				<ul>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+					<li>
+						<h1 class="lesson__title"></h1>
+						<p class="lesson__room"></p>
+						<p class="lesson__teacher"></p>
+					</li>
+				</ul>
+			</div>
+		</div> --><!-- 
+		<div class="clear"></div>
+		<div class="clear"></div> -->
+	</div>
+</section>
+<script>
+	$(document).ready(function() {
+		api_link = "http://api.rozklad.timenko.com/"
+		link = "http://rozklad.timenko.com/"
+		$.ajax({
+			method: "GET",
+			url: api_link + 'groups/1/timetable',
+			dataType: "json"
+		}).done(function(data) {
+			for (var i = 1; i <= 2; i++){
+				if (data.data.hasOwnProperty(i)) {
+					div_week = $('<div>', {
+						class: 'week',
+						id: 'w--' + i
+					})
+					div_clear = $('<div>', {
+						class: 'clear'
+					})
+					$('.timetable .container').append(div_week)
+					$('.timetable .container').append(div_clear)
+					for (j = 1; j <= 6; j++)
+					{
+						div_day = $('<div>', {
+							class: 'day',
+							id: 'day--' + j + 'w' + i
+						})
+						h1_daytitle = $('<h1>', {
+							class: "day__title"
+						})
+						div_day.append(h1_daytitle)
+						div_week.append(div_day)
+						if (data.data[i].hasOwnProperty(j)) {
+							switch (j) {
+								case 1:
+									h1_daytitle.text('Понеділок')
+									break
+								case 2:
+									h1_daytitle.text('Вівторок')
+									break
+								case 3:
+									h1_daytitle.text('Середа')
+									break
+								case 4:
+									h1_daytitle.text('Четвер')
+									break
+								case 5:
+									h1_daytitle.text('П\'ятниця')
+									break
+								case 6:
+									h1_daytitle.text('Субота')
+									break
+								default:
+									break
+							}
+							div_day.append('<ul></ul>')
+							var isWindow = false
+							for (k = 1; k <= 6; k++){
+								if (data.data[i][j].hasOwnProperty(k)){
+									var max = Object.keys(data.data[i][j]).sort().pop()
+									if (k == max)
+										isWindow = true
+
+									div_li = $('<li>')
+									h1_lesson__title = $('<h1>', {
+										class: 'lesson__title'
+									})
+									p_lesson__room = $('<p>', {
+										class: 'lesson__room'
+									})
+									p_lesson__teacher = $('<p>', {
+										class: 'lesson__teacher'
+									})
+									h1_lesson__title.text(data.data[i][j][k].discipline.name) 
+									var rooms = ''
+									data.data[i][j][k].rooms.forEach(function(entry) {
+										rooms += entry.full_name + '<br>'
+									})
+									p_lesson__room.html(rooms)
+									var teachers = ''
+									data.data[i][j][k].teachers.forEach(function(entry) {
+										teachers += entry.short_name + '<br>'
+									})
+									p_lesson__teacher.html(teachers)
+									div_li.append(h1_lesson__title).append(p_lesson__room).append(p_lesson__teacher)
+									div_day.find('ul').append(div_li)
+								} else {
+									if (!isWindow) {
+										div_li = $('<li>', {
+											class: "window"
+										})
+										div_day.find('ul').append(div_li)
+									}
+								}
+							}
+						}
+						else {
+							console.log('#day--' + j)
+							$('#day--' + j + 'w' + i).css('opacity', 0)
+						}
+					}
+				}
+			}
+				
+				if (data.data.hasOwnProperty(i))
+					console.log(data.data[i])
+		})
+	})
+</script>
+{% endblock %}
