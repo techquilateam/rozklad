@@ -34,10 +34,3 @@ for (i = 1; i < 7; i++)
 	$("w-1_list2").sortable("destroy");
 $('.day').removeClass('holiday')
 $('li').removeClass('nolesson').removeClass('window').addClass('moveAble').append('<i class="handle"></i><i class="edit"></i>')
-$('.edit').click(function(){
-	$('#overlay').css('opacity', 1).fadeIn(300)
-})
-$('.close').click(function(){
-	$('#overlay').animate({opacity: 0}, 300, function() {$(this).hide()})
-	return false
-})
