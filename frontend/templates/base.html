@@ -26,7 +26,8 @@
 					<button class="button">знайти</button>
 				</form>
 				{% if user.is_authenticated %}
-					<a href="#" class="login">{{ user.get_username }}</a>
+					<a href="#" class="login exit">Вийти</a>
+					<span class="login">{{ user.get_username }}</span>
 				{% else %}
 					<a href="#" class="login">Увійти</a>
 				{% endif %}
@@ -54,13 +55,11 @@
 			<div id="modal">
 				<h1 class="maintitle">Вікно логіну</h1>
 				<div class="content">
-					<form action="">
-						<input type="text" placeholder="Ім'я користувача" id="login_username_input">
-						<input type="text" placeholder="Пароль" id="login_password_input">
-						<p class="error">Перевірте правильність уведених даних</p>
-						<button name="" class="button close">закрити</button>
-						<button name="" class="button" id="login_button">Увійти</button>
-					</form>
+					<input type="text" placeholder="Ім'я користувача" id="login_username_input">
+					<input type="password" placeholder="Пароль" id="login_password_input">
+					<p class="error">Перевірте правильність уведених даних</p>
+					<button name="" class="button close">закрити</button>
+					<button name="" class="button" id="login_button">Увійти</button>
 				</div>
 			</div>
 		</div>
@@ -106,7 +105,12 @@
 		</script>
 		<script>
 			$(document).ready(function() {
-				$('.login, .edit').click(function(){
+				{% if not user.is_authenticated %}
+					$('.login').click(function(){
+						$('#overlay').css('opacity', 1).fadeIn(300)
+					})
+				{% endif %}
+				$('.edit').click(function(){
 					$('#overlay').css('opacity', 1).fadeIn(300)
 				})
 				$('.close').click(function(){
@@ -123,6 +127,20 @@
 							username: $("#login_username_input").val(),
 							password: $("#login_password_input").val()
 						}
+					}).done(function(data) {
+						if (data.result == "OK") {
+							window.location.reload()
+						}
+						if (data.result == "ERROR") {
+							$('.error').animate({opacity: 1}, 400)
+						}
+					})
+				})
+				$('.exit').click(function() {
+					$.ajax({
+						methond: "POST",
+						url: "/logout/",
+						dataType: "json"
 					}).done(function(data) {
 						if (data.result == "OK") {
 							window.location.reload()
