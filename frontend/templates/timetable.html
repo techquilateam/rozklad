@@ -191,14 +191,24 @@
 </section>
 <script>
 	$(document).ready(function() {
-		api_link = "http://api.rozklad.timenko.com/"
-		link = "http://rozklad.timenko.com/"
+		api_link = "http://{{ base.api_domain }}/"
+		
 		$.ajax({
 			method: "GET",
-			url: api_link + 'groups/1/timetable',
+			url: api_link + "{{ type }}/{{ id }}/",
+			dataType: "json",
+		}).done(function(data) {
+			$("#search__input").val(data.name.toUpperCase())
+		})
+
+		$("#searchbar select").val("{{ type }}")
+
+		$.ajax({
+			method: "GET",
+			url: api_link + "{{ type }}/{{ id }}/timetable/",
 			dataType: "json"
 		}).done(function(data) {
-			for (var i = 1; i <= 2; i++){
+			for (var i = 1; i <= 2; i++) {
 				if (data.data.hasOwnProperty(i)) {
 					div_week = $('<div>', {
 						class: 'week',
@@ -207,9 +217,11 @@
 					div_clear = $('<div>', {
 						class: 'clear'
 					})
+					
 					$('.timetable .container').append(div_week)
 					$('.timetable .container').append(div_clear)
-					for (j = 1; j <= 6; j++)
+					
+					for (var j = 1; j <= 6; j++)
 					{
 						div_day = $('<div>', {
 							class: 'day',
@@ -245,8 +257,8 @@
 							}
 							div_day.append('<ul></ul>')
 							var isWindow = false
-							for (k = 1; k <= 6; k++){
-								if (data.data[i][j].hasOwnProperty(k)){
+							for (var k = 1; k <= 6; k++) {
+								if (data.data[i][j].hasOwnProperty(k)) {
 									var max = Object.keys(data.data[i][j]).sort().pop()
 									if (k == max)
 										isWindow = true
@@ -262,16 +274,45 @@
 										class: 'lesson__teacher'
 									})
 									h1_lesson__title.text(data.data[i][j][k].discipline.name) 
-									var rooms = ''
-									data.data[i][j][k].rooms.forEach(function(entry) {
-										rooms += entry.full_name + '<br>'
-									})
-									p_lesson__room.html(rooms)
-									var teachers = ''
-									data.data[i][j][k].teachers.forEach(function(entry) {
-										teachers += entry.short_name + '<br>'
-									})
-									p_lesson__teacher.html(teachers)
+									
+									{% if type == 'groups' %}
+										var first_list = ''
+										data.data[i][j][k].rooms.forEach(function(entry) {
+											first_list += entry.name + '<br>'
+										})
+										p_lesson__room.html(first_list)
+										
+										var second_list = ''
+										data.data[i][j][k].teachers.forEach(function(entry) {
+											second_list += entry.short_name + '<br>'
+										})
+										p_lesson__teacher.html(second_list)
+									{% elif type == 'teachers' %}
+										var first_list = ''
+										data.data[i][j][k].rooms.forEach(function(entry) {
+											first_list += entry.name + '<br>'
+										})
+										p_lesson__room.html(first_list)
+										
+										var second_list = ''
+										data.data[i][j][k].groups.forEach(function(entry) {
+											second_list += entry.name + '<br>'
+										})
+										p_lesson__teacher.html(second_list)
+									{% else %}
+										var first_list = ''
+										data.data[i][j][k].groups.forEach(function(entry) {
+											first_list += entry.name + '<br>'
+										})
+										p_lesson__room.html(first_list)
+										
+										var second_list = ''
+										data.data[i][j][k].teachers.forEach(function(entry) {
+											second_list += entry.short_name + '<br>'
+										})
+										p_lesson__teacher.html(second_list)
+									{% endif %}
+
 									div_li.append(h1_lesson__title).append(p_lesson__room).append(p_lesson__teacher)
 									div_day.find('ul').append(div_li)
 								} else {
@@ -283,17 +324,12 @@
 									}
 								}
 							}
-						}
-						else {
-							console.log('#day--' + j)
+						} else {
 							$('#day--' + j + 'w' + i).css('opacity', 0)
 						}
 					}
 				}
 			}
-				
-				if (data.data.hasOwnProperty(i))
-					console.log(data.data[i])
 		})
 	})
 </script>

@@ -90,7 +90,7 @@ class RoomViewSet(viewsets.ModelViewSet):
     get_serializer_class = get_serializer_class
 
     filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
-    search_fields = ('^name')
+    search_fields = ('^name',)
     filter_fields = ('name', 'building')
 
     @detail_route(methods=['GET'])

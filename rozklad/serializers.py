@@ -5,15 +5,15 @@ from rest_framework import serializers
 from .models import Group, Building, Room, Discipline, Teacher, Lesson
 
 class GroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('id', 'name', 'okr', 'type')
-
     def validate_name(self, value):
         if not re.match('^[0-9a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ\-\(\)]*$', value):
             raise serializers.ValidationError('This value can only contain letters, numbers or -() symbols')
 
         return value.lower()
+
+    class Meta:
+        model = Group
+        fields = ('id', 'name', 'okr', 'type')
 
 class BuildingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,16 +21,30 @@ class BuildingSerializer(serializers.ModelSerializer):
         fields = ('id', 'number', 'latitude', 'longitude')
 
 class RoomSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        if '-' in data['name']:
+            try:
+                if int(data['name'].split('-')[-1]) != data['building'].number:
+                    raise
+                else:
+                    return data
+            except:
+                raise serializers.ValidationError('You cannot use \'-\' or a space character. \'-\' before building number will be added automatically')
+
+        data['name'] = data['name'] + '-' + str(data['building'].number)
+
+        return data
+
     class Meta:
         model = Room
-        fields = ('id', 'name', 'full_name', 'building')
+        fields = ('id', 'name', 'building')
 
 class NestedRoomSerializer(serializers.ModelSerializer):
     building = BuildingSerializer()
 
     class Meta:
         model = Room
-        fields = ('id', 'name', 'full_name', 'building')
+        fields = ('id', 'name', 'building')
 
 class DisciplineSerializer(serializers.ModelSerializer):
     class Meta:

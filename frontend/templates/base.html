@@ -16,10 +16,10 @@
 				</div>
 				<form action="" id="searchbar">
 					<select name="">
-						<option class="groups" selected="selected">Група</option>
-						<option class="teachers">Викладач</option>
-						<option class="disciplines">Предмет</option>
-						<option class="rooms">Аудиторія</option>
+						<option class="groups" value="groups" selected="selected">Група</option>
+						<option class="teachers" value="teachers">Викладач</option>
+						<option class="rooms" value="rooms">Аудиторія</option>
+						<option class="disciplines" value="disciplines">Предмет</option>
 					</select>
 					<input type="text" placeholder="Введіть запит" name="" id="search__input" autocomplete="off">
 					<button class="button">знайти</button>
@@ -51,9 +51,8 @@
 					top: $('header').height() * 1.1
 				})
 				$("#search__input").keyup(function() {
-					api_link = "http://api.rozklad.timenko.com/"
-					link = "http://rozklad.timenko.com/"
-					base_url = link + $('#searchbar option:selected').attr("class") + '/'
+					api_link = "http://{{ base.api_domain }}/"
+					base_url = '/' + $('#searchbar option:selected').attr("class") + '/'
 					base_api_url = api_link + $('#searchbar option:selected').attr("class") + '/?search='
 					if ($(this).val().length >= 2) {
 						$.ajax({

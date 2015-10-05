@@ -39,11 +39,8 @@ class Room(ModeratorsModelMixin):
     name = models.CharField(max_length=10)
     building = models.ForeignKey(Building)
 
-    def full_name(self):
-        return self.name + '-' + str(self.building.number)
-
     def __str__(self):
-        return self.full_name()
+        return self.name
 
     class Meta(ModeratorsModelMixin.Meta):
         unique_together = (('name', 'building'),)
