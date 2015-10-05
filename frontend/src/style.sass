@@ -69,6 +69,12 @@ header
 	#logo
 		float: left
 		margin: 20px 0 10px 50px
+		a
+			text-decoration: none
+			color: $white
+			@extend .transition
+		a:hover
+			color: $linkhover
 	#searchbar
 		position: absolute
 		top: 10px
@@ -77,8 +83,8 @@ header
 		width: 70%
 		overflow: auto
 		margin: auto
-		option[selected="selected"]
-			color: #e6e6e6
+		// option[selected="selected"]
+		// 	color: #e6e6e6
 		select
 			font-family: $font
 			font-size: 1em
@@ -98,7 +104,6 @@ header
 	@extend .transition
 	color: #777
 	z-index: 999
-	@extend .transition
 .login:hover
 	color: $linkhover
 footer
@@ -161,12 +166,21 @@ footer
 			h1, p
 				font-size: 1em
 				margin: 0
-			.lesson__room
+			.lesson__right
 				position: absolute
 				right: 10px
 				bottom: 5px
+			p
+				a
+					color: $dark
+					text-decoration: none
+					@extend .transition
+				a:hover
+					color: $darker
+					text-decoration: underline
 		li.window
 			background: #e6e6e6
+			border-bottom: 1px solid #c0c0c0
 		li.nolesson
 			display: none
 .day.holiday
@@ -233,8 +247,8 @@ footer
 			color: $white
 		.content
 			padding: 25px
-			option[selected="selected"]
-				color: #e6e6e6
+			// option[selected="selected"]
+			// 	color: #e6e6e6
 			select
 				font-family: $font
 				font-size: 1em
@@ -258,3 +272,51 @@ footer
 				float: right
 			.button.close:after
 				background: $red
+#search_proposals
+	background-color: $white
+	position: absolute
+	width: 40%
+	margin: auto
+	overflow: auto
+	left: 0
+	right: 0
+	z-index: 999
+	top: 67px
+	color: $dark
+	display: none
+	@extend .shadow
+	@extend .transition
+	padding: 5px 25px
+	ul
+		margin: 0
+		padding: 0
+		li
+			list-style-type: none
+			padding: 5px 0
+			text-transform: uppercase
+			a
+				color: $dark
+				text-decoration: none
+				display: inline-block
+				width: 100%
+#index_block
+	max-width: 600px
+	margin: 75px auto
+	.title
+		text-align: center
+	#shield
+		margin: 25px auto
+		width: 255px
+		height: 361px
+		background-image: url('../img/shield.png')
+		background-size: 100% 100%
+	p
+		padding-left: 20px
+.one_half
+	float: left
+	margin-right: 4%
+	position: relative
+	width: 48%
+.last 
+	margin-right: 0px !important
+	clear: right
