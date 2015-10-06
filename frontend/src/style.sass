@@ -160,11 +160,12 @@ footer
 			font-size: 0.7em
 			padding: 5px 10px
 			background: $white
-			height: 70px
+			height: 90px
 			border-bottom: 1px solid #e6e6e6
 			width: $containerwidth / 6.299999 - 20
 			display: block
 			position: relative
+			@extend .transition
 			h1, p
 				font-size: 1em
 				margin: 0
@@ -213,19 +214,27 @@ footer
 		-webkit-transform: rotate(0deg)
 		transform: rotate(0deg)
 		background: linear-gradient(to bottom, #000 0%, #000 5%, transparent 5%, transparent 5%, #000 5%, #000 5%, transparent 5%, transparent 80%, #000 80%, #000 100%)
-	.edit
-		height: 11px
-		width: 11px
-		background: url('../img/edit.png')
-		display: block
-		position: absolute
-		opacity: 0.2
-		cursor: pointer
-		right: 10px
-		top: 10px
-		@extend .transition
-	.edit:hover
-		opacity: 0.5	
+.edit
+	height: 11px
+	width: 11px
+	background: url('../img/edit.png')
+	display: block
+	position: absolute
+	opacity: 0.2
+	cursor: pointer
+	right: 10px
+	top: 10px
+	@extend .transition
+.edit:hover
+	opacity: 0.5	
+.plus
+	@extend .edit
+	background: url('../img/add.png')
+	opacity: 0.5
+	height: 12px
+	width: 12px
+.plus:hover
+	opacity: 1
 #w--1
 	height: 650px
 #overlay
@@ -241,6 +250,7 @@ footer
 		width: 500px
 		background-color: $white
 		border-radius: 5px
+		position: relative
 		@extend .shadow
 		.maintitle
 			font-size: 1.1em
@@ -258,7 +268,7 @@ footer
 				outline: none
 				border: 1px solid $dark
 				display: block
-				width: 100%
+				width: 98.8%
 				margin-bottom: 25px
 			.error
 				line-height: 0
@@ -327,3 +337,10 @@ footer
 .last 
 	margin-right: 0px !important
 	clear: right
+#delete
+	@extend .edit
+	width: 20px
+	height: 20px
+	background-image: url('../img/delete.png')
+	right: 30px
+	top: 25px

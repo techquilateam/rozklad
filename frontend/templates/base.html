@@ -7,7 +7,7 @@
 		<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
 		<!-- <link rel="stylesheet" href="../static/css/style.css"> -->
 		<meta charset="utf-8">
-		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="/static/js/jquery-2.1.4.min.js"></script>
 	</head>
 	<body>
 		<header>
@@ -51,6 +51,7 @@
 				<div class="clear"></div>
 			</div>
 		</footer>
+		{% if not user.is_authenticated %}
 		<div id="overlay" class="modal_login">
 			<div id="modal">
 				<h1 class="maintitle">Вікно логіну</h1>
@@ -63,6 +64,7 @@
 				</div>
 			</div>
 		</div>
+		{% endif %}
 		<script>
 			$(document).ready(function() {
 				$('#search_proposals').css({
@@ -110,9 +112,6 @@
 						$('#overlay').css('opacity', 1).fadeIn(300)
 					})
 				{% endif %}
-				$('.edit').click(function(){
-					$('#overlay').css('opacity', 1).fadeIn(300)
-				})
 				$('.close').click(function(){
 					$('#overlay').animate({opacity: 0}, 300, function() {$(this).hide()})
 					return false

@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<section class="timetable">
+		<div class="container">
+		</div>
+	</section>
+	<div id="overlay">
+		<div id="modal">
+			<h1 class="maintitle">Редагування пари</h1>
+			<i id="delete"></i>
+			<div class="content">
+				<select id="edit_lesson_type">
+					<option value="null">Тип пари</option>
+					<option value="0">Лекція</option>
+					<option value="1">Практика</option>
+					<option value="2">Лабораторна</option>
+				</select>
+				<input type="text" placeholder="Назва пари" id="edit_lesson_name">
+				<input type="text" placeholder="Викладачі" id="edit_lesson_teachers">
+				<input type="text" placeholder="Кабінет" id="edit_lesson_rooms">
+				<button class="button close">закрити</button>
+				<button class="button" id="edit_lesson_button">Зберегти</button>
+			</div>
+		</div>
+	</div>
+	<script>
+		$(document).ready(function() {
+			var week, day, lesson
+			api_link = "http://{{ base.api_domain }}/"
+			$.ajax({
+				method: "GET",
+				url: api_link + "{{ type }}/{{ id }}/",
+				dataType: "json",
+			}).done(function(data) {
+				$("#search__input").val(data.name.toUpperCase())
+				$('head title').append(' - ' + data.name.toUpperCase())
+			})
+
+			$("#searchbar select").val("{{ type }}")
+			var data_all
+			$.ajax({
+				method: "GET",
+				url: api_link + "{{ type }}/{{ id }}/timetable/",
+				dataType: "json"
+			}).done(function(data) {
+				data_all = data.data
+				for (var i = 1; i <= 2; i++) {
+					if (data.data.hasOwnProperty(i)) {
+						div_week = $('<div>', {
+							class: 'week',
+							id: 'w--' + i
+						})
+						div_clear = $('<div>', {
+							class: 'clear'
+						})
+						
+						$('.timetable .container').append(div_week)
+						$('.timetable .container').append(div_clear)
+						
+						for (var j = 1; j <= 6; j++)
+						{
+							div_day = $('<div>', {
+								class: 'day',
+								id: 'day--' + j + 'w' + i
+							})
+							h1_daytitle = $('<h1>', {
+								class: "day__title"
+							})
+							div_day.append(h1_daytitle)
+							ul = $('<ul>', {
+								id: "w-" + i + "_list-" + j
+							})
+							div_day.append(ul)
+							div_week.append(div_day)
+							switch (j) {
+								case 1:
+									h1_daytitle.text('Понеділок')
+									break
+								case 2:
+									h1_daytitle.text('Вівторок')
+									break
+								case 3:
+									h1_daytitle.text('Середа')
+									break
+								case 4:
+									h1_daytitle.text('Четвер')
+									break
+								case 5:
+									h1_daytitle.text('П\'ятниця')
+									break
+								case 6:
+									h1_daytitle.text('Субота')
+									break
+								default:
+									break
+							}
+							for (var k = 1; k <= 6; k++) {
+								h1_lesson__title = $('<h1>', {
+									class: 'lesson__title'
+								})
+								p_lesson__right = $('<p>', {
+									class: 'lesson__right'
+								})
+								p_lesson__left = $('<p>', {
+									class: 'lesson__left'
+								})
+								handle = $('<i>', {
+									// class: 'handle'
+								})
+								if (data.data[i].hasOwnProperty(j)) {
+									if (data.data[i][j].hasOwnProperty(k)) {
+										var div_li = $('<li>', {
+											class: 'moveAble',
+											id: 'w'+ i + 'd' + j + 'l' + k,
+											'data-week': i,
+											'data-day': j,
+											'data-lesson': k
+										})
+										edit = $('<i>', {
+											class: 'edit'
+										})
+										div_li.append(handle).append(edit)
+										h1_lesson__title.text(data.data[i][j][k].discipline.name) 
+										
+										{% if type == 'groups' %}
+											var first_list = ''
+											data.data[i][j][k].rooms.forEach(function(entry) {
+												first_list += '<a href="/rooms/' + entry.id + '">' + entry.name + '</a><br>'
+											})
+											p_lesson__right.html(first_list)
+											
+											var second_list = ''
+											data.data[i][j][k].teachers.forEach(function(entry) {
+												second_list += '<a href="/teachers/' + entry.id + '">' + entry.short_name + '<br>'
+											})
+											p_lesson__left.html(second_list)
+										{% elif type == 'teachers' %}
+											var first_list = ''
+											data.data[i][j][k].rooms.forEach(function(entry) {
+												first_list += '<a href="/rooms/' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
+											})
+											p_lesson__right.html(first_list)
+											
+											var second_list = ''
+											data.data[i][j][k].groups.forEach(function(entry) {
+												second_list += '<a href="/groups/' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
+											})
+											p_lesson__left.html(second_list)
+										{% else %}
+											var first_list = ''
+											data.data[i][j][k].groups.forEach(function(entry) {
+												first_list += '<a href="/groups/' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
+											})
+											p_lesson__right.html(first_list)
+											
+											var second_list = ''
+											data.data[i][j][k].teachers.forEach(function(entry) {
+												second_list += '<a href="/teachers/' + entry.id + '">' + entry.short_name + '<br>'
+											})
+											p_lesson__left.html(second_list)
+										{% endif %}
+									} else {
+										plus = $('<i>', {
+											class: 'plus'
+										})
+										var div_li = $('<li>', {
+											class: 'window',
+											id: 'w'+ i + 'd' + j + 'l' + k,
+											'data-week': i,
+											'data-day': j,
+											'data-lesson': k
+										})
+										div_li.append(plus)
+									} 
+								} else {
+									plus = $('<i>', {
+										class: 'plus'
+									})
+									var div_li = $('<li>', {
+										class: 'window',
+										id: 'w'+ i + 'd' + j + 'l' + k,
+										'data-week': i,
+										'data-day': j,
+										'data-lesson': k
+									})
+									div_li.append(plus)
+								} 
+								div_li.append(h1_lesson__title).append(p_lesson__right).append(p_lesson__left)
+								div_day.find('ul').append(div_li)
+							}
+						}
+					} 
+				}
+			})
+			$(document).on('click', '.plus', function() {
+				$('#overlay').css('opacity', 1).fadeIn(300)
+				$("#edit_lesson_teachers").val('')
+				$("#edit_lesson_type").val('null')
+				$("#edit_lesson_name").val('')
+				$("#edit_lesson_rooms").val('')
+			})
+			$(document).on('click', '.edit', '.plus', function() {
+				$("#edit_lesson_teachers").val('')
+				$("#edit_lesson_type").val('null')
+				$("#edit_lesson_name").val('')
+				$("#edit_lesson_rooms").val('')
+				$('#overlay').css('opacity', 1).fadeIn(300)
+				var week = $(this).parent().attr('data-week')
+				var day = $(this).parent().attr('data-day')
+				var lesson = $(this).parent().attr('data-lesson')
+				$('#edit_lesson_name').val(data_all[week][day][lesson].discipline.name)
+				if (data_all[week][day][lesson].type == null)
+					$("#edit_lesson_type").val('null')
+				else
+					$("#edit_lesson_type").val(data_all[week][day][lesson].type)
+				teachersName = ''
+				data_all[week][day][lesson].teachers.forEach(function(entry) {
+					teachersName += entry.full_name + ', '
+				})
+				$("#edit_lesson_teachers").val(teachersName)
+				roomsName = ''
+				data_all[week][day][lesson].rooms.forEach(function(entry) {
+					roomsName += entry.name + ', '
+				})
+				$("#edit_lesson_rooms").val(roomsName)
+			})
+		})
+		$(document).on('click', '#edit_lesson_button', function() {
+			if (($("#edit_lesson_rooms").val() == '') 
+				&& ($("#edit_lesson_teachers").val() == '')
+				&& ($("#edit_lesson_name").val() == '')) {
+				$('#w' + week + 'd' + day + 'l' + lesson).addClass('window')
+				$('#w' + week + 'd' + day + 'l' + lesson).find('.edit').removeClass('edit').addClass('plus')
+			}
+		})
+		$(document).on('click', '.lesson_name', function() {
+			$('#search_proposals').fadeOut(300)
+			$('#search_proposals ul li').remove()
+			$("#edit_lesson_name").val($(this).text())
+		})
+		$(document).on('click', '.room_name', function() {
+			$('#search_proposals').fadeOut(300)
+			$('#search_proposals ul li').remove()
+			$("#edit_lesson_rooms").val($(this).text())
+		})
+		$(document).on('click', '.teacher_name', function() {
+			$('#search_proposals').fadeOut(300)
+			$('#search_proposals ul li').remove()
+			$("#edit_lesson_teachers").val($(this).text())
+		})
+		$("#edit_lesson_name").keyup(function() {
+			api_link = "http://{{ base.api_domain }}/"
+			if ($(this).val().length >= 2) {
+				$.ajax({
+					method: "GET",
+					url: api_link + '/disciplines/?search='  + $("#edit_lesson_name").val(),
+					dataType: "json"
+				}).done(function(data) {
+					$('#search_proposals ul li').remove()
+					if (data.results.length == 0) {
+						$('#search_proposals').fadeOut(300)
+					} else {
+						$('#search_proposals').fadeIn(300)
+						data.results.forEach(function(entry) {
+							li = $('<li>')
+							a = $('<a>', {
+								href: '#',
+								class: 'lesson_name'
+							})
+							a.text(entry.name)
+							li.append(a)
+							$('#search_proposals ul').append(li)
+						})
+					}
+				})
+			} else {
+				$('#search_proposals').fadeOut(300)
+				$('#search_proposals ul li').remove()
+			}
+		})
+		$("#edit_lesson_rooms").keyup(function() {
+			api_link = "http://{{ base.api_domain }}/"
+			if ($(this).val().length >= 2) {
+				$.ajax({
+					method: "GET",
+					url: api_link + '/rooms/?search='  + $("#edit_lesson_teachers").val(),
+					dataType: "json"
+				}).done(function(data) {
+					$('#search_proposals ul li').remove()
+					if (data.results.length == 0) {
+						$('#search_proposals').fadeOut(300)
+					} else {
+						$('#search_proposals').fadeIn(300)
+						data.results.forEach(function(entry) {
+							li = $('<li>')
+							a = $('<a>', {
+								href: '#',
+								class: 'room_name'
+							})
+							a.text(entry.name)
+							li.append(a)
+							$('#search_proposals ul').append(li)
+						})
+					}
+				})
+			} else {
+				$('#search_proposals').fadeOut(300)
+				$('#search_proposals ul li').remove()
+			}
+		})
+		$("#edit_lesson_teachers").keyup(function() {
+			api_link = "http://{{ base.api_domain }}/"
+			if ($(this).val().length >= 2) {
+				$.ajax({
+					method: "GET",
+					url: api_link + '/teachers/?search='  + $("#edit_lesson_teachers").val(),
+					dataType: "json"
+				}).done(function(data) {
+					$('#search_proposals ul li').remove()
+					if (data.results.length == 0) {
+						$('#search_proposals').fadeOut(300)
+					} else {
+						$('#search_proposals').fadeIn(300)
+						data.results.forEach(function(entry) {
+							li = $('<li>')
+							a = $('<a>', {
+								href: '#',
+								class: 'teacher_name'
+							})
+							a.text(entry.name)
+							li.append(a)
+							$('#search_proposals ul').append(li)
+						})
+					}
+				})
+			} else {
+				$('#search_proposals').fadeOut(300)
+				$('#search_proposals ul li').remove()
+			}
+		})
+	</script>
+{% endblock %}

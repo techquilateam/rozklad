@@ -24,7 +24,10 @@ def timetable(request, id, type):
     context['id'] = id
     context['type'] = type
 
-    return render(request, 'timetable.html', context)
+    if request.user.is_authenticated():
+        return render(request, 'timetable_edit.html', context)
+    else:
+        return render(request, 'timetable.html', context)
 
 @require_http_methods(['POST'])
 def auth_login(request):
