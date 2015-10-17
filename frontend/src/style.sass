@@ -1,11 +1,12 @@
-@import url("https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700,300&subset=latin,cyrillic-ext")
-$darker: #222
+@charset "utf-8"
+$darker: #012e3e
 $white: #fff
-$dark: #333
-$linkhover: #00B945
-$font: "Open Sans Condensed", sans-serif
+$dark: #012e3e
+$linkhover: #2194be
+$font: "Open Sans Condensed", Arial, sans-serif
 $containerwidth: 1280px
 $red: #FF6140
+$blue: #00729b
 .transition
 	-webkit-transition: all 0.2s
 	-moz-transition: all 0.2s
@@ -15,6 +16,7 @@ body
 	padding: 0
 	font-family: $font
 	font-size: 20px
+	color: $white
 	@extend .background
 .clear 
 	clear: both
@@ -91,18 +93,32 @@ header
 			padding: 5px 10px
 			outline: none
 			border: 1px solid #fff
+			border-radius: 0
+			background: #fff
+			width: 105px
+			-webkit-appearance: none
+			-moz-appearance: none
+			text-indent: 0.01px
+			text-overflow: ''
+			color: black
+			-ms-appearance: none
+			appearance: none !important
+			background-image: url('../img/arrow.png')
+			background-position: right center
+			background-repeat: no-repeat
 		input
 			@extend select
 			padding: 6px 10px
 			width: 300px
 			margin-left: -5px
+			background: #fff
 .login
 	float: right
 	padding-bottom: 0
 	margin-top: 20px
 	text-decoration: none
 	@extend .transition
-	color: #777
+	color: #cfcfcf
 	z-index: 999
 .login:hover
 	color: $linkhover
@@ -114,29 +130,32 @@ footer
 	padding: 10px 0
 	font-size: 0.7em
 	color: $white
+	position: absolute
+	bottom: 0
 	@extend .shadow
 	.createdby
 		float: right
-		color: #777
+		color: #cfcfcf
 	.links
 		float: left
 	a
 		text-decoration: none
-		color: #777
+		color: #cfcfcf
 		@extend .transition	
 	a:hover
 		color: $linkhover
 		opacity: 1
 
 .background
-	background: rgb(255,255,255) /* Old browsers */
-	background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%) /* FF3.6+ */
-	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))) /* Chrome,Safari4+ */
-	background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* Chrome10+,Safari5.1+ */
-	background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* Opera 12+ */
-	background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* IE10+ */
-	background: radial-gradient(ellipse at center,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f4f4f4',GradientType=1 ) /* IE6-9 fallback on horizontal gradient */
+	// background: rgb(255,255,255) /* Old browsers */
+	// background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%) /* FF3.6+ */
+	// background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))) /* Chrome,Safari4+ */
+	// background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* Chrome10+,Safari5.1+ */
+	// background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* Opera 12+ */
+	// background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* IE10+ */
+	// background: radial-gradient(ellipse at center,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* W3C */
+	// filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f4f4f4',GradientType=1 ) /* IE6-9 fallback on horizontal gradient */
+	background: $blue
 .shadow
 	-webkit-box-shadow: 0px 0px 25px -5px rgba(0,0,0,0.56)
 	-moz-box-shadow: 0px 0px 25px -5px rgba(0,0,0,0.56)
@@ -159,6 +178,7 @@ footer
 			list-style-type: none
 			font-size: 0.7em
 			padding: 5px 10px
+			color: black
 			background: $white
 			height: 90px
 			border-bottom: 1px solid #e6e6e6
@@ -251,6 +271,7 @@ footer
 		background-color: $white
 		border-radius: 5px
 		position: relative
+		color: black
 		@extend .shadow
 		.maintitle
 			font-size: 1.1em
@@ -267,19 +288,35 @@ footer
 				padding: 5px 10px
 				outline: none
 				border: 1px solid $dark
+				color: black
 				display: block
+				border-radius: 0
 				width: 98.8%
-				margin-bottom: 25px
+				margin-bottom: 10px
+				-webkit-appearance: none
+				-moz-appearance: none
+				text-indent: 0.01px
+				text-overflow: ''
+				-ms-appearance: none
+				appearance: none !important
+				background-image: url('../img/arrow.png')
+				background-position: right center
+				background-repeat: no-repeat
+			label
+				margin-bottom: 10px
+				display: inline-block
 			.error
 				line-height: 0
 				color: $red
 				opacity: 0
 			input
 				@extend select
+				background: #fff
 				padding: 6px 10px
 				width: 94%
 			.button
 				background: $dark
+				-webkit-appearance: none
 			.button:hover
 				color: $white
 				opacity: .9
@@ -287,7 +324,8 @@ footer
 				background: $linkhover
 			.button.close
 				float: right
-			.button.close:after
+			.button.close:after,
+			.button.close.active
 				background: $red
 #search_proposals
 	background-color: $white
@@ -337,10 +375,45 @@ footer
 .last 
 	margin-right: 0px !important
 	clear: right
-#delete
+#close
 	@extend .edit
 	width: 20px
 	height: 20px
-	background-image: url('../img/delete.png')
+	background-image: url('../img/close.png')
 	right: 30px
 	top: 25px
+div.editable
+	padding: 6px 10px
+	width: 94%
+	border: 1px solid #333
+	outline: none
+	margin-bottom: 10px
+	min-height: 30px
+div.editable span 
+	color: #fff
+	background: $blue
+	padding: 5px 10px
+	line-height: 40px
+	margin-right: 10px
+	border-radius: 10px
+	font-size: 0.8em
+	-moz-user-select: text
+	-khtml-user-select: text
+	-webkit-user-select: text
+	-o-user-select: text
+.week
+	position: relative
+.week:before 
+	display: block
+	content: 'Тиждень 1'
+	font-size: 1.3em
+	font-weight: bold
+	opacity: 0.1
+	position: absolute
+	left: 90px
+	top: 25px
+#w--2:before
+	content: 'Тиждень 2'
+#overlay #modal .content input#edit_lesson_name.inputcorrect
+	background: #f1fbff
+	@extend .transition

@@ -8,7 +8,7 @@
 	<div id="overlay">
 		<div id="modal">
 			<h1 class="maintitle">Редагування пари</h1>
-			<i id="delete"></i>
+			<i id="close"></i>
 			<div class="content">
 				<select id="edit_lesson_type">
 					<option value="null">Тип пари</option>
@@ -16,18 +16,22 @@
 					<option value="1">Практика</option>
 					<option value="2">Лабораторна</option>
 				</select>
-				<input type="text" placeholder="Назва пари" id="edit_lesson_name">
-				<input type="text" placeholder="Викладачі" id="edit_lesson_teachers">
-				<input type="text" placeholder="Кабінет" id="edit_lesson_rooms">
-				<button class="button close">закрити</button>
+				<label for="edit_lesson_name">Назва пари:</label>
+				<input type="text" id="edit_lesson_name">
+				<label for="edit_lesson_teachers">Викладачі:</label>
+				<div class="editable" contenteditable="true" id="edit_lesson_teachers">&nbsp;</div>
+				<label for="edit_lesson_rooms">Кабінети:</label>
+				<div class="editable" contenteditable="true" id="edit_lesson_rooms">&nbsp;</div>
+				<p class="error">Перевірте правильність уведених даних</p>
+				<button class="button close active">Видалити</button>
 				<button class="button" id="edit_lesson_button">Зберегти</button>
 			</div>
 		</div>
 	</div>
 	<script>
 		$(document).ready(function() {
-			var week, day, lesson
 			api_link = "http://{{ base.api_domain }}/"
+			
 			$.ajax({
 				method: "GET",
 				url: api_link + "{{ type }}/{{ id }}/",
@@ -38,7 +42,7 @@
 			})
 
 			$("#searchbar select").val("{{ type }}")
-			var data_all
+
 			$.ajax({
 				method: "GET",
 				url: api_link + "{{ type }}/{{ id }}/timetable/",
@@ -121,42 +125,42 @@
 											class: 'edit'
 										})
 										div_li.append(handle).append(edit)
-										h1_lesson__title.text(data.data[i][j][k].discipline.name) 
+										h1_lesson__title.text(data.data[i][j][k].discipline.name).attr('data-id', data.data[i][j][k].discipline.id)
 										
 										{% if type == 'groups' %}
 											var first_list = ''
 											data.data[i][j][k].rooms.forEach(function(entry) {
-												first_list += '<a href="/rooms/' + entry.id + '">' + entry.name + '</a><br>'
+												first_list += '<a href="/rooms/' + entry.id + '" data-id="' + entry.id + '">' + entry.name + '</a><br>'
 											})
 											p_lesson__right.html(first_list)
 											
 											var second_list = ''
 											data.data[i][j][k].teachers.forEach(function(entry) {
-												second_list += '<a href="/teachers/' + entry.id + '">' + entry.short_name + '<br>'
+												second_list += '<a href="/teachers/' + entry.id + '" data-id="' + entry.id + '">' + entry.short_name + '<br>'
 											})
 											p_lesson__left.html(second_list)
 										{% elif type == 'teachers' %}
 											var first_list = ''
 											data.data[i][j][k].rooms.forEach(function(entry) {
-												first_list += '<a href="/rooms/' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
+												first_list += '<a href="/rooms/' + entry.id + '" data-id="' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
 											})
 											p_lesson__right.html(first_list)
 											
 											var second_list = ''
 											data.data[i][j][k].groups.forEach(function(entry) {
-												second_list += '<a href="/groups/' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
+												second_list += '<a href="/groups/' + entry.id + '" data-id="' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
 											})
 											p_lesson__left.html(second_list)
 										{% else %}
 											var first_list = ''
 											data.data[i][j][k].groups.forEach(function(entry) {
-												first_list += '<a href="/groups/' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
+												first_list += '<a href="/groups/' + entry.id + '" data-id="' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
 											})
 											p_lesson__right.html(first_list)
 											
 											var second_list = ''
 											data.data[i][j][k].teachers.forEach(function(entry) {
-												second_list += '<a href="/teachers/' + entry.id + '">' + entry.short_name + '<br>'
+												second_list += '<a href="/teachers/' + entry.id + '" data-id="' + entry.id + '">' + entry.short_name + '<br>'
 											})
 											p_lesson__left.html(second_list)
 										{% endif %}
@@ -193,151 +197,218 @@
 					} 
 				}
 			})
-			$(document).on('click', '.plus', function() {
-				$('#overlay').css('opacity', 1).fadeIn(300)
-				$("#edit_lesson_teachers").val('')
+
+			//ections with editable content
+
+			//open the modal by click on icon
+			$(document).on('click', '.edit, .plus', function() {
 				$("#edit_lesson_type").val('null')
 				$("#edit_lesson_name").val('')
-				$("#edit_lesson_rooms").val('')
-			})
-			$(document).on('click', '.edit', '.plus', function() {
-				$("#edit_lesson_teachers").val('')
-				$("#edit_lesson_type").val('null')
-				$("#edit_lesson_name").val('')
-				$("#edit_lesson_rooms").val('')
+				$("#edit_lesson_teachers").html('')
+				$("#edit_lesson_rooms").html('')
+				$("p.error").css('opacity', 0)
 				$('#overlay').css('opacity', 1).fadeIn(300)
 				var week = $(this).parent().attr('data-week')
 				var day = $(this).parent().attr('data-day')
 				var lesson = $(this).parent().attr('data-lesson')
-				$('#edit_lesson_name').val(data_all[week][day][lesson].discipline.name)
-				if (data_all[week][day][lesson].type == null)
-					$("#edit_lesson_type").val('null')
-				else
-					$("#edit_lesson_type").val(data_all[week][day][lesson].type)
-				teachersName = ''
-				data_all[week][day][lesson].teachers.forEach(function(entry) {
-					teachersName += entry.full_name + ', '
-				})
-				$("#edit_lesson_teachers").val(teachersName)
-				roomsName = ''
-				data_all[week][day][lesson].rooms.forEach(function(entry) {
-					roomsName += entry.name + ', '
-				})
-				$("#edit_lesson_rooms").val(roomsName)
+
+				if ($(this).hasClass('edit')){
+					$("#edit_lesson_name").addClass('inputcorrect')
+					$('#edit_lesson_name').val(data_all[week][day][lesson].discipline.name).attr('data-id', data_all[week][day][lesson].discipline.id)
+					if (data_all[week][day][lesson].type == null)
+						$("#edit_lesson_type").val('null')
+					else
+						$("#edit_lesson_type").val(data_all[week][day][lesson].type)
+					teachersName = ''
+					data_all[week][day][lesson].teachers.forEach(function(entry) {
+						teachersName += '<span class="teacher" contenteditable="false" data-id="' + entry.id + '">' + entry.full_name + '</span>&nbsp;<br>'
+					})
+					$("#edit_lesson_teachers").html(teachersName)
+					roomsName = ''
+					data_all[week][day][lesson].rooms.forEach(function(entry) {
+						roomsName += '<span class="room" contenteditable="false" data-id="' + entry.id + '">' + entry.name + '</span>&nbsp;<br>'
+					})
+					$("#edit_lesson_rooms").html(roomsName)
+				}
 			})
-		})
-		$(document).on('click', '#edit_lesson_button', function() {
-			if (($("#edit_lesson_rooms").val() == '') 
-				&& ($("#edit_lesson_teachers").val() == '')
-				&& ($("#edit_lesson_name").val() == '')) {
-				$('#w' + week + 'd' + day + 'l' + lesson).addClass('window')
-				$('#w' + week + 'd' + day + 'l' + lesson).find('.edit').removeClass('edit').addClass('plus')
-			}
-		})
-		$(document).on('click', '.lesson_name', function() {
-			$('#search_proposals').fadeOut(300)
-			$('#search_proposals ul li').remove()
-			$("#edit_lesson_name").val($(this).text())
-		})
-		$(document).on('click', '.room_name', function() {
-			$('#search_proposals').fadeOut(300)
-			$('#search_proposals ul li').remove()
-			$("#edit_lesson_rooms").val($(this).text())
-		})
-		$(document).on('click', '.teacher_name', function() {
-			$('#search_proposals').fadeOut(300)
-			$('#search_proposals ul li').remove()
-			$("#edit_lesson_teachers").val($(this).text())
-		})
-		$("#edit_lesson_name").keyup(function() {
-			api_link = "http://{{ base.api_domain }}/"
-			if ($(this).val().length >= 2) {
-				$.ajax({
-					method: "GET",
-					url: api_link + '/disciplines/?search='  + $("#edit_lesson_name").val(),
-					dataType: "json"
-				}).done(function(data) {
-					$('#search_proposals ul li').remove()
-					if (data.results.length == 0) {
-						$('#search_proposals').fadeOut(300)
-					} else {
-						$('#search_proposals').fadeIn(300)
-						data.results.forEach(function(entry) {
-							li = $('<li>')
-							a = $('<a>', {
-								href: '#',
-								class: 'lesson_name'
+
+			//search for lesson name
+			$("#edit_lesson_name").keyup(function() {
+				if ($(this).val().length >= 2) {
+					$.ajax({
+						method: "GET",
+						url: api_link + '/disciplines/?search='  + $("#edit_lesson_name").val(),
+						dataType: "json"
+					}).done(function(data) {
+						$('#search_proposals ul li').remove()
+						if (data.results.length == 0) {
+							$('#search_proposals').fadeOut(300)
+						} else {
+							$('#search_proposals').fadeIn(300)
+							data.results.forEach(function(entry) {
+								li = $('<li>')
+								a = $('<a>', {
+									href: '#',
+									class: 'lesson_name',
+									'data-id': entry.id
+								})
+								a.text(entry.name)
+								li.append(a)
+								$('#search_proposals ul').append(li)
 							})
-							a.text(entry.name)
-							li.append(a)
-							$('#search_proposals ul').append(li)
-						})
-					}
-				})
-			} else {
+						}
+					})
+				} else {
+					$('#search_proposals').fadeOut(300)
+					$('#search_proposals ul li').remove()
+				}
+			})
+			function moveToEnd(el) {
+			    el.focus();
+			        if (typeof window.getSelection != "undefined"
+			                && typeof document.createRange != "undefined") {
+			            var range = document.createRange();
+			            range.selectNodeContents(el);
+			            range.collapse(false);
+			            var sel = window.getSelection();
+			            sel.removeAllRanges();
+			            sel.addRange(range);
+			        } else if (typeof document.body.createTextRange != "undefined") {
+			            var textRange = document.body.createTextRange();
+			            textRange.moveToElementText(el);
+			            textRange.collapse(false);
+			            textRange.select();
+			        }
+			}
+			function OnlyChildText(obj) {
+				var str = '';
+
+				obj.each(function(){
+				  var cN = this.childNodes;
+				  for (var i=0, l=cN&&cN.length||0; i<l; i++) {
+				    if (cN[i].nodeType == 3 && String(cN[i].nodeValue).split(/\s/).join('')) {
+				      str += cN[i].nodeValue;
+				    }
+				  }
+				});
+
+				return str
+			}
+			//search for teachers
+			$("#edit_lesson_teachers").keyup(function() {
+				moveToEnd(document.getElementById("edit_lesson_teachers"))
+				if (OnlyChildText($(this)).length >= 2) {
+					$.ajax({
+						method: "GET",
+						url: api_link + '/teachers/?search=' + OnlyChildText($(this)),
+						dataType: "json"
+					}).done(function(data) {
+						$('#search_proposals ul li').remove()
+						if (data.results.length == 0) {
+							$('#search_proposals').fadeOut(300)
+						} else {
+							$('#search_proposals').fadeIn(300)
+							data.results.forEach(function(entry) {
+								li = $('<li>')
+								a = $('<a>', {
+									href: '#',
+									class: 'teacher_name',
+									'data-id': entry.id
+								})
+								a.text(entry.name)
+								li.append(a)
+								$('#search_proposals ul').append(li)
+							})
+						}
+					})
+				} else {
+					$('#search_proposals').fadeOut(300)
+					$('#search_proposals ul li').remove()
+				}
+			})
+
+			//search for rooms
+			$("#edit_lesson_rooms").keyup(function() {
+				moveToEnd(document.getElementById("edit_lesson_rooms"))
+				if (OnlyChildText($(this)).length >= 2) {
+					$.ajax({
+						method: "GET",
+						url: api_link + '/rooms/?search='  + OnlyChildText($(this)),
+						dataType: "json"
+					}).done(function(data) {
+						$('#search_proposals ul li').remove()
+						if (data.results.length == 0) {
+							$('#search_proposals').fadeOut(300)
+						} else {
+							$('#search_proposals').fadeIn(300)
+							data.results.forEach(function(entry) {
+								li = $('<li>')
+								a = $('<a>', {
+									href: '#',
+									class: 'room_name',
+									'data-id': entry.id
+								})
+								a.text(entry.name)
+								li.append(a)
+								$('#search_proposals ul').append(li)
+							})
+						}
+					})
+				} else {
+					$('#search_proposals').fadeOut(300)
+					$('#search_proposals ul li').remove()
+				}
+			})
+
+			//choose of modal proposals
+			$(document).on('click', '#search_proposals a', function() {
+				if ($(this).hasClass('lesson_name')) {
+					$("#edit_lesson_name").val($(this).text())
+					$("#edit_lesson_name").addClass('inputcorrect').attr('data-id', $(this).attr('data-id'))
+				}
+				else if ($(this).hasClass('room_name')) {
+					childs = $("#edit_lesson_rooms").children()
+					$("#edit_lesson_rooms").empty()
+					$("#edit_lesson_rooms").append(childs, '<span class="room" contenteditable="false" data-id="' + $(this).attr('data-id') + '">' + $(this).text() + '</span>&nbsp;<br>')
+					moveToEnd(document.getElementById("edit_lesson_rooms"))
+				} else {
+					childs = $("#edit_lesson_teachers").children()
+					$("#edit_lesson_teachers").empty()
+					$("#edit_lesson_teachers").append(childs, '<span class="teacher" contenteditable="false" data-id="' + $(this).attr('data-id') + '">' + $(this).text() + '</span>&nbsp;<br>')
+					moveToEnd(document.getElementById("edit_lesson_teachers"))
+				}
 				$('#search_proposals').fadeOut(300)
 				$('#search_proposals ul li').remove()
-			}
-		})
-		$("#edit_lesson_rooms").keyup(function() {
-			api_link = "http://{{ base.api_domain }}/"
-			if ($(this).val().length >= 2) {
-				$.ajax({
-					method: "GET",
-					url: api_link + '/rooms/?search='  + $("#edit_lesson_teachers").val(),
-					dataType: "json"
-				}).done(function(data) {
-					$('#search_proposals ul li').remove()
-					if (data.results.length == 0) {
-						$('#search_proposals').fadeOut(300)
-					} else {
-						$('#search_proposals').fadeIn(300)
-						data.results.forEach(function(entry) {
-							li = $('<li>')
-							a = $('<a>', {
-								href: '#',
-								class: 'room_name'
-							})
-							a.text(entry.name)
-							li.append(a)
-							$('#search_proposals ul').append(li)
-						})
-					}
-				})
-			} else {
-				$('#search_proposals').fadeOut(300)
-				$('#search_proposals ul li').remove()
-			}
-		})
-		$("#edit_lesson_teachers").keyup(function() {
-			api_link = "http://{{ base.api_domain }}/"
-			if ($(this).val().length >= 2) {
-				$.ajax({
-					method: "GET",
-					url: api_link + '/teachers/?search='  + $("#edit_lesson_teachers").val(),
-					dataType: "json"
-				}).done(function(data) {
-					$('#search_proposals ul li').remove()
-					if (data.results.length == 0) {
-						$('#search_proposals').fadeOut(300)
-					} else {
-						$('#search_proposals').fadeIn(300)
-						data.results.forEach(function(entry) {
-							li = $('<li>')
-							a = $('<a>', {
-								href: '#',
-								class: 'teacher_name'
-							})
-							a.text(entry.name)
-							li.append(a)
-							$('#search_proposals ul').append(li)
-						})
-					}
-				})
-			} else {
-				$('#search_proposals').fadeOut(300)
-				$('#search_proposals ul li').remove()
-			}
+			})
+
+			$('#edit_lesson_name').keyup(function(e){
+				if ($(this).hasClass('inputcorrect')) {
+					$(this).removeClass('inputcorrect').val('').attr('data-id', '')
+		    		$('#search_proposals').animate({opacity: 0}, 300, function() {$(this).hide()})
+				}
+			})
+			$('#edit_lesson_teachers, #edit_lesson_rooms').keydown(function(e){
+			    if (e.keyCode == 13) {
+			    	document.execCommand('insertHTML', false, '<br>');
+		         	return false
+			    }
+			    if (e.keyCode == 8){
+			    	if (OnlyChildText($(this)).length == 0) {
+			    		$(this).find('span').last().remove()
+			    	}
+			    }
+			})
+
+			$(document).on('click', '#edit_lesson_button', function() {
+				if (($('#edit_lesson_name').val().length == 0) && //нужна проверка на то, правильно ли введено имя в соответствии с базой
+					($("#edit_lesson_rooms").children().length == 0) &&
+					($("#edit_lesson_teachers").children().length == 0)) 
+					$('.error').animate({opacity: 1}, 400)
+				else // надо решить, перезагружаем ли мы страницу после сохранение сам щит. 
+					 // если нет,то мне надо поебаться с перекрашиванием прикола и заполнением полей.
+					 // легче перезагрузить короч
+					$('#overlay').fadeOut(300)
+			})
 		})
 	</script>
 {% endblock %}

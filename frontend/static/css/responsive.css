@@ -1,0 +1,117 @@
+@media only screen and (max-width: 1600px){
+	footer{
+		position: relative;
+	}
+}
+@media only screen and (min-device-width: 480px) and (max-device-width: 1024px), only screen and (max-width: 950px){
+	footer{
+		position: relative;
+	}
+	header #searchbar{
+		width: 288px;
+		overflow: hidden;
+	}
+	header #logo{
+	    float: none;
+    	margin: 20px auto;
+	}
+	form#searchbar {
+	    position: relative;
+        font-size: 0.8em;
+	}
+	header #searchbar input{
+		width: 100px
+	}
+	header button{
+	    width: 288px;
+		display: block;
+	    float: none;
+	    margin: auto !important;
+	}
+	header #searchbar select,
+	header #searchbar input{
+		display: block;
+	    width: 288px;
+		width: 100%;
+		margin: 0;
+		border-bottom: 1px solid #ececec;
+		-webkit-appearance: none;
+	}
+	header #searchbar input{
+		padding-left: 14px;
+	}
+	.one_half{
+		float: none;
+		width: 90%;
+	}
+	footer .links,
+	footer .createdby{
+		float: none;
+		margin: auto;
+		text-align: center;
+	}
+	.login {
+	    margin-right: 10px;
+	    opacity: 0;
+        visibility: hidden;
+	}
+	.login.exit {
+	    margin-left: 10px;
+	}
+	div#search_proposals {
+	    top: 120px !Important;
+        width: 245px;
+    	font-size: 0.8em;
+	}
+	.day {
+	    float: none;
+	    width: 288px;
+	    margin: auto;
+	}
+	.day ul li {
+        width: 268px;
+	    font-size: 0.8em;
+	}
+	#overlay #modal{
+		width: 90%;
+		top: 0;
+		margin: 0 auto;
+		font-size: 0.8em;
+	}
+	#overlay #modal .content select{
+		width: 100%
+	}
+	#overlay #modal .content input,
+	div.editable{
+		width: 217px
+	}
+	#overlay #modal button{
+	    float: none;
+	    width: 100%;
+	    margin: auto;
+	}
+	#overlay #modal .content label{
+		margin-bottom: 0;
+	}
+	#w--1{
+		height: initial;
+	}
+	.week:before{
+		position: initial;
+		text-align: center;
+		opacity: 0.7;
+		margin: 5px auto;
+	}
+}
+
+select::-ms-expand {
+  	display: none;
+}
+@-moz-document url-prefix(){
+	.button{
+		padding: 4px 35px 36px;
+	}
+	.editable br{
+		display: none;
+	}
+}

@@ -62,5 +62,5 @@ target/
 *.sublime-project
 *.sublime-workspace
 *.css.map
-static/
+/static/
 touchme

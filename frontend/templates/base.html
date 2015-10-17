@@ -2,9 +2,14 @@
 <html lang="uk">
 	<head>
 		<title>Розклад КПІ</title>
+		<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="/static/css/normalize.css">
 		<link rel="stylesheet" href="/static/css/style.css">
+		<link rel="stylesheet" href="/static/css/responsive.css">
 		<link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
 		<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<!-- <link rel="stylesheet" href="../static/css/style.css"> -->
 		<meta charset="utf-8">
 		<script src="/static/js/jquery-2.1.4.min.js"></script>
@@ -20,7 +25,7 @@
 						<option class="groups" value="groups" selected="selected">Група</option>
 						<option class="teachers" value="teachers">Викладач</option>
 						<option class="rooms" value="rooms">Аудиторія</option>
-						<!-- <option class="disciplines" value="disciplines">Предмет</option> -->
+						<option class="disciplines" value="disciplines">Предмет</option>
 					</select>
 					<input type="text" placeholder="Введіть запит" name="" id="search__input" autocomplete="off">
 					<button class="button">знайти</button>
@@ -55,11 +60,12 @@
 		<div id="overlay" class="modal_login">
 			<div id="modal">
 				<h1 class="maintitle">Вікно логіну</h1>
+				<i id="close"></i>
 				<div class="content">
 					<input type="text" placeholder="Ім'я користувача" id="login_username_input">
 					<input type="password" placeholder="Пароль" id="login_password_input">
 					<p class="error">Перевірте правильність уведених даних</p>
-					<button name="" class="button close">закрити</button>
+					<!-- <button name="" class="button close">закрити</button> -->
 					<button name="" class="button" id="login_button">Увійти</button>
 				</div>
 			</div>
@@ -112,8 +118,9 @@
 						$('#overlay').css('opacity', 1).fadeIn(300)
 					})
 				{% endif %}
-				$('.close').click(function(){
+				$('#close').click(function(){
 					$('#overlay').animate({opacity: 0}, 300, function() {$(this).hide()})
+					$('#search_proposals').animate({opacity: 0}, 300, function() {$(this).hide()})
 					return false
 				})
 
