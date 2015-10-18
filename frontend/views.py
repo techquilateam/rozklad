@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
@@ -44,6 +45,49 @@ def timetable(request, type, id):
         queryset = Lesson.objects.filter(teachers=Teacher.objects.get(id=id))
     else:
         queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
+
+    initial_data = {}
+    initial_data['groups'] = []
+    initial_data['teachers'] = []
+    initial_data['rooms'] = []
+    initial_data['disciplines'] = []
+    for lesson in queryset:
+        for group in lesson.groups.all():
+            group_dict = {
+                'id': group.id,
+                'name': group.name,
+            }
+
+            if group_dict not in initial_data['groups']:
+                initial_data['groups'].append(group_dict)
+
+        for teacher in lesson.teachers.all():
+            teacher_dict = {
+                'id': teacher.id,
+                'name': teacher.name(),
+            }
+
+            if teacher_dict not in initial_data['teachers']:
+                initial_data['teachers'].append(teacher_dict)
+
+        for room in lesson.rooms.all():
+            room_dict = {
+                'id': room.id,
+                'name': room.name,
+            }
+
+            if room_dict not in initial_data['rooms']:
+                initial_data['rooms'].append(room_dict)
+    
+        discipline_dict = {
+            'id': lesson.discipline.id,
+            'name': lesson.discipline.name,
+        }
+
+        if discipline_dict not in initial_data['disciplines']:
+            initial_data['disciplines'].append(discipline_dict)
+
+    context['initial_data'] = json.dumps(initial_data)
 
     if request.user.is_authenticated():
         context['timetable'] = []
