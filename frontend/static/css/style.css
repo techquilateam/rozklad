@@ -412,3 +412,7 @@ div.editable span {
   background: #f1fbff; }
 
 /*# sourceMappingURL=style.css.map */
+
+.noday {
+  opacity: 0;
+}

@@ -3,6 +3,57 @@
 {% block content %}
 	<section class="timetable">
 		<div class="container">
+			{% for week in timetable %}
+				<div class="week" id="w--{% cycle '1' '2' as week_number %}">
+					{% for day in week %}
+						<div class="day{% if not day %} noday{% endif %}" id="day--{% cycle '1' '2' '3' '4' '5' '6' as day_number %}w{{ week_number }}">
+							<h1 class="day__title">{% cycle 'Понеділок' 'Вівторок' 'Середа' 'Четвер' "П'ятниця" 'Субота' %}</h1>
+							<ul id="w-{{ week_number }}_list-{{ day_number }}">
+								{% for lesson in day %}
+									{% cycle '1' '2' '3' '4' '5' '6' as number silent %}
+									{% if lesson %}
+										<li class="" id="w{{ week_number }}d{{ day_number }}l{{ number }}" data-week="{{ week_number }}" data-day="{{ day_number }}" data-lesson="{{ number }}">
+											<i class="edit"></i>
+											<h1 class="lesson__title" data-id="{{ lesson.discipline.id }}">{{ lesson.discipline.name }}</h1>
+											<p class="lesson__right">
+													{% if type == 'groups' or type == 'teachers' %}
+														{% for room in lesson.rooms.all %}
+															<a href="/rooms/{{ room.id }}" data-id="{{ room.id }}">{{ room.name }}</a>
+															<br>
+														{% endfor %}
+													{% else %}
+														{% for group in lesson.groups.all %}
+															<a href="/groups/{{ group.id }}" data-id="{{ group.id }}">{{ group.name|upper }}</a>
+															<br>
+														{% endfor %}
+													{% endif %}
+												</p>
+												<p class="lesson__left">
+													{% if type == 'groups' or type == 'rooms' %}
+														{% for teacher in lesson.teachers.all %}
+															<a href="/teachers/{{ teacher.id }}" data-id="{{ teacher.id }}">{{ teacher.short_name }}</a>
+															<br>
+														{% endfor %}
+													{% else %}
+														{% for group in lesson.groups.all %}
+															<a href="/groups/{{ group.id }}" data-id="{{ group.id }}">{{ group.name|upper }}</a>
+															<br>
+														{% endfor %}
+													{% endif %}
+												</p>
+										</li>
+									{% else %}
+										<li class="window" id="w{{ week_number }}d{{ day_number }}l{{ number }}" data-week="{{ week_number }}" data-day="{{ day_number }}" data-lesson="{{ number }}">
+											<i class="plus"></i>
+										</li>
+									{% endif %}
+								{% endfor %}
+							</ul>
+						</div>
+					{% endfor %}
+				</div>
+				<div class="clear"></div>
+			{% endfor %}
 		</div>
 	</section>
 	<div id="overlay">
@@ -31,172 +82,6 @@
 	<script>
 		$(document).ready(function() {
 			api_link = "http://{{ base.api_domain }}/"
-			
-			$.ajax({
-				method: "GET",
-				url: api_link + "{{ type }}/{{ id }}/",
-				dataType: "json",
-			}).done(function(data) {
-				$("#search__input").val(data.name.toUpperCase())
-				$('head title').append(' - ' + data.name.toUpperCase())
-			})
-
-			$("#searchbar select").val("{{ type }}")
-
-			$.ajax({
-				method: "GET",
-				url: api_link + "{{ type }}/{{ id }}/timetable/",
-				dataType: "json"
-			}).done(function(data) {
-				data_all = data.data
-				for (var i = 1; i <= 2; i++) {
-					if (data.data.hasOwnProperty(i)) {
-						div_week = $('<div>', {
-							class: 'week',
-							id: 'w--' + i
-						})
-						div_clear = $('<div>', {
-							class: 'clear'
-						})
-						
-						$('.timetable .container').append(div_week)
-						$('.timetable .container').append(div_clear)
-						
-						for (var j = 1; j <= 6; j++)
-						{
-							div_day = $('<div>', {
-								class: 'day',
-								id: 'day--' + j + 'w' + i
-							})
-							h1_daytitle = $('<h1>', {
-								class: "day__title"
-							})
-							div_day.append(h1_daytitle)
-							ul = $('<ul>', {
-								id: "w-" + i + "_list-" + j
-							})
-							div_day.append(ul)
-							div_week.append(div_day)
-							switch (j) {
-								case 1:
-									h1_daytitle.text('Понеділок')
-									break
-								case 2:
-									h1_daytitle.text('Вівторок')
-									break
-								case 3:
-									h1_daytitle.text('Середа')
-									break
-								case 4:
-									h1_daytitle.text('Четвер')
-									break
-								case 5:
-									h1_daytitle.text('П\'ятниця')
-									break
-								case 6:
-									h1_daytitle.text('Субота')
-									break
-								default:
-									break
-							}
-							for (var k = 1; k <= 6; k++) {
-								h1_lesson__title = $('<h1>', {
-									class: 'lesson__title'
-								})
-								p_lesson__right = $('<p>', {
-									class: 'lesson__right'
-								})
-								p_lesson__left = $('<p>', {
-									class: 'lesson__left'
-								})
-								handle = $('<i>', {
-									// class: 'handle'
-								})
-								if (data.data[i].hasOwnProperty(j)) {
-									if (data.data[i][j].hasOwnProperty(k)) {
-										var div_li = $('<li>', {
-											class: 'moveAble',
-											id: 'w'+ i + 'd' + j + 'l' + k,
-											'data-week': i,
-											'data-day': j,
-											'data-lesson': k
-										})
-										edit = $('<i>', {
-											class: 'edit'
-										})
-										div_li.append(handle).append(edit)
-										h1_lesson__title.text(data.data[i][j][k].discipline.name).attr('data-id', data.data[i][j][k].discipline.id)
-										
-										{% if type == 'groups' %}
-											var first_list = ''
-											data.data[i][j][k].rooms.forEach(function(entry) {
-												first_list += '<a href="/rooms/' + entry.id + '" data-id="' + entry.id + '">' + entry.name + '</a><br>'
-											})
-											p_lesson__right.html(first_list)
-											
-											var second_list = ''
-											data.data[i][j][k].teachers.forEach(function(entry) {
-												second_list += '<a href="/teachers/' + entry.id + '" data-id="' + entry.id + '">' + entry.short_name + '<br>'
-											})
-											p_lesson__left.html(second_list)
-										{% elif type == 'teachers' %}
-											var first_list = ''
-											data.data[i][j][k].rooms.forEach(function(entry) {
-												first_list += '<a href="/rooms/' + entry.id + '" data-id="' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
-											})
-											p_lesson__right.html(first_list)
-											
-											var second_list = ''
-											data.data[i][j][k].groups.forEach(function(entry) {
-												second_list += '<a href="/groups/' + entry.id + '" data-id="' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
-											})
-											p_lesson__left.html(second_list)
-										{% else %}
-											var first_list = ''
-											data.data[i][j][k].groups.forEach(function(entry) {
-												first_list += '<a href="/groups/' + entry.id + '" data-id="' + entry.id + '">' + entry.name.toUpperCase() + '<br>'
-											})
-											p_lesson__right.html(first_list)
-											
-											var second_list = ''
-											data.data[i][j][k].teachers.forEach(function(entry) {
-												second_list += '<a href="/teachers/' + entry.id + '" data-id="' + entry.id + '">' + entry.short_name + '<br>'
-											})
-											p_lesson__left.html(second_list)
-										{% endif %}
-									} else {
-										plus = $('<i>', {
-											class: 'plus'
-										})
-										var div_li = $('<li>', {
-											class: 'window',
-											id: 'w'+ i + 'd' + j + 'l' + k,
-											'data-week': i,
-											'data-day': j,
-											'data-lesson': k
-										})
-										div_li.append(plus)
-									} 
-								} else {
-									plus = $('<i>', {
-										class: 'plus'
-									})
-									var div_li = $('<li>', {
-										class: 'window',
-										id: 'w'+ i + 'd' + j + 'l' + k,
-										'data-week': i,
-										'data-day': j,
-										'data-lesson': k
-									})
-									div_li.append(plus)
-								} 
-								div_li.append(h1_lesson__title).append(p_lesson__right).append(p_lesson__left)
-								div_day.find('ul').append(div_li)
-							}
-						}
-					} 
-				}
-			})
 
 			//ections with editable content
 

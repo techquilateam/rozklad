@@ -1,13 +1,12 @@
 from collections import OrderedDict
 from django.contrib.auth.models import User
-from rest_framework import viewsets, pagination, filters, permissions
+from rest_framework import viewsets, pagination, filters
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
 from rest_framework.reverse import reverse
-from .models import Group, Building, Room, Discipline, Teacher, Lesson
+from data.models import Group, Building, Room, Discipline, Teacher, Lesson
 from . import serializers
-from . import permissions as rozklad_permissions
 
 def get_serializer_class(self):
     if not self.request.user.is_superuser:
@@ -44,28 +43,11 @@ def timetable(request, lessons):
 
     return Response(result)
 
-class ApiRoot(APIView):
-    def get(self, request, format=None):
-        api_root_dict = OrderedDict()
-        
-        api_root_dict['groups'] = reverse('group-list', request=request, format=format)
-        api_root_dict['buildings'] = reverse('building-list', request=request, format=format)
-        api_root_dict['rooms'] = reverse('room-list', request=request, format=format)
-        api_root_dict['disciplines'] = reverse('discipline-list', request=request, format=format)
-        api_root_dict['teachers'] = reverse('teacher-list', request=request, format=format)
-        api_root_dict['lessons'] = reverse('lesson-list', request=request, format=format)
-        
-        if request.user.is_authenticated():
-            api_root_dict['users'] = reverse('user-list', request=request, format=format)
-
-        return Response(api_root_dict)
-
-class GroupViewSet(viewsets.ModelViewSet):
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
     pagination_class = GlobalViewPagination
 
-    permission_classes = (rozklad_permissions.IsAdminOrModeratorOrReadOnly,)
     get_serializer_class = get_serializer_class
 
     filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
@@ -76,17 +58,16 @@ class GroupViewSet(viewsets.ModelViewSet):
     def timetable(self, request, pk, format=None):
         return timetable(request, Lesson.objects.filter(groups=Group.objects.get(pk=pk)))
 
-class BuildingViewSet(viewsets.ModelViewSet):
+class BuildingViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Building.objects.all()
     serializer_class = serializers.BuildingSerializer
     pagination_class = GlobalViewPagination
 
-class RoomViewSet(viewsets.ModelViewSet):
+class RoomViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Room.objects.all()
     serializer_class = serializers.RoomSerializer
     pagination_class = GlobalViewPagination
 
-    permission_classes = (rozklad_permissions.IsAdminOrModeratorOrReadOnly,)
     get_serializer_class = get_serializer_class
 
     filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
@@ -97,23 +78,21 @@ class RoomViewSet(viewsets.ModelViewSet):
     def timetable(self, request, pk, format=None):
         return timetable(request, Lesson.objects.filter(rooms=Room.objects.get(pk=pk)))
 
-class DisciplineViewSet(viewsets.ModelViewSet):
+class DisciplineViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Discipline.objects.all()
     serializer_class = serializers.DisciplineSerializer
     pagination_class = GlobalViewPagination
 
-    permission_classes = (rozklad_permissions.IsAdminOrModeratorOrReadOnly,)
     get_serializer_class = get_serializer_class
 
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'full_name')
 
-class TeacherViewSet(viewsets.ModelViewSet):
+class TeacherViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = serializers.TeacherSerializer
     pagination_class = GlobalViewPagination
 
-    permission_classes = (rozklad_permissions.IsAdminOrModeratorOrReadOnly,)
     get_serializer_class = get_serializer_class
 
     filter_backends = (filters.SearchFilter,)
@@ -123,16 +102,10 @@ class TeacherViewSet(viewsets.ModelViewSet):
     def timetable(self, request, pk, format=None):
         return timetable(request, Lesson.objects.filter(teachers=Teacher.objects.get(pk=pk)))
 
-class LessonViewSet(viewsets.ModelViewSet):
+class LessonViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Lesson.objects.all()
     serializer_class = serializers.LessonSerializer
     pagination_class = GlobalViewPagination
 
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('number', 'day', 'week', 'type', 'discipline', 'groups', 'teachers', 'rooms')
-
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = serializers.UserSerializer
-
-    permission_classes = (permissions.IsAuthenticated,)

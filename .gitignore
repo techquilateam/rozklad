@@ -64,3 +64,4 @@ target/
 *.css.map
 /static/
 touchme
+settings_secure.py
