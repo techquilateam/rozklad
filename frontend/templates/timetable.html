@@ -14,6 +14,7 @@
 										{% if lesson %}
 											<li>
 												<h1 class="lesson__title">{{ lesson.discipline.name }}</h1>
+												<i class="type" data-type="{{ lesson.type }}"></i>
 												<p class="lesson__right">
 													{% if type == 'groups' or type == 'teachers' %}
 														{% for room in lesson.rooms.all %}

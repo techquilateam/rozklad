@@ -14,6 +14,7 @@
 									{% if lesson %}
 										<li class="" id="w{{ week_number }}d{{ day_number }}l{{ number }}" data-week="{{ week_number }}" data-day="{{ day_number }}" data-lesson="{{ number }}">
 											<i class="edit"></i>
+											<i class="type" data-type="{{ lesson.type }}" alt="lalka"></i>
 											<h1 class="lesson__title" data-id="{{ lesson.discipline.id }}">{{ lesson.discipline.name }}</h1>
 											<p class="lesson__right">
 													{% if type == 'groups' or type == 'teachers' %}
@@ -62,7 +63,7 @@
 			<i id="close"></i>
 			<div class="content">
 				<select id="edit_lesson_type">
-					<option value="null">Тип пари</option>
+					<option value="None">Тип пари</option>
 					<option value="0">Лекція</option>
 					<option value="1">Практика</option>
 					<option value="2">Лабораторна</option>
@@ -89,7 +90,7 @@
 
 			//open the modal by click on icon
 			$(document).on('click', '.edit, .plus', function() {
-				$("#edit_lesson_type").val('null')
+				$("#edit_lesson_type").val('None')
 				$("#edit_lesson_name").val('')
 				$("#edit_lesson_teachers").html('')
 				$("#edit_lesson_rooms").html('')
@@ -98,30 +99,57 @@
 				var week = $(this).parent().attr('data-week')
 				var day = $(this).parent().attr('data-day')
 				var lesson = $(this).parent().attr('data-lesson')
-
+				var type = $(this).siblings('.type').attr('data-type')
+				var id_lesson = $(this).parent().find('.lesson__title').attr('data-id')
+				lesson__right_children = $(this).parent().find('.lesson__right a')
+				lesson__right_arr = []
+				for (i = 0;i < lesson__right_children.length;i++)
+					lesson__right_arr.push($(lesson__right_children[i]).attr('data-id'))
+				lesson__left_children = $(this).parent().find('.lesson__left a')
+				lesson__left_arr = []
+				for (i = 0;i < lesson__left_children.length;i++)
+					lesson__left_arr.push($(lesson__right_children[i]).attr('data-id'))
 				if ($(this).hasClass('edit')){
+					$('#overlay #modal .content .button.close.active').css('visibility', 'visible')
+					$('#overlay #modal .maintitle').text('Редагування пари')
 					$("#edit_lesson_name").addClass('inputcorrect')
-					$('#edit_lesson_name').val(data_all[week][day][lesson].discipline.name).attr('data-id', data_all[week][day][lesson].discipline.id)
-					if (data_all[week][day][lesson].type == null)
-						$("#edit_lesson_type").val('null')
+					discipline_name = ''
+					for (i = 0; i < data_preload.disciplines.length; i++)
+						if (data_preload.disciplines[i].id == id_lesson)
+							discipline_name = data_preload.disciplines[i].name
+					$('#edit_lesson_name').val(discipline_name).attr('data-id', id_lesson)
+					if (type == 'None') 
+						$("#edit_lesson_type").val('None')
 					else
-						$("#edit_lesson_type").val(data_all[week][day][lesson].type)
-					teachersName = ''
-					data_all[week][day][lesson].teachers.forEach(function(entry) {
-						teachersName += '<span class="teacher" contenteditable="false" data-id="' + entry.id + '">' + entry.full_name + '</span>&nbsp;<br>'
-					})
-					$("#edit_lesson_teachers").html(teachersName)
-					roomsName = ''
-					data_all[week][day][lesson].rooms.forEach(function(entry) {
-						roomsName += '<span class="room" contenteditable="false" data-id="' + entry.id + '">' + entry.name + '</span>&nbsp;<br>'
-					})
-					$("#edit_lesson_rooms").html(roomsName)
+						$("#edit_lesson_type").val(type)
+					teachersBlock = ''
+					teacherName = ''
+					for (i = 0; i < lesson__left_arr.length; i++) {
+						for (j = 0; j < data_preload.teachers.length; j++)
+							if (lesson__right_arr[i] == data_preload.teachers[j].id)
+								teacherName = data_preload.teachers[j].name
+						teachersBlock += '<span class="room" contenteditable="false" data-id="' + lesson__left_arr[i] + '">' + teacherName + '</span>&nbsp;<br>'
+					}
+					$("#edit_lesson_teachers").html(teachersBlock)
+					roomsBlock = ''
+					roomName = ''
+					for (i = 0; i < lesson__right_arr.length; i++) {
+						for (j = 0; j < data_preload.rooms.length; j++)
+							if (lesson__right_arr[i] == data_preload.rooms[j].id)
+								roomName = data_preload.rooms[j].name
+						roomsBlock += '<span class="room" contenteditable="false" data-id="' + lesson__right_arr[i] + '">' + roomName + '</span>&nbsp;<br>'
+					}
+					$("#edit_lesson_rooms").html(roomsBlock)
+				} else {
+					$('#overlay #modal .content .button.close.active').css('visibility', 'hidden')
+					$('#overlay #modal .maintitle').text('Додавання пари')
+					$("#edit_lesson_name").removeClass('inputcorrect')
 				}
 			})
 
 			//search for lesson name
 			$("#edit_lesson_name").keyup(function() {
-				if ($(this).val().length >= 2) {
+				if (($(this).val().length >= 2) && (!$("#edit_lesson_name").hasClass('inputcorrect'))) {
 					$.ajax({
 						method: "GET",
 						url: api_link + '/disciplines/?search='  + $("#edit_lesson_name").val(),
@@ -270,8 +298,11 @@
 
 			$('#edit_lesson_name').keyup(function(e){
 				if ($(this).hasClass('inputcorrect')) {
+					$('#search_proposals').addClass('noday')
 					$(this).removeClass('inputcorrect').val('').attr('data-id', '')
-		    		$('#search_proposals').animate({opacity: 0}, 300, function() {$(this).hide()})
+		    		$('#search_proposals').fadeOut(300)
+					$('#search_proposals ul li').remove()
+					$('#search_proposals').removeClass('noday')
 				}
 			})
 			$('#edit_lesson_teachers, #edit_lesson_rooms').keydown(function(e){

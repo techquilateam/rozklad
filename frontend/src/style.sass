@@ -222,18 +222,6 @@ footer
 .sortable-ghost
 	opacity: .5
 	@extend .shadow
-.moveAble
-	.handle:hover
-		opacity: 0.3
-		-ms-transform: rotate(180deg)
-		-webkit-transform: rotate(180deg)
-		transform: rotate(180deg)
-	.handle:active
-		opacity: 0.1
-		-ms-transform: rotate(0deg)
-		-webkit-transform: rotate(0deg)
-		transform: rotate(0deg)
-		background: linear-gradient(to bottom, #000 0%, #000 5%, transparent 5%, transparent 5%, #000 5%, #000 5%, transparent 5%, transparent 80%, #000 80%, #000 100%)
 .edit
 	height: 11px
 	width: 11px
@@ -417,3 +405,26 @@ div.editable span
 #overlay #modal .content input#edit_lesson_name.inputcorrect
 	background: #f1fbff
 	@extend .transition
+.noday
+	opacity: 0
+i.type 
+	width: 6px
+	height: 6px
+	display: block
+	position: absolute
+	background: #00782D
+	border-radius: 100%
+	bottom: 11px
+	left: 12px
+	opacity: 0.5
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
+	-moz-box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
+	box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
+	cursor: help
+	@extend .transition
+i.type[data-type = "1"]
+	background: #024C68
+i.type[data-type = "2"]
+	background: #A65600
+i.type:hover
+	opacity: 0.8

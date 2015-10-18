@@ -1,5 +1,5 @@
 @charset "UTF-8";
-.transition, .button, .button:after, header #logo a, .login, footer a, .day ul li, .day ul li p a, .handle, .edit, .plus, #close, #search_proposals, #overlay #modal .content input#edit_lesson_name.inputcorrect {
+.transition, .button, .button:after, header #logo a, .login, footer a, .day ul li, .day ul li p a, .handle, .edit, .plus, #close, #search_proposals, #overlay #modal .content input#edit_lesson_name.inputcorrect, i.type {
   -webkit-transition: all 0.2s;
   -moz-transition: all 0.2s;
   transition: all 0.2s; }
@@ -209,18 +209,6 @@ footer {
 .sortable-ghost {
   opacity: 0.5; }
 
-.moveAble .handle:hover {
-  opacity: 0.3;
-  -ms-transform: rotate(180deg);
-  -webkit-transform: rotate(180deg);
-  transform: rotate(180deg); }
-.moveAble .handle:active {
-  opacity: 0.1;
-  -ms-transform: rotate(0deg);
-  -webkit-transform: rotate(0deg);
-  transform: rotate(0deg);
-  background: linear-gradient(to bottom, #000 0%, #000 5%, transparent 5%, transparent 5%, #000 5%, #000 5%, transparent 5%, transparent 80%, #000 80%, #000 100%); }
-
 .edit, .plus, #close {
   height: 11px;
   width: 11px;
@@ -411,8 +399,31 @@ div.editable span {
 #overlay #modal .content input#edit_lesson_name.inputcorrect {
   background: #f1fbff; }
 
-/*# sourceMappingURL=style.css.map */
-
 .noday {
-  opacity: 0;
-}
+  opacity: 0; }
+
+i.type {
+  width: 6px;
+  height: 6px;
+  display: block;
+  position: absolute;
+  background: #00782D;
+  border-radius: 100%;
+  bottom: 11px;
+  left: 12px;
+  opacity: 0.5;
+  -webkit-box-shadow: 0px 0px 10px 0px #a4f43d;
+  -moz-box-shadow: 0px 0px 10px 0px #a4f43d;
+  box-shadow: 0px 0px 10px 0px #a4f43d;
+  cursor: help; }
+
+i.type[data-type="1"] {
+  background: #024C68; }
+
+i.type[data-type="2"] {
+  background: #A65600; }
+
+i.type:hover {
+  opacity: 0.8; }
+
+/*# sourceMappingURL=style.css.map */
