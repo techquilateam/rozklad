@@ -1,22 +1,8 @@
-from collections import OrderedDict
-from django.contrib.auth.models import User
 from rest_framework import viewsets, pagination, filters
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
-from rest_framework.views import APIView
-from rest_framework.reverse import reverse
 from data.models import Group, Building, Room, Discipline, Teacher, Lesson
 from . import serializers
-
-def get_serializer_class(self):
-    if not self.request.user.is_superuser:
-        return self.serializer_class
-
-    class AdminSerializerClass(self.serializer_class):
-        class Meta(self.serializer_class.Meta):
-            fields = self.serializer_class.Meta.fields + ('moderators',)
-
-    return AdminSerializerClass
 
 class GlobalViewPagination(pagination.LimitOffsetPagination):
     default_limit = 10
@@ -48,8 +34,6 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.GroupSerializer
     pagination_class = GlobalViewPagination
 
-    get_serializer_class = get_serializer_class
-
     filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
     search_fields = ('^name',)
     filter_fields = ('name', 'okr', 'type')
@@ -68,8 +52,6 @@ class RoomViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.RoomSerializer
     pagination_class = GlobalViewPagination
 
-    get_serializer_class = get_serializer_class
-
     filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
     search_fields = ('^name',)
     filter_fields = ('name', 'building')
@@ -83,8 +65,6 @@ class DisciplineViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.DisciplineSerializer
     pagination_class = GlobalViewPagination
 
-    get_serializer_class = get_serializer_class
-
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'full_name')
 
@@ -92,8 +72,6 @@ class TeacherViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = serializers.TeacherSerializer
     pagination_class = GlobalViewPagination
-
-    get_serializer_class = get_serializer_class
 
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^last_name', '^first_name', '^middle_name')

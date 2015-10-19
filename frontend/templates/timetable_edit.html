@@ -84,46 +84,43 @@
 		var data_preload = {{ initial_data|safe }}
 
 		$(document).ready(function() {
-			api_link = "http://{{ base.api_domain }}/"
-
-			//ections with editable content
-
 			//open the modal by click on icon
-			$(document).on('click', '.edit, .plus', function() {
-				$("#edit_lesson_type").val('None')
-				$("#edit_lesson_name").val('')
-				$("#edit_lesson_teachers").html('')
-				$("#edit_lesson_rooms").html('')
-				$("p.error").css('opacity', 0)
-				$('#overlay').css('opacity', 1).fadeIn(300)
-				var week = $(this).parent().attr('data-week')
-				var day = $(this).parent().attr('data-day')
-				var lesson = $(this).parent().attr('data-lesson')
-				var type = $(this).siblings('.type').attr('data-type')
-				var id_lesson = $(this).parent().find('.lesson__title').attr('data-id')
-				lesson__right_children = $(this).parent().find('.lesson__right a')
+			$(document).on("click", ".edit, .plus", function() {
+				$("#edit_lesson_type").val("None")
+				$("#edit_lesson_name").val("")
+				$("#edit_lesson_teachers").html("")
+				$("#edit_lesson_rooms").html("")
+				$("p.error").css("opacity", 0)
+				$("#overlay").css("opacity", 1).fadeIn(300)
+				var week = $(this).parent().attr("data-week")
+				var day = $(this).parent().attr("data-day")
+				var lesson = $(this).parent().attr("data-lesson")
+				var type = $(this).siblings(".type").attr("data-type")
+				var id_lesson = $(this).parent().find(".lesson__title").attr("data-id")
+				lesson__right_children = $(this).parent().find(".lesson__right a")
 				lesson__right_arr = []
-				for (i = 0;i < lesson__right_children.length;i++)
-					lesson__right_arr.push($(lesson__right_children[i]).attr('data-id'))
-				lesson__left_children = $(this).parent().find('.lesson__left a')
+				for (i = 0; i < lesson__right_children.length; i++)
+					lesson__right_arr.push($(lesson__right_children[i]).attr("data-id"))
+				lesson__left_children = $(this).parent().find(".lesson__left a")
 				lesson__left_arr = []
-				for (i = 0;i < lesson__left_children.length;i++)
-					lesson__left_arr.push($(lesson__right_children[i]).attr('data-id'))
-				if ($(this).hasClass('edit')){
-					$('#overlay #modal .content .button.close.active').css('visibility', 'visible')
-					$('#overlay #modal .maintitle').text('Редагування пари')
-					$("#edit_lesson_name").addClass('inputcorrect')
-					discipline_name = ''
+				for (i = 0; i < lesson__left_children.length; i++)
+					lesson__left_arr.push($(lesson__right_children[i]).attr("data-id"))
+				
+				if ($(this).hasClass("edit")) {
+					$("#overlay #modal .content .button.close.active").css("visibility", "visible")
+					$("#overlay #modal .maintitle").text("Редагування пари")
+					$("#edit_lesson_name").addClass("inputcorrect")
+					discipline_name = ""
 					for (i = 0; i < data_preload.disciplines.length; i++)
 						if (data_preload.disciplines[i].id == id_lesson)
 							discipline_name = data_preload.disciplines[i].name
-					$('#edit_lesson_name').val(discipline_name).attr('data-id', id_lesson)
-					if (type == 'None') 
-						$("#edit_lesson_type").val('None')
+					$("#edit_lesson_name").val(discipline_name).attr("data-id", id_lesson)
+					if (type == "None") 
+						$("#edit_lesson_type").val("None")
 					else
 						$("#edit_lesson_type").val(type)
-					teachersBlock = ''
-					teacherName = ''
+					teachersBlock = ""
+					teacherName = ""
 					for (i = 0; i < lesson__left_arr.length; i++) {
 						for (j = 0; j < data_preload.teachers.length; j++)
 							if (lesson__right_arr[i] == data_preload.teachers[j].id)
@@ -131,8 +128,8 @@
 						teachersBlock += '<span class="room" contenteditable="false" data-id="' + lesson__left_arr[i] + '">' + teacherName + '</span>&nbsp;<br>'
 					}
 					$("#edit_lesson_teachers").html(teachersBlock)
-					roomsBlock = ''
-					roomName = ''
+					roomsBlock = ""
+					roomName = ""
 					for (i = 0; i < lesson__right_arr.length; i++) {
 						for (j = 0; j < data_preload.rooms.length; j++)
 							if (lesson__right_arr[i] == data_preload.rooms[j].id)
@@ -141,104 +138,109 @@
 					}
 					$("#edit_lesson_rooms").html(roomsBlock)
 				} else {
-					$('#overlay #modal .content .button.close.active').css('visibility', 'hidden')
-					$('#overlay #modal .maintitle').text('Додавання пари')
-					$("#edit_lesson_name").removeClass('inputcorrect')
+					$("#overlay #modal .content .button.close.active").css("visibility", "hidden")
+					$("#overlay #modal .maintitle").text("Додавання пари")
+					$("#edit_lesson_name").removeClass("inputcorrect")
 				}
 			})
 
 			//search for lesson name
 			$("#edit_lesson_name").keyup(function() {
-				if (($(this).val().length >= 2) && (!$("#edit_lesson_name").hasClass('inputcorrect'))) {
+				if (($(this).val().length >= 2) && (!$("#edit_lesson_name").hasClass("inputcorrect"))) {
 					$.ajax({
 						method: "GET",
-						url: api_link + '/disciplines/?search='  + $("#edit_lesson_name").val(),
+						url: "/disciplines/search/?search="  + $("#edit_lesson_name").val(),
 						dataType: "json"
 					}).done(function(data) {
-						$('#search_proposals ul li').remove()
-						if (data.results.length == 0) {
-							$('#search_proposals').fadeOut(300)
+						data = data.data
+						$("#search_proposals ul li").remove()
+						if (data.length == 0) {
+							$("#search_proposals").fadeOut(300)
 						} else {
-							$('#search_proposals').fadeIn(300)
-							data.results.forEach(function(entry) {
-								li = $('<li>')
-								a = $('<a>', {
-									href: '#',
-									class: 'lesson_name',
-									'data-id': entry.id
+							$("#search_proposals").fadeIn(300)
+							data.forEach(function(entry) {
+								li = $("<li>")
+								a = $("<a>", {
+									href: "#",
+									class: "lesson_name",
+									"data-id": entry.id
 								})
 								a.text(entry.name)
 								li.append(a)
-								$('#search_proposals ul').append(li)
+								$("#search_proposals ul").append(li)
 							})
 						}
 					})
 				} else {
-					$('#search_proposals').fadeOut(300)
-					$('#search_proposals ul li').remove()
+					$("#search_proposals").fadeOut(300)
+					$("#search_proposals ul li").remove()
 				}
 			})
-			function moveToEnd(el) {
-			    el.focus();
-			        if (typeof window.getSelection != "undefined"
-			                && typeof document.createRange != "undefined") {
-			            var range = document.createRange();
-			            range.selectNodeContents(el);
-			            range.collapse(false);
-			            var sel = window.getSelection();
-			            sel.removeAllRanges();
-			            sel.addRange(range);
-			        } else if (typeof document.body.createTextRange != "undefined") {
-			            var textRange = document.body.createTextRange();
-			            textRange.moveToElementText(el);
-			            textRange.collapse(false);
-			            textRange.select();
-			        }
-			}
-			function OnlyChildText(obj) {
-				var str = '';
 
-				obj.each(function(){
-				  var cN = this.childNodes;
-				  for (var i=0, l=cN&&cN.length||0; i<l; i++) {
-				    if (cN[i].nodeType == 3 && String(cN[i].nodeValue).split(/\s/).join('')) {
-				      str += cN[i].nodeValue;
-				    }
-				  }
-				});
+			function moveToEnd(el) {
+				el.focus();
+				
+				if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+					var range = document.createRange();
+					range.selectNodeContents(el);
+					range.collapse(false);
+					var sel = window.getSelection();
+					sel.removeAllRanges();
+					sel.addRange(range);
+				} else if (typeof document.body.createTextRange != "undefined") {
+					var textRange = document.body.createTextRange();
+					textRange.moveToElementText(el);
+					textRange.collapse(false);
+					textRange.select();
+				}
+			}
+
+			function OnlyChildText(obj) {
+				var str = "";
+
+				obj.each(function() {
+					var cN = this.childNodes;
+					for (var i=0, l=cN&&cN.length||0; i<l; i++) {
+						if (cN[i].nodeType == 3 && String(cN[i].nodeValue).split(/\s/).join("")) {
+							str += cN[i].nodeValue;
+						}
+					}
+				})
 
 				return str
 			}
+
 			//search for teachers
 			$("#edit_lesson_teachers").keyup(function() {
 				moveToEnd(document.getElementById("edit_lesson_teachers"))
 				if (OnlyChildText($(this)).length >= 2) {
 					$.ajax({
 						method: "GET",
-						url: api_link + '/teachers/?search=' + OnlyChildText($(this)),
+						url: "/teachers/search/?search=" + OnlyChildText($(this)),
 						dataType: "json"
 					}).done(function(data) {
-						$('#search_proposals ul li').remove()
-						if (data.results.length == 0) {
-							$('#search_proposals').fadeOut(300)
+						data = data.data
+						$("#search_proposals ul li").remove()
+						if (data.length == 0) {
+							$("#search_proposals").fadeOut(300)
 						} else {
-							$('#search_proposals').fadeIn(300)
-							data.results.forEach(function(entry) {
-								li = $('<li>')
-								a = $('<a>', {
-									href: '#',
-									class: 'teacher_name',
-									'data-id': entry.id
+							$("#search_proposals").fadeIn(300)
+							data.forEach(function(entry) {
+								li = $("<li>")
+								a = $("<a>", {
+									href: "#",
+									class: "teacher_name",
+									"data-id": entry.id
 								})
 								a.text(entry.name)
 								li.append(a)
-								$('#search_proposals ul').append(li)
+								$("#search_proposals ul").append(li)
 							})
 						}
 					})
 				} else {
-					$('#search_proposals').fadeOut(300)
-					$('#search_proposals ul li').remove()
+					$("#search_proposals").fadeOut(300)
+					$("#search_proposals ul li").remove()
 				}
 			})
 
@@ -248,84 +250,86 @@
 				if (OnlyChildText($(this)).length >= 2) {
 					$.ajax({
 						method: "GET",
-						url: api_link + '/rooms/?search='  + OnlyChildText($(this)),
+						url: "/rooms/search/?search="  + OnlyChildText($(this)),
 						dataType: "json"
 					}).done(function(data) {
-						$('#search_proposals ul li').remove()
-						if (data.results.length == 0) {
-							$('#search_proposals').fadeOut(300)
+						data = data.data
+						$("#search_proposals ul li").remove()
+						if (data.length == 0) {
+							$("#search_proposals").fadeOut(300)
 						} else {
-							$('#search_proposals').fadeIn(300)
-							data.results.forEach(function(entry) {
-								li = $('<li>')
-								a = $('<a>', {
-									href: '#',
-									class: 'room_name',
-									'data-id': entry.id
+							$("#search_proposals").fadeIn(300)
+							data.forEach(function(entry) {
+								li = $("<li>")
+								a = $("<a>", {
+									href: "#",
+									class: "room_name",
+									"data-id": entry.id
 								})
 								a.text(entry.name)
 								li.append(a)
-								$('#search_proposals ul').append(li)
+								$("#search_proposals ul").append(li)
 							})
 						}
 					})
 				} else {
-					$('#search_proposals').fadeOut(300)
-					$('#search_proposals ul li').remove()
+					$("#search_proposals").fadeOut(300)
+					$("#search_proposals ul li").remove()
 				}
 			})
 
 			//choose of modal proposals
-			$(document).on('click', '#search_proposals a', function() {
-				if ($(this).hasClass('lesson_name')) {
+			$(document).on("click", "#search_proposals a", function() {
+				if ($(this).hasClass("lesson_name")) {
 					$("#edit_lesson_name").val($(this).text())
-					$("#edit_lesson_name").addClass('inputcorrect').attr('data-id', $(this).attr('data-id'))
+					$("#edit_lesson_name").addClass("inputcorrect").attr("data-id", $(this).attr("data-id"))
 				}
-				else if ($(this).hasClass('room_name')) {
+				else if ($(this).hasClass("room_name")) {
 					childs = $("#edit_lesson_rooms").children()
 					$("#edit_lesson_rooms").empty()
-					$("#edit_lesson_rooms").append(childs, '<span class="room" contenteditable="false" data-id="' + $(this).attr('data-id') + '">' + $(this).text() + '</span>&nbsp;<br>')
+					$("#edit_lesson_rooms").append(childs, '<span class="room" contenteditable="false" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '</span>&nbsp;<br>')
 					moveToEnd(document.getElementById("edit_lesson_rooms"))
 				} else {
 					childs = $("#edit_lesson_teachers").children()
 					$("#edit_lesson_teachers").empty()
-					$("#edit_lesson_teachers").append(childs, '<span class="teacher" contenteditable="false" data-id="' + $(this).attr('data-id') + '">' + $(this).text() + '</span>&nbsp;<br>')
+					$("#edit_lesson_teachers").append(childs, '<span class="teacher" contenteditable="false" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '</span>&nbsp;<br>')
 					moveToEnd(document.getElementById("edit_lesson_teachers"))
 				}
-				$('#search_proposals').fadeOut(300)
-				$('#search_proposals ul li').remove()
+				$("#search_proposals").fadeOut(300)
+				$("#search_proposals ul li").remove()
 			})
 
-			$('#edit_lesson_name').keyup(function(e){
-				if ($(this).hasClass('inputcorrect')) {
-					$('#search_proposals').addClass('noday')
-					$(this).removeClass('inputcorrect').val('').attr('data-id', '')
-		    		$('#search_proposals').fadeOut(300)
-					$('#search_proposals ul li').remove()
-					$('#search_proposals').removeClass('noday')
+			$("#edit_lesson_name").keyup(function(e){
+				if ($(this).hasClass("inputcorrect")) {
+					$("#search_proposals").addClass("noday")
+					$(this).removeClass("inputcorrect").val("").attr("data-id", "")
+					$("#search_proposals").fadeOut(300)
+					$("#search_proposals ul li").remove()
+					$("#search_proposals").removeClass("noday")
 				}
 			})
-			$('#edit_lesson_teachers, #edit_lesson_rooms').keydown(function(e){
-			    if (e.keyCode == 13) {
-			    	document.execCommand('insertHTML', false, '<br>');
-		         	return false
-			    }
-			    if (e.keyCode == 8){
-			    	if (OnlyChildText($(this)).length == 0) {
-			    		$(this).find('span').last().remove()
-			    	}
-			    }
+
+			$("#edit_lesson_teachers, #edit_lesson_rooms").keydown(function(e){
+				if (e.keyCode == 13) {
+					document.execCommand("insertHTML", false, "<br>");
+					return false
+				}
+				if (e.keyCode == 8) {
+					if (OnlyChildText($(this)).length == 0) {
+						$(this).find("span").last().remove()
+					}
+				}
 			})
 
-			$(document).on('click', '#edit_lesson_button', function() {
-				if (($('#edit_lesson_name').val().length == 0) && //нужна проверка на то, правильно ли введено имя в соответствии с базой
+			$(document).on("click", "#edit_lesson_button", function() {
+				if (($("#edit_lesson_name").val().length == 0) && //нужна проверка на то, правильно ли введено имя в соответствии с базой
 					($("#edit_lesson_rooms").children().length == 0) &&
-					($("#edit_lesson_teachers").children().length == 0)) 
-					$('.error').animate({opacity: 1}, 400)
+					($("#edit_lesson_teachers").children().length == 0))
+					$(".error").animate({opacity: 1}, 400)
 				else // надо решить, перезагружаем ли мы страницу после сохранение сам щит. 
 					 // если нет,то мне надо поебаться с перекрашиванием прикола и заполнением полей.
 					 // легче перезагрузить короч
-					$('#overlay').fadeOut(300)
+					$("#overlay").fadeOut(300)
 			})
 		})
 	</script>

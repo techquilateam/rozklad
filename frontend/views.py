@@ -1,25 +1,17 @@
 import json
-from django.http import HttpResponse, JsonResponse, Http404
+from django.http import HttpResponse, JsonResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
+from django.db.models import Q
 from settings import domains
-from data.models import Lesson, Group, Teacher, Room
-
-base_context = {
-    'domain': domains.FRONTEND_DOMAIN,
-    'api_domain': domains.API_DOMAIN,
-}
+from data.models import Lesson, Group, Teacher, Room, Building, Discipline
 
 def index(request):
-    context = {}
-    context['base'] = base_context
-
-    return render(request, 'index.html', context)
+    return render(request, 'index.html', {})
 
 def timetable(request, type, id):
     context = {}
-    context['base'] = base_context
 
     context['id'] = id
     context['type'] = type
@@ -132,6 +124,54 @@ def timetable(request, type, id):
                         context['timetable'][week][day].append(lesson)
 
         return render(request, 'timetable.html', context)
+
+@require_http_methods(['GET'])
+def search(request, type):
+    if 'search' not in request.GET.keys() or request.GET['search'] == '':
+        return HttpResponseBadRequest('Bad request')
+
+    search_str = request.GET['search']
+
+    result = {}
+
+    if type == 'groups':
+        groups = Group.objects.filter(name__istartswith=search_str)
+        result['data'] = [{'id': group.id, 'name': group.name} for group in groups]
+    elif type == 'teachers':
+        search_parts = search_str.split(' ')
+        search_parts = [part for part in search_parts if part != '']
+
+        if len(search_parts) > 0:
+            complex_lookup = Q()
+            for part in search_parts:
+                complex_lookup &= Q(last_name__istartswith=part) | Q(first_name__istartswith=part) | Q(middle_name__istartswith=part)
+
+            teachers = Teacher.objects.filter(complex_lookup)
+            result['data'] = [{'id': teacher.id, 'name': teacher.name()} for teacher in teachers]
+        else:
+            result['data'] = []
+    elif type == 'rooms':
+        rooms = Room.objects.filter(name__istartswith=search_str)
+        result['data'] = [{'id': room.id, 'name': room.name} for room in rooms]
+    else:
+        search_parts = search_str.split(' ')
+        search_parts = [part for part in search_parts if part != '']
+
+        if len(search_parts) > 0:
+            complex_lookup = Q()
+            for part in search_parts:
+                complex_lookup &= Q(name__icontains=part) | Q(full_name__icontains=part)
+
+            disciplines = Discipline.objects.filter(complex_lookup)
+            result['data'] = [{'id': discipline.id, 'name': discipline.name} for discipline in disciplines]
+        else:
+            result['data'] = []
+
+    return JsonResponse(result)
+
+@require_http_methods(['POST'])
+def edit_lesson(request):
+    return HttpResponse('OK')
 
 @require_http_methods(['POST'])
 def auth_login(request):

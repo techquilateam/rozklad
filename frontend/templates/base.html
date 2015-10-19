@@ -2,7 +2,7 @@
 <html lang="uk">
 	<head>
 		<title>Розклад КПІ</title>
-		<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="/static/css/normalize.css">
 		<link rel="stylesheet" href="/static/css/style.css">
 		<link rel="stylesheet" href="/static/css/responsive.css">
@@ -73,41 +73,43 @@
 		{% endif %}
 		<script>
 			$(document).ready(function() {
-				$('#search_proposals').css({
-					top: $('header').height() * 1.1
+				$("#search_proposals").css({
+					top: $("header").height() * 1.1
 				})
 				
 				$("#search__input").keyup(function() {
-					api_link = "http://{{ base.api_domain }}/"
-					base_url = '/' + $('#searchbar option:selected').attr("class") + '/'
-					base_api_url = api_link + $('#searchbar option:selected').attr("class") + '/?search='
+					var base_url = "/" + $("#searchbar option:selected").attr("class") + "/"
 					if ($(this).val().length >= 2) {
+						var search_url = "/" + $("#searchbar option:selected").attr("class") + "/search/?search=" + $("#search__input").val()
+
 						$.ajax({
 							method: "GET",
-							url: base_api_url + $("#search__input").val(),
+							url: search_url,
 							dataType: "json"
 						}).done(function(data) {
-							$('#search_proposals ul li').remove()
-							if (data.results.length == 0) {
-								$('#search_proposals').fadeOut(300)
+							data = data.data
+
+							$("#search_proposals ul li").remove()
+							if (data.length == 0) {
+								$("#search_proposals").fadeOut(300)
 							} else {
-								$('#search_proposals').fadeIn(300)
-								data.results.forEach(function(entry) {
-									li = $('<li>')
-									a = $('<a>', {
-										href: base_url + entry.id + '/'
+								$("#search_proposals").fadeIn(300)
+								data.forEach(function(entry) {
+									li = $("<li>")
+									a = $("<a>", {
+										href: base_url + entry.id + "/"
 									})
 									a.text(entry.name)
 									li.append(a)
-									$('#search_proposals ul').append(li)
+									$("#search_proposals ul").append(li)
 								})
 								
-								$('#searchbar').attr('action', base_url + data.results[0].id) + '/'
+								$("#searchbar").attr("action", base_url + data[0].id) + "/"
 							}
 						})
 					} else {
-						$('#search_proposals').fadeOut(300)
-						$('#search_proposals ul li').remove()
+						$("#search_proposals").fadeOut(300)
+						$("#search_proposals ul li").remove()
 					}
 				})
 			})
@@ -115,16 +117,16 @@
 		<script>
 			$(document).ready(function() {
 				{% if not user.is_authenticated %}
-					$('.login').click(function() {
-						$('#overlay').css('opacity', 1).fadeIn(300)
+					$(".login").click(function() {
+						$("#overlay").css("opacity", 1).fadeIn(300)
 					})
 				{% endif %}
-				$('#close').click(function() {
-					$('#overlay').animate({opacity: 0}, 300, function() {
+				$("#close").click(function() {
+					$("#overlay").animate({opacity: 0}, 300, function() {
 						$(this).hide()
 					})
 
-					$('#search_proposals').animate({opacity: 0}, 300, function() {
+					$("#search_proposals").animate({opacity: 0}, 300, function() {
 						$(this).hide()
 					})
 
@@ -145,12 +147,12 @@
 						if (data.result == "OK") {
 							window.location.reload()
 						} else {
-							$('.error').animate({opacity: 1}, 400)
+							$(".error").animate({opacity: 1}, 400)
 						}
 					})
 				})
 
-				$('.exit').click(function() {
+				$(".exit").click(function() {
 					$.ajax({
 						methond: "POST",
 						url: "/logout/",

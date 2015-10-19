@@ -1,14 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
 
-class ModeratorsModelMixin(models.Model):
-    moderators = models.ManyToManyField(User, blank=True)
-
+class IdOrderingModelAbstract(models.Model):
     class Meta:
         abstract = True
         ordering = ('id',)
 
-class Group(ModeratorsModelMixin):
+class Group(IdOrderingModelAbstract):
     OKR_CHOICES = (
         (0, 'bachelor'),
         (1, 'magister'),
@@ -27,7 +24,7 @@ class Group(ModeratorsModelMixin):
     def __str__(self):
         return self.name
 
-class Building(ModeratorsModelMixin):
+class Building(IdOrderingModelAbstract):
     number = models.IntegerField(unique=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
@@ -35,24 +32,24 @@ class Building(ModeratorsModelMixin):
     def __str__(self):
         return str(self.number)
 
-class Room(ModeratorsModelMixin):
+class Room(IdOrderingModelAbstract):
     name = models.CharField(max_length=10)
     building = models.ForeignKey(Building)
 
     def __str__(self):
         return self.name
 
-    class Meta(ModeratorsModelMixin.Meta):
+    class Meta(IdOrderingModelAbstract.Meta):
         unique_together = (('name', 'building'),)
 
-class Discipline(ModeratorsModelMixin):
+class Discipline(IdOrderingModelAbstract):
     name = models.TextField(unique=True)
     full_name = models.TextField(unique=True)
 
     def __str__(self):
         return self.name
 
-class Teacher(ModeratorsModelMixin):
+class Teacher(IdOrderingModelAbstract):
     last_name = models.TextField()
     first_name = models.TextField()
     middle_name = models.TextField()
@@ -84,10 +81,10 @@ class Teacher(ModeratorsModelMixin):
     def __str__(self):
         return self.name()
 
-    class Meta(ModeratorsModelMixin.Meta):
+    class Meta(IdOrderingModelAbstract.Meta):
         unique_together = (('last_name', 'first_name', 'middle_name', 'degree'))
 
-class Lesson(models.Model):
+class Lesson(IdOrderingModelAbstract):
     NUMBER_CHOICES = (
         (1, '1'),
         (2, '2'),
@@ -149,6 +146,3 @@ class Lesson(models.Model):
 
     def __str__(self):
         return self.discipline.name
-
-    class Meta:
-        ordering = ('id',)
