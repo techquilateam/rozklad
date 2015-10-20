@@ -24,6 +24,11 @@ class Group(IdOrderingModelAbstract):
     def __str__(self):
         return self.name
 
+    class Meta(IdOrderingModelAbstract.Meta):
+        permissions = (
+            ('edit_group_timetable', 'Edit Group Timetable'),
+        )
+
 class Building(IdOrderingModelAbstract):
     number = models.IntegerField(unique=True)
     latitude = models.FloatField()
@@ -41,6 +46,9 @@ class Room(IdOrderingModelAbstract):
 
     class Meta(IdOrderingModelAbstract.Meta):
         unique_together = (('name', 'building'),)
+        permissions = (
+            ('edit_room_timetable', 'Edit Room Timetable'),
+        )
 
 class Discipline(IdOrderingModelAbstract):
     name = models.TextField(unique=True)
@@ -83,6 +91,9 @@ class Teacher(IdOrderingModelAbstract):
 
     class Meta(IdOrderingModelAbstract.Meta):
         unique_together = (('last_name', 'first_name', 'middle_name', 'degree'))
+        permissions = (
+            ('edit_teacher_timetable', 'Edit Teacher Timetable'),
+        )
 
 class Lesson(IdOrderingModelAbstract):
     NUMBER_CHOICES = (
