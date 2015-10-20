@@ -94,7 +94,7 @@
 							if (data.length == 0) {
 								$("#search_proposals").fadeOut(300)
 							} else {
-								$("#search_proposals").fadeIn(300).css({"opacity": 1, "top": $("#search__input").offset().top + $("#search__input").outerHeight()}).outerWidth($("#search__input").outerWidth())
+								$("#search_proposals").fadeIn(300).css({"opacity": 1, "top": $("#search__input").offset().top + $("#search__input").outerHeight()}).outerWidth($("#search__input").outerWidth() + $("#searchbar select").outerWidth() + $("#searchbar button").outerWidth())
 								data.forEach(function(entry) {
 									li = $("<li>")
 									a = $("<a>", {
@@ -164,7 +164,7 @@
 						}
 					})
 				})
-				$("i.type").mousemove(function (eventObject) {
+				$('i.type[data-type="0"], i.type[data-type="1"], i.type[data-type="2"]').mousemove(function (eventObject) {
 			        $data_tooltip = $(this).attr("data-typename");
 			        $("#tooltip").text($data_tooltip)
 			                     .css({ 

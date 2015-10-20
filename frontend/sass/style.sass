@@ -71,12 +71,23 @@ header
 	#logo
 		float: left
 		margin: 20px 0 10px 50px
+		position: relative
 		a
 			text-decoration: none
 			color: $white
 			@extend .transition
 		a:hover
 			color: $linkhover
+	#logo:after
+		display: inline-block
+		content: 'beta'
+		color: #000
+		background-color: rgba(255,255,255,0.5)
+		position: absolute
+		top: 0
+		padding: 0 5px
+		font-size: 0.4em
+		right: -25px
 	#searchbar
 		position: absolute
 		top: 10px
@@ -131,7 +142,7 @@ footer
 	font-size: 0.7em
 	color: $white
 	position: absolute
-	bottom: 0
+	bottom: -3px
 	@extend .shadow
 	.createdby
 		float: right
@@ -145,7 +156,6 @@ footer
 	a:hover
 		color: $linkhover
 		opacity: 1
-
 .background
 	// background: rgb(255,255,255) /* Old browsers */
 	// background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%) /* FF3.6+ */
@@ -378,7 +388,8 @@ footer
 				border-bottom: 1px solid #fff
 #index_block
 	max-width: 600px
-	margin: 75px auto
+	margin: 50px auto
+	font-size: 0.9em
 	.title
 		text-align: center
 	#shield
@@ -389,6 +400,7 @@ footer
 		background-size: 100% 100%
 	p
 		padding-left: 20px
+		width: 325px
 .one_half
 	float: left
 	margin-right: 4%
@@ -407,14 +419,17 @@ footer
 #teachersblock,
 #roomsblock
 	margin-bottom: 10px
+	white-space: pre-wrap
+	line-height: 35px
 #teachersblock span,
 #roomsblock span
 	color: #fff
 	background: $blue
-	padding: 5px 10px
-	line-height: 40px
+	padding: 0 10px
+	line-height: 30px
 	margin-right: 10px
-	border-radius: 10px
+	border-radius: 20px
+	display: inline-block
 	font-size: 0.8em
 	-moz-user-select: text
 	-khtml-user-select: text
@@ -440,10 +455,9 @@ footer
 	content: 'Тиждень 1'
 	font-size: 1.3em
 	font-weight: bold
-	opacity: 0.1
-	position: absolute
-	left: 90px
-	top: 25px
+	opacity: 0.5
+	margin-left: 10px
+	margin-top: 15px
 #w--2:before
 	content: 'Тиждень 2'
 #overlay #modal .content input#edit_lesson_name.inputcorrect
@@ -463,13 +477,15 @@ i.type
 	-webkit-box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
 	-moz-box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
 	box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
-	cursor: help
 	@extend .transition
 i.type[data-type = "0"]
+	cursor: help
 	background: #00782D
 i.type[data-type = "1"]
+	cursor: help
 	background: #024C68
 i.type[data-type = "2"]
+	cursor: help
 	background: #A65600
 i.type:hover
 	opacity: 0.8
@@ -485,3 +501,7 @@ i.type:hover
 	color: white
 	opacity: 0.8
 	border-radius: 5px 
+#index_block .title
+	color: #012e3e
+#index_block #shield
+	background-image: url("../static/img/shield--gradient.png")

@@ -1,8 +1,3 @@
-@media only screen and (max-width: 1600px){
-	footer{
-		position: relative;
-	}
-}
 @media only screen and (min-device-width: 480px) and (max-device-width: 1024px), only screen and (max-width: 950px){
 	footer{
 		position: relative;
@@ -59,8 +54,7 @@
 	    margin-left: 10px;
 	}
 	div#search_proposals {
-	    top: 120px !Important;
-        width: 245px;
+        width: 238px !important;
     	font-size: 0.8em;
 	}
 	.day {
@@ -154,6 +148,23 @@
 	.day ul li:nth-child(6):before{
 		content: '6';
 	}
+	#index_block{
+		text-align: center;
+		width: 280px
+	}
+	#index_block p{
+		width: initial;
+		padding: 0
+	}
+	#index_block #shield {
+        width: 140px;
+	    background-size: 100%;
+	    height: 198px;
+	}
+	#logo:after{
+		right: initial !important;
+		margin-left: 5px !important;
+	}
 }
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px), only screen and (min-width: 749px) and (max-width: 950px){
 	.container{
@@ -168,6 +179,14 @@
         width: 268px;
 	    font-size: 0.8em;
 	}
+	#index_block{
+		width: 656px
+	}
+	#index_block p {
+	    width: 55%;
+	    margin: auto !important;
+	    padding: 0;
+	}
 }
 select::-ms-expand {
   	display: none;
@@ -178,5 +197,32 @@ select::-ms-expand {
 	}
 	.editable br{
 		display: none;
+	}
+}
+@media only screen and (min-width: 951px) and (max-width: 1300px) {
+	.container{
+		max-width: 1200px
+	}
+	.day{
+	    width: 190px;
+	}
+	.day ul li{
+		width: 170px
+	}
+	footer{
+		position: fixed;
+	}
+}
+@media only screen and (min-width: 1400px){
+	footer{
+		position: fixed;
+	}
+	#index_block{
+	    margin-top: 10%;
+	}
+}
+@media only screen and (max-width: 1400px){
+	footer{
+		position: relative;
 	}
 }
