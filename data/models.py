@@ -51,9 +51,9 @@ class Discipline(IdOrderingModelAbstract):
 
 class Teacher(IdOrderingModelAbstract):
     last_name = models.TextField()
-    first_name = models.TextField()
-    middle_name = models.TextField()
-    degree = models.TextField()
+    first_name = models.TextField(blank=True)
+    middle_name = models.TextField(blank=True)
+    degree = models.TextField(blank=True)
 
     def name(self):
         return self.last_name + ' ' + self.first_name + ' ' + self.middle_name
