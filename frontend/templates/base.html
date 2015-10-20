@@ -44,11 +44,12 @@
 			</ul>
 		</div>
 			{% block content %}{% endblock %}
+		<div id="tooltip"></div>
 		<p>&nbsp;</p>
 		<footer>
 			<div class="container">
 				<div class="links">
-					<a href="#">API</a>
+					<a href="#">API</a> &nbsp; <a href="http://telegram.me/kpibot" class="foretelegram">КПИ Бот</a>
 				</div>
 				<div class="createdby">
 					created by <a href="http://vk.com/antontimenko">Anton Timenko</a>, <a href="http://vk.com/vladkampov">Vlad Kampov</a> and <a href="http://vk.com/vlad_sidorenko">Vlad Sidorenko</a>
@@ -74,7 +75,7 @@
 		<script>
 			$(document).ready(function() {
 				$("#search_proposals").css({
-					top: $("header").height() * 1.1
+					// top: $("header").height() * 1.1
 				})
 				
 				$("#search__input").keyup(function() {
@@ -93,7 +94,7 @@
 							if (data.length == 0) {
 								$("#search_proposals").fadeOut(300)
 							} else {
-								$("#search_proposals").fadeIn(300)
+								$("#search_proposals").fadeIn(300).css({"opacity": 1, "top": $("#search__input").offset().top + $("#search__input").outerHeight()}).outerWidth($("#search__input").outerWidth())
 								data.forEach(function(entry) {
 									li = $("<li>")
 									a = $("<a>", {
@@ -163,6 +164,22 @@
 						}
 					})
 				})
+				$("i.type").mousemove(function (eventObject) {
+			        $data_tooltip = $(this).attr("data-typename");
+			        $("#tooltip").text($data_tooltip)
+			                     .css({ 
+			                         "top" : eventObject.pageY - 20,
+			                        "left" : eventObject.pageX + 20
+			                     })
+			                     .show();
+			    }).mouseout(function () {
+			        $("#tooltip").hide()
+			                     .text("")
+			                     .css({
+			                         "top" : 0,
+			                        "left" : 0
+			                     });
+			    });
 			})
 		</script>
 	</body>

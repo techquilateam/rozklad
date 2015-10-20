@@ -60,4 +60,11 @@
 		    height: initial;
 		}
 	</style>
+	<script>
+		$(document).ready(function() {
+			$('i.type[data-type="0"').attr('data-typename', 'Лекція')
+			$('i.type[data-type="1"').attr('data-typename', 'Практика')
+			$('i.type[data-type="2"').attr('data-typename', 'Лабораторна')
+		})
+	</script>
 {% endblock %}

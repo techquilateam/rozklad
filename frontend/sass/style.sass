@@ -254,7 +254,7 @@ footer
 	top: 0px
 	display: none
 	#modal
-		margin: 100px auto 0px auto
+		margin: 50px auto 0px auto
 		width: 500px
 		background-color: $white
 		border-radius: 5px
@@ -315,8 +315,42 @@ footer
 			.button.close:after,
 			.button.close.active
 				background: $red
+	#areyousure
+		position: absolute
+		z-index: 9999
+		top: 10px
+		display: none
+		left: 0
+		right: 0
+		overflow: auto
+		margin: auto
+		@extend #modal
+		.maintitle
+			margin: 0 auto
+		.content
+			text-align: center
+			p
+				margin-top: 0
+			.button
+				background: $dark
+				-webkit-appearance: none
+				float: none !important
+				width: 60%
+				margin: 5px auto
+			.button:hover
+				color: $white
+				opacity: .9
+			.button:after
+				background: $linkhover
+			#new_lesson:after
+				background: #37DC74
+			.button.close
+				float: right
+			.button.close:after,
+			.button.close.active
+				background: $red
 #search_proposals
-	background-color: $white
+	background-color: #F9F9F9
 	position: absolute
 	width: 40%
 	margin: auto
@@ -327,8 +361,7 @@ footer
 	top: 67px
 	color: $dark
 	display: none
-	@extend .shadow
-	@extend .transition
+	// @extend .shadow
 	padding: 5px 25px
 	ul
 		margin: 0
@@ -342,6 +375,7 @@ footer
 				text-decoration: none
 				display: inline-block
 				width: 100%
+				border-bottom: 1px solid #fff
 #index_block
 	max-width: 600px
 	margin: 75px auto
@@ -370,14 +404,11 @@ footer
 	background-image: url('../img/close.png')
 	right: 30px
 	top: 25px
-div.editable
-	padding: 6px 10px
-	width: 94%
-	border: 1px solid #333
-	outline: none
+#teachersblock,
+#roomsblock
 	margin-bottom: 10px
-	min-height: 30px
-div.editable span 
+#teachersblock span,
+#roomsblock span
 	color: #fff
 	background: $blue
 	padding: 5px 10px
@@ -389,6 +420,19 @@ div.editable span
 	-khtml-user-select: text
 	-webkit-user-select: text
 	-o-user-select: text
+#teachersblock span a,
+#roomsblock span a
+	width: 10px
+	height: 10px
+	background-image: url('../img/close.png')
+	background-size: 100% 100%
+	opacity: 0.3
+	display: inline-block
+	margin-left: 5px
+	@extend .transition
+#teachersblock span a:hover,
+#roomsblock span a:hover
+	opacity: 0.5
 .week
 	position: relative
 .week:before 
@@ -412,7 +456,6 @@ i.type
 	height: 6px
 	display: block
 	position: absolute
-	background: #00782D
 	border-radius: 100%
 	bottom: 11px
 	left: 12px
@@ -422,9 +465,23 @@ i.type
 	box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
 	cursor: help
 	@extend .transition
+i.type[data-type = "0"]
+	background: #00782D
 i.type[data-type = "1"]
 	background: #024C68
 i.type[data-type = "2"]
 	background: #A65600
 i.type:hover
 	opacity: 0.8
+
+#tooltip 
+	z-index: 9999
+	position: absolute
+	display: none
+	top: 0px
+	left: 0px
+	background-color: $dark
+	padding: 5px 10px 5px 10px
+	color: white
+	opacity: 0.8
+	border-radius: 5px 

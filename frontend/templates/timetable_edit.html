@@ -71,25 +71,42 @@
 				<label for="edit_lesson_name">Назва пари:</label>
 				<input type="text" id="edit_lesson_name">
 				<label for="edit_lesson_teachers">Викладачі:</label>
-				<div class="editable" contenteditable="true" id="edit_lesson_teachers">&nbsp;</div>
+				<!-- <div class="editable" contenteditable="true" id="edit_lesson_teachers">&nbsp;</div> -->
+				<div id="teachersblock"></div>
+				<input type="text" id="edit_lesson_teachers" placeholder="Додати викладача">
 				<label for="edit_lesson_rooms">Кабінети:</label>
-				<div class="editable" contenteditable="true" id="edit_lesson_rooms">&nbsp;</div>
+				<!-- <div class="editable" contenteditable="true" id="edit_lesson_rooms">&nbsp;</div> -->
+				<div id="roomsblock"></div>
+				<input type="text" id="edit_lesson_rooms" placeholder="Додати аудиторію">
 				<p class="error">Перевірте правильність уведених даних</p>
-				<button class="button close active">Видалити</button>
+				<button class="button close active" id="delete">Видалити</button>
 				<button class="button" id="edit_lesson_button">Зберегти</button>
+			</div>
+		</div>
+		<div id="areyousure">
+			<h1 class="maintitle">Що саме зробити?</h1>
+			<div class="content">
+				<p>Ця пара вже є у групи СЮДА ГРУППУ ВСТАВЬ СУЧАРА. Поєднати?</p>
+				<button class="button" id="merge_lesson">поєднати</button><br>
+				<button class="button" id="new_lesson">створити нову</button><br>
+				<button class="button close" id="idontneedthisshit">відмінити</button><br>
 			</div>
 		</div>
 	</div>
 	<script>
 		var data_preload = {{ initial_data|safe }}
-
+		var lesson__right_arr = []
+		var lesson__left_arr = []
 		$(document).ready(function() {
+			$('i.type[data-type="0"').attr('data-typename', 'Лекція')
+			$('i.type[data-type="1"').attr('data-typename', 'Практика')
+			$('i.type[data-type="2"').attr('data-typename', 'Лабораторна')
+			
 			//open the modal by click on icon
 			$(document).on("click", ".edit, .plus", function() {
 				$("#edit_lesson_type").val("None")
-				$("#edit_lesson_name").val("")
-				$("#edit_lesson_teachers").html("")
-				$("#edit_lesson_rooms").html("")
+				$("#edit_lesson_name, #edit_lesson_teachers, #edit_lesson_rooms").val("")
+				$("#teachersblock, #roomsblock").empty()
 				$("p.error").css("opacity", 0)
 				$("#overlay").css("opacity", 1).fadeIn(300)
 				var week = $(this).parent().attr("data-week")
@@ -104,12 +121,15 @@
 				lesson__left_children = $(this).parent().find(".lesson__left a")
 				lesson__left_arr = []
 				for (i = 0; i < lesson__left_children.length; i++)
-					lesson__left_arr.push($(lesson__right_children[i]).attr("data-id"))
+					lesson__left_arr.push($(lesson__left_children[i]).attr("data-id"))
 				
 				if ($(this).hasClass("edit")) {
 					$("#overlay #modal .content .button.close.active").css("visibility", "visible")
 					$("#overlay #modal .maintitle").text("Редагування пари")
 					$("#edit_lesson_name").addClass("inputcorrect")
+					$('#edit_lesson_name, label[for="edit_lesson_name"]').css("display", "none")
+					$('#edit_lesson_teachers, #edit_lesson_rooms, #edit_lesson_type, label[for="edit_lesson_teachers"], label[for="edit_lesson_rooms"]').css("display", "block")
+					$("#edit_lesson_button").text("Зберегти").removeClass("addlesson")
 					discipline_name = ""
 					for (i = 0; i < data_preload.disciplines.length; i++)
 						if (data_preload.disciplines[i].id == id_lesson)
@@ -123,23 +143,26 @@
 					teacherName = ""
 					for (i = 0; i < lesson__left_arr.length; i++) {
 						for (j = 0; j < data_preload.teachers.length; j++)
-							if (lesson__right_arr[i] == data_preload.teachers[j].id)
+							if (lesson__left_arr[i] == data_preload.teachers[j].id)
 								teacherName = data_preload.teachers[j].name
-						teachersBlock += '<span class="room" contenteditable="false" data-id="' + lesson__left_arr[i] + '">' + teacherName + '</span>&nbsp;<br>'
+						teachersBlock += '<span class="left" contenteditable="false" data-id="' + lesson__left_arr[i] + '">' + teacherName + '<a href="#" class="deletespan"></a></span>'
 					}
-					$("#edit_lesson_teachers").html(teachersBlock)
+					$("#teachersblock").html(teachersBlock)
 					roomsBlock = ""
 					roomName = ""
 					for (i = 0; i < lesson__right_arr.length; i++) {
 						for (j = 0; j < data_preload.rooms.length; j++)
 							if (lesson__right_arr[i] == data_preload.rooms[j].id)
 								roomName = data_preload.rooms[j].name
-						roomsBlock += '<span class="room" contenteditable="false" data-id="' + lesson__right_arr[i] + '">' + roomName + '</span>&nbsp;<br>'
+						roomsBlock += '<span class="right" contenteditable="false" data-id="' + lesson__right_arr[i] + '">' + roomName + '<a href="#" class="deletespan"></a></span>'
 					}
-					$("#edit_lesson_rooms").html(roomsBlock)
+					$("#roomsblock").html(roomsBlock)
 				} else {
 					$("#overlay #modal .content .button.close.active").css("visibility", "hidden")
 					$("#overlay #modal .maintitle").text("Додавання пари")
+					$('#edit_lesson_teachers, #edit_lesson_rooms, #edit_lesson_type, label[for="edit_lesson_teachers"], label[for="edit_lesson_rooms"]').css("display", "none")
+					$('#edit_lesson_name, label[for="edit_lesson_name"]').css("display", "block")
+					$("#edit_lesson_button").text("Додати").addClass("addlesson")
 					$("#edit_lesson_name").removeClass("inputcorrect")
 				}
 			})
@@ -157,7 +180,7 @@
 						if (data.length == 0) {
 							$("#search_proposals").fadeOut(300)
 						} else {
-							$("#search_proposals").fadeIn(300)
+							$("#search_proposals").fadeIn(300).css("opacity", 1).css({"opacity": 1, "top": $("#edit_lesson_name").offset().top + $("#edit_lesson_name").outerHeight()}).outerWidth($("#edit_lesson_name").outerWidth())
 							data.forEach(function(entry) {
 								li = $("<li>")
 								a = $("<a>", {
@@ -177,46 +200,12 @@
 				}
 			})
 
-			function moveToEnd(el) {
-				el.focus();
-				
-				if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
-					var range = document.createRange();
-					range.selectNodeContents(el);
-					range.collapse(false);
-					var sel = window.getSelection();
-					sel.removeAllRanges();
-					sel.addRange(range);
-				} else if (typeof document.body.createTextRange != "undefined") {
-					var textRange = document.body.createTextRange();
-					textRange.moveToElementText(el);
-					textRange.collapse(false);
-					textRange.select();
-				}
-			}
-
-			function OnlyChildText(obj) {
-				var str = "";
-
-				obj.each(function() {
-					var cN = this.childNodes;
-					for (var i=0, l=cN&&cN.length||0; i<l; i++) {
-						if (cN[i].nodeType == 3 && String(cN[i].nodeValue).split(/\s/).join("")) {
-							str += cN[i].nodeValue;
-						}
-					}
-				})
-
-				return str
-			}
-
 			//search for teachers
 			$("#edit_lesson_teachers").keyup(function() {
-				moveToEnd(document.getElementById("edit_lesson_teachers"))
-				if (OnlyChildText($(this)).length >= 2) {
+				if ($(this).val().length >= 2) {
 					$.ajax({
 						method: "GET",
-						url: "/teachers/search/?search=" + OnlyChildText($(this)),
+						url: "/teachers/search/?search=" + $(this).val(),
 						dataType: "json"
 					}).done(function(data) {
 						data = data.data
@@ -224,7 +213,7 @@
 						if (data.length == 0) {
 							$("#search_proposals").fadeOut(300)
 						} else {
-							$("#search_proposals").fadeIn(300)
+							$("#search_proposals").fadeIn(300).css({"opacity": 1, "top": $("#edit_lesson_teachers").offset().top + $("#edit_lesson_teachers").outerHeight()}).outerWidth($("#edit_lesson_teachers").outerWidth())
 							data.forEach(function(entry) {
 								li = $("<li>")
 								a = $("<a>", {
@@ -246,11 +235,10 @@
 
 			//search for rooms
 			$("#edit_lesson_rooms").keyup(function() {
-				moveToEnd(document.getElementById("edit_lesson_rooms"))
-				if (OnlyChildText($(this)).length >= 2) {
+				if ($(this).val().length >= 2) {
 					$.ajax({
 						method: "GET",
-						url: "/rooms/search/?search="  + OnlyChildText($(this)),
+						url: "/rooms/search/?search="  + $(this).val(),
 						dataType: "json"
 					}).done(function(data) {
 						data = data.data
@@ -258,7 +246,7 @@
 						if (data.length == 0) {
 							$("#search_proposals").fadeOut(300)
 						} else {
-							$("#search_proposals").fadeIn(300)
+							$("#search_proposals").fadeIn(300).css({"opacity": 1, "top": $("#edit_lesson_rooms").offset().top + $("#edit_lesson_rooms").outerHeight()}).outerWidth($("#edit_lesson_rooms").outerWidth())
 							data.forEach(function(entry) {
 								li = $("<li>")
 								a = $("<a>", {
@@ -278,6 +266,18 @@
 				}
 			})
 
+			$(document).on("click", ".deletespan", function() {
+				if ($(this).parent().hasClass("right")) {
+					for (i = 0; i < lesson__right_arr.length; i++)
+						if ($(this).parent().attr("data-id") == lesson__right_arr[i])
+							lesson__right_arr.splice(i, i + 1)
+				} else {
+					for (i = 0; i < lesson__left_arr.length; i++)
+						if ($(this).parent().attr("data-id") == lesson__left_arr[i])
+							lesson__left_arr.splice(i, i + 1)
+				}
+				($(this).parent().siblings.length == 1) ? $(this).parent().parent().empty() : $(this).parent().remove()
+			})
 			//choose of modal proposals
 			$(document).on("click", "#search_proposals a", function() {
 				if ($(this).hasClass("lesson_name")) {
@@ -285,15 +285,25 @@
 					$("#edit_lesson_name").addClass("inputcorrect").attr("data-id", $(this).attr("data-id"))
 				}
 				else if ($(this).hasClass("room_name")) {
-					childs = $("#edit_lesson_rooms").children()
-					$("#edit_lesson_rooms").empty()
-					$("#edit_lesson_rooms").append(childs, '<span class="room" contenteditable="false" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '</span>&nbsp;<br>')
-					moveToEnd(document.getElementById("edit_lesson_rooms"))
+					isAlreadyTaken = false
+					for (i = 0; i < lesson__right_arr[i]; i++)
+						if 	(lesson__right_arr[i] == $(this).attr("data-id")) 
+							isAlreadyTaken = true
+					if (!isAlreadyTaken) {
+						$("#roomsblock").append('<span class="right" contenteditable="false" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
+						lesson__right_arr.push($(this).attr("data-id"))
+					}
+					$("#edit_lesson_rooms").val('')
 				} else {
-					childs = $("#edit_lesson_teachers").children()
-					$("#edit_lesson_teachers").empty()
-					$("#edit_lesson_teachers").append(childs, '<span class="teacher" contenteditable="false" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '</span>&nbsp;<br>')
-					moveToEnd(document.getElementById("edit_lesson_teachers"))
+					isAlreadyTaken = false
+					for (i = 0; i < lesson__left_arr[i]; i++)
+						if 	(lesson__left_arr[i] == $(this).attr("data-id")) 
+							isAlreadyTaken = true
+					if (!isAlreadyTaken) {
+						$("#teachersblock").append('<span class="left" contenteditable="false" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
+						lesson__left_arr.push($(this).attr("data-id"))
+					}
+					$("#edit_lesson_teachers").val('')
 				}
 				$("#search_proposals").fadeOut(300)
 				$("#search_proposals ul li").remove()
@@ -309,18 +319,10 @@
 				}
 			})
 
-			$("#edit_lesson_teachers, #edit_lesson_rooms").keydown(function(e){
-				if (e.keyCode == 13) {
-					document.execCommand("insertHTML", false, "<br>");
-					return false
-				}
-				if (e.keyCode == 8) {
-					if (OnlyChildText($(this)).length == 0) {
-						$(this).find("span").last().remove()
-					}
-				}
+			$(document).on("click", "#areyousure .close", function() {
+				$("#areyousure").fadeOut(300)
+				$("#modal").animate({"opacity": 1}, 300)
 			})
-
 			$(document).on("click", "#edit_lesson_button", function() {
 				if (($("#edit_lesson_name").val().length == 0) && //нужна проверка на то, правильно ли введено имя в соответствии с базой
 					($("#edit_lesson_rooms").children().length == 0) &&
@@ -329,7 +331,11 @@
 				else // надо решить, перезагружаем ли мы страницу после сохранение сам щит. 
 					 // если нет,то мне надо поебаться с перекрашиванием прикола и заполнением полей.
 					 // легче перезагрузить короч
-					$("#overlay").fadeOut(300)
+					 if ($(this).hasClass("addlesson")) {//вот сюда ещё свою проверку печальную на то, есть ли одинаковые пары
+					 	$("#areyousure").fadeIn("300")
+					 	$("#modal").animate({"opacity": 0.6}, 300)
+					 }
+					// $("#overlay").fadeOut(300)
 			})
 		})
 	</script>
