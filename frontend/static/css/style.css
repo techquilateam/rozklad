@@ -1,6 +1,6 @@
 @charset "UTF-8";
-.transition, .button, .button:after, header #logo a, .login, footer a, .day ul li, .day ul li p a, .handle, .edit, .plus, #close, #teachersblock span a,
-#roomsblock span a, #overlay #modal .content input#edit_lesson_name.inputcorrect, #overlay #areyousure .content input#edit_lesson_name.inputcorrect, i.type {
+.transition, .button, .button:after, header #logo a, .login, footer a, .day ul li, .day ul li p a, .handle, .edit, .plus, .closeicon, #teachersblock span a,
+#roomsblock span a, #overlay .modal .content input#edit_lesson_name.inputcorrect, #overlay #areyousure .content input#edit_lesson_name.inputcorrect, i.type {
   -webkit-transition: all 0.2s;
   -moz-transition: all 0.2s;
   transition: all 0.2s; }
@@ -93,7 +93,7 @@ header {
     width: 70%;
     overflow: auto;
     margin: auto; }
-    header #searchbar select, header #searchbar input, header #searchbar #overlay #modal .content input, #overlay #modal .content header #searchbar input, header #searchbar #overlay #areyousure .content input, #overlay #areyousure .content header #searchbar input {
+    header #searchbar select, header #searchbar input, header #searchbar #overlay .modal .content input, #overlay .modal .content header #searchbar input, header #searchbar #overlay #areyousure .content input, #overlay #areyousure .content header #searchbar input {
       font-family: "Open Sans Condensed", Arial, sans-serif;
       font-size: 1em;
       padding: 5px 10px;
@@ -155,7 +155,7 @@ footer {
 .background, body {
   background: #00729b; }
 
-.shadow, header, footer, .sortable-ghost, #overlay #modal, #overlay #areyousure {
+.shadow, header, footer, .sortable-ghost, #overlay .modal, #overlay #areyousure {
   -webkit-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.56);
   -moz-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.56);
   box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.56); }
@@ -221,7 +221,7 @@ footer {
 .sortable-ghost {
   opacity: 0.5; }
 
-.edit, .plus, #close {
+.edit, .plus, .closeicon {
   height: 11px;
   width: 11px;
   background: url("../img/edit.png");
@@ -232,7 +232,7 @@ footer {
   right: 10px;
   top: 10px; }
 
-.edit:hover, .plus:hover, #close:hover {
+.edit:hover, .plus:hover, .closeicon:hover {
   opacity: 0.5; }
 
 .plus {
@@ -255,21 +255,22 @@ footer {
   position: fixed;
   top: 0px;
   display: none; }
-  #overlay #modal, #overlay #areyousure {
+  #overlay .modal, #overlay #areyousure {
     margin: 50px auto 0px auto;
     width: 500px;
     background-color: #fff;
     border-radius: 5px;
     position: relative;
-    color: black; }
-    #overlay #modal .maintitle, #overlay #areyousure .maintitle {
+    color: black;
+    display: none; }
+    #overlay .modal .maintitle, #overlay #areyousure .maintitle {
       font-size: 1.1em;
       background: #012e3e;
       padding: 25px 25px 15px;
       color: #fff; }
-    #overlay #modal .content, #overlay #areyousure .content {
+    #overlay .modal .content, #overlay #areyousure .content {
       padding: 25px; }
-      #overlay #modal .content select, #overlay #areyousure .content select, #overlay #modal .content input, #overlay #areyousure .content input {
+      #overlay .modal .content select, #overlay #areyousure .content select, #overlay .modal .content input, #overlay #areyousure .content input {
         font-family: "Open Sans Condensed", Arial, sans-serif;
         font-size: 1em;
         padding: 5px 10px;
@@ -280,6 +281,7 @@ footer {
         border-radius: 0;
         width: 98.8%;
         margin-bottom: 10px;
+        background-color: #fff;
         -webkit-appearance: none;
         -moz-appearance: none;
         text-indent: 0.01px;
@@ -289,29 +291,29 @@ footer {
         background-image: url("../img/arrow.png");
         background-position: right center;
         background-repeat: no-repeat; }
-      #overlay #modal .content label, #overlay #areyousure .content label {
+      #overlay .modal .content label, #overlay #areyousure .content label {
         margin-bottom: 10px;
         display: inline-block; }
-      #overlay #modal .content .error, #overlay #areyousure .content .error {
+      #overlay .modal .content .error, #overlay #areyousure .content .error {
         line-height: 0;
         color: #FF6140;
         opacity: 0; }
-      #overlay #modal .content input, #overlay #areyousure .content input {
+      #overlay .modal .content input, #overlay #areyousure .content input {
         background: #fff;
         padding: 6px 10px;
         width: 94%; }
-      #overlay #modal .content .button, #overlay #areyousure .content .button {
+      #overlay .modal .content .button, #overlay #areyousure .content .button {
         background: #012e3e;
         -webkit-appearance: none; }
-      #overlay #modal .content .button:hover, #overlay #areyousure .content .button:hover {
+      #overlay .modal .content .button:hover, #overlay #areyousure .content .button:hover {
         color: #fff;
         opacity: 0.9; }
-      #overlay #modal .content .button:after, #overlay #areyousure .content .button:after {
+      #overlay .modal .content .button:after, #overlay #areyousure .content .button:after {
         background: #2194be; }
-      #overlay #modal .content .button.close, #overlay #areyousure .content .button.close {
+      #overlay .modal .content .button.close, #overlay #areyousure .content .button.close {
         float: right; }
-      #overlay #modal .content .button.close:after, #overlay #areyousure .content .button.close:after,
-      #overlay #modal .content .button.close.active,
+      #overlay .modal .content .button.close:after, #overlay #areyousure .content .button.close:after,
+      #overlay .modal .content .button.close.active,
       #overlay #areyousure .content .button.close.active {
         background: #FF6140; }
   #overlay #areyousure {
@@ -323,12 +325,45 @@ footer {
     right: 0;
     overflow: auto;
     margin: auto; }
+    #overlay #areyousure ul {
+      padding: 0;
+      list-style-type: none;
+      text-align: left; }
+    #overlay #areyousure .groups {
+      width: 60%;
+      margin: 0 auto; }
+      #overlay #areyousure .groups .groupname {
+        float: left;
+        display: block;
+        padding: 10px 0; }
     #overlay #areyousure .maintitle {
       margin: 0 auto; }
     #overlay #areyousure .content {
       text-align: center; }
       #overlay #areyousure .content p {
         margin-top: 0; }
+      #overlay #areyousure .content .day {
+        float: initial;
+        margin: 15px auto; }
+        #overlay #areyousure .content .day li {
+          border: none;
+          color: #fff;
+          background: #00729b; }
+          #overlay #areyousure .content .day li i.edit, #overlay #areyousure .content .day li i.plus, #overlay #areyousure .content .day li i.closeicon,
+          #overlay #areyousure .content .day li i.plus {
+            display: none; }
+          #overlay #areyousure .content .day li i.type[data-type="0"] {
+            background: #84E900; }
+          #overlay #areyousure .content .day li i.type[data-type="1"] {
+            background: #62B1D0; }
+          #overlay #areyousure .content .day li i.type[data-type="2"] {
+            background: #FFA340; }
+          #overlay #areyousure .content .day li i.type[data-type="0"],
+          #overlay #areyousure .content .day li i.type[data-type="1"],
+          #overlay #areyousure .content .day li i.type[data-type="2"] {
+            cursor: help; }
+          #overlay #areyousure .content .day li p a {
+            color: #fff; }
       #overlay #areyousure .content .button {
         background: #012e3e;
         -webkit-appearance: none;
@@ -347,6 +382,11 @@ footer {
       #overlay #areyousure .content .button.close:after,
       #overlay #areyousure .content .button.close.active {
         background: #FF6140; }
+      #overlay #areyousure .content .merge_lesson {
+        float: right !important;
+        font-size: 0.8em;
+        padding: 0;
+        width: 50%; }
 
 #search_proposals {
   background-color: #F9F9F9;
@@ -401,7 +441,7 @@ footer {
   margin-right: 0px !important;
   clear: right; }
 
-#close {
+.closeicon {
   width: 20px;
   height: 20px;
   background-image: url("../img/close.png");
@@ -458,7 +498,7 @@ footer {
 #w--2:before {
   content: "Тиждень 2"; }
 
-#overlay #modal .content input#edit_lesson_name.inputcorrect, #overlay #areyousure .content input#edit_lesson_name.inputcorrect {
+#overlay .modal .content input#edit_lesson_name.inputcorrect, #overlay #areyousure .content input#edit_lesson_name.inputcorrect {
   background: #f1fbff; }
 
 .noday {
@@ -508,6 +548,6 @@ i.type:hover {
   color: #012e3e; }
 
 #index_block #shield {
-  background-image: url("../static/img/shield--gradient.png"); }
+  background-image: url("../img/shield--gradient.png"); }
 
 /*# sourceMappingURL=style.css.map */

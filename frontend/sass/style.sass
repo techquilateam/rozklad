@@ -263,13 +263,14 @@ footer
 	position: fixed
 	top: 0px
 	display: none
-	#modal
+	.modal
 		margin: 50px auto 0px auto
 		width: 500px
 		background-color: $white
 		border-radius: 5px
 		position: relative
 		color: black
+		display: none
 		@extend .shadow
 		.maintitle
 			font-size: 1.1em
@@ -291,6 +292,7 @@ footer
 				border-radius: 0
 				width: 98.8%
 				margin-bottom: 10px
+				background-color: #fff
 				-webkit-appearance: none
 				-moz-appearance: none
 				text-indent: 0.01px
@@ -334,13 +336,47 @@ footer
 		right: 0
 		overflow: auto
 		margin: auto
-		@extend #modal
+		@extend .modal
+		ul
+			padding: 0
+			list-style-type: none
+			text-align: left
+		.groups
+			width: 60%
+			margin: 0 auto
+			.groupname
+				float: left
+				display: block
+				padding: 10px 0
 		.maintitle
 			margin: 0 auto
 		.content
 			text-align: center
 			p
 				margin-top: 0
+			.day
+				float: initial
+				margin: 15px auto
+				li
+					border: none
+					color: #fff
+					background: $blue
+					i.edit,
+					i.plus
+						display: none
+					i.type[data-type="0"]
+						background: #84E900
+					i.type[data-type="1"]
+						background: #62B1D0
+					i.type[data-type="2"]
+						background: #FFA340
+					i.type[data-type="0"],
+					i.type[data-type="1"],
+					i.type[data-type="2"]
+						cursor: help
+					p
+						a
+							color: #fff
 			.button
 				background: $dark
 				-webkit-appearance: none
@@ -359,6 +395,11 @@ footer
 			.button.close:after,
 			.button.close.active
 				background: $red
+			.merge_lesson
+				float: right !important
+				font-size: 0.8em
+				padding: 0
+				width: 50%
 #search_proposals
 	background-color: #F9F9F9
 	position: absolute
@@ -409,7 +450,7 @@ footer
 .last 
 	margin-right: 0px !important
 	clear: right
-#close
+.closeicon
 	@extend .edit
 	width: 20px
 	height: 20px
@@ -460,7 +501,7 @@ footer
 	margin-top: 15px
 #w--2:before
 	content: 'Тиждень 2'
-#overlay #modal .content input#edit_lesson_name.inputcorrect
+#overlay .modal .content input#edit_lesson_name.inputcorrect
 	background: #f1fbff
 	@extend .transition
 .noday
@@ -504,4 +545,4 @@ i.type:hover
 #index_block .title
 	color: #012e3e
 #index_block #shield
-	background-image: url("../static/img/shield--gradient.png")
+	background-image: url("../img/shield--gradient.png")

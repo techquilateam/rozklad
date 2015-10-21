@@ -6,15 +6,16 @@
 			{% for week in timetable %}
 				<div class="week" id="w--{% cycle '1' '2' as week_number %}">
 					{% for day in week %}
-						<div class="day{% if not day %} noday{% endif %}" id="day--{% cycle '1' '2' '3' '4' '5' '6' as day_number %}w{{ week_number }}">
+						{% cycle '1' '2' '3' '4' '5' '6' as day_number silent %}
+						<div class="day{% if not day %} noday{% endif %}">
 							<h1 class="day__title">{% cycle 'Понеділок' 'Вівторок' 'Середа' 'Четвер' "П'ятниця" 'Субота' %}</h1>
-							<ul id="w-{{ week_number }}_list-{{ day_number }}">
+							<ul>
 								{% for lesson in day %}
 									{% cycle '1' '2' '3' '4' '5' '6' as number silent %}
 									{% if lesson %}
-										<li class="" id="w{{ week_number }}d{{ day_number }}l{{ number }}" data-week="{{ week_number }}" data-day="{{ day_number }}" data-lesson="{{ number }}">
+										<li class="" data-week="{{ week_number }}" data-day="{{ day_number }}" data-lesson="{{ number }}" data-id="{{ lesson.id }}">
 											<i class="edit"></i>
-											<i class="type" data-type="{{ lesson.type }}" alt="lalka"></i>
+											<i class="type" data-type="{{ lesson.type }}"></i>
 											<h1 class="lesson__title" data-id="{{ lesson.discipline.id }}">{{ lesson.discipline.name }}</h1>
 											<p class="lesson__right">
 													{% if type == 'groups' or type == 'teachers' %}
@@ -58,9 +59,9 @@
 		</div>
 	</section>
 	<div id="overlay">
-		<div id="modal">
+		<div id="edit" class="modal">
 			<h1 class="maintitle">Редагування пари</h1>
-			<i id="close"></i>
+			<i class="closeicon"></i>
 			<div class="content">
 				<select id="edit_lesson_type">
 					<option value="None">Тип пари</option>
@@ -68,26 +69,46 @@
 					<option value="1">Практика</option>
 					<option value="2">Лабораторна</option>
 				</select>
-				<label for="edit_lesson_name">Назва пари:</label>
-				<input type="text" id="edit_lesson_name">
 				<label for="edit_lesson_teachers">Викладачі:</label>
-				<!-- <div class="editable" contenteditable="true" id="edit_lesson_teachers">&nbsp;</div> -->
 				<div id="teachersblock"></div>
 				<input type="text" id="edit_lesson_teachers" placeholder="Додати викладача">
 				<label for="edit_lesson_rooms">Кабінети:</label>
-				<!-- <div class="editable" contenteditable="true" id="edit_lesson_rooms">&nbsp;</div> -->
 				<div id="roomsblock"></div>
 				<input type="text" id="edit_lesson_rooms" placeholder="Додати аудиторію">
 				<p class="error">Перевірте правильність уведених даних</p>
 				<button class="button close active" id="delete">Видалити</button>
-				<button class="button" id="edit_lesson_button">Зберегти</button>
+				<button class="button" id="save_lesson">Зберегти</button>
 			</div>
 		</div>
-		<div id="areyousure">
+		<div id="adding" class="modal">
+			<h1 class="maintitle">Додавання пари</h1>
+			<i class="closeicon"></i>
+			<div class="content">
+				<label for="edit_lesson_name">Назва пари:</label>
+				<input type="text" id="edit_lesson_name">
+				<p class="error">Перевірте правильність уведених даних</p>
+				<button class="button" id="add_lesson">Додати</button>
+				</div>
+		</div>
+		<div id="areyousure" class="modal">
 			<h1 class="maintitle">Що саме зробити?</h1>
 			<div class="content">
-				<p>Ця пара вже є у групи СЮДА ГРУППУ ВСТАВЬ СУЧАРА. Поєднати?</p>
-				<button class="button" id="merge_lesson">поєднати</button><br>
+				<p>Є підозри, що ця пара у вас разом з іншими групами? <br>Тож що робити?</p>
+				<div class="day">
+					<ul>
+						<li class="" data-week="1" data-day="4" data-lesson="1" data-id="8">
+							<i class="edit"></i>
+							<i class="type" data-type="0" data-typename="Лекція"></i>
+							<h1 class="lesson__title" data-id="5">Захист інформації в комп'ютерних системах</h1>
+							<p class="lesson__right"></p>
+							<p class="lesson__left"><a href="/teachers/2" data-id="2">Кучмій О. О.</a><br></p>
+						</li>
+					</ul>
+				</div>
+				<ul class="groups">
+					<li><span class="groupname">КВ-31, КП-32</span><button class="button merge_lesson">поєднати</button><div class="clear"></div></li>
+				</ul>
+				<br>
 				<button class="button" id="new_lesson">створити нову</button><br>
 				<button class="button close" id="idontneedthisshit">відмінити</button><br>
 			</div>
@@ -109,32 +130,22 @@
 				$("#teachersblock, #roomsblock").empty()
 				$("p.error").css("opacity", 0)
 				$("#overlay").css("opacity", 1).fadeIn(300)
-				var week = $(this).parent().attr("data-week")
-				var day = $(this).parent().attr("data-day")
-				var lesson = $(this).parent().attr("data-lesson")
-				var type = $(this).siblings(".type").attr("data-type")
-				var id_lesson = $(this).parent().find(".lesson__title").attr("data-id")
+				var week = $(this).parent().data("week")
+				var day = $(this).parent().data("day")
+				var lesson = $(this).parent().data("lesson")
+				var type = $(this).siblings(".type").data("type")
+				var id_lesson = $(this).parent().find(".lesson__title").data("id")
 				lesson__right_children = $(this).parent().find(".lesson__right a")
 				lesson__right_arr = []
 				for (i = 0; i < lesson__right_children.length; i++)
-					lesson__right_arr.push($(lesson__right_children[i]).attr("data-id"))
+					lesson__right_arr.push($(lesson__right_children[i]).data("id"))
 				lesson__left_children = $(this).parent().find(".lesson__left a")
 				lesson__left_arr = []
 				for (i = 0; i < lesson__left_children.length; i++)
-					lesson__left_arr.push($(lesson__left_children[i]).attr("data-id"))
+					lesson__left_arr.push($(lesson__left_children[i]).data("id"))
 				
 				if ($(this).hasClass("edit")) {
-					$("#overlay #modal .content .button.close.active").css("visibility", "visible")
-					$("#overlay #modal .maintitle").text("Редагування пари")
-					$("#edit_lesson_name").addClass("inputcorrect")
-					$('#edit_lesson_name, label[for="edit_lesson_name"]').css("display", "none")
-					$('#edit_lesson_teachers, #edit_lesson_rooms, #edit_lesson_type, label[for="edit_lesson_teachers"], label[for="edit_lesson_rooms"]').css("display", "block")
-					$("#edit_lesson_button").text("Зберегти").removeClass("addlesson")
-					discipline_name = ""
-					for (i = 0; i < data_preload.disciplines.length; i++)
-						if (data_preload.disciplines[i].id == id_lesson)
-							discipline_name = data_preload.disciplines[i].name
-					$("#edit_lesson_name").val(discipline_name).attr("data-id", id_lesson)
+					$("#edit.modal").css("opacity", 1).fadeIn(300)
 					if (type == "None") 
 						$("#edit_lesson_type").val("None")
 					else
@@ -145,7 +156,7 @@
 						for (j = 0; j < data_preload.teachers.length; j++)
 							if (lesson__left_arr[i] == data_preload.teachers[j].id)
 								teacherName = data_preload.teachers[j].name
-						teachersBlock += '<span class="left" contenteditable="false" data-id="' + lesson__left_arr[i] + '">' + teacherName + '<a href="#" class="deletespan"></a></span>'
+						teachersBlock += '<span class="left" data-id="' + lesson__left_arr[i] + '">' + teacherName + '<a href="#" class="deletespan"></a></span>'
 					}
 					$("#teachersblock").html(teachersBlock)
 					roomsBlock = ""
@@ -154,15 +165,11 @@
 						for (j = 0; j < data_preload.rooms.length; j++)
 							if (lesson__right_arr[i] == data_preload.rooms[j].id)
 								roomName = data_preload.rooms[j].name
-						roomsBlock += '<span class="right" contenteditable="false" data-id="' + lesson__right_arr[i] + '">' + roomName + '<a href="#" class="deletespan"></a></span>'
+						roomsBlock += '<span class="right" data-id="' + lesson__right_arr[i] + '">' + roomName + '<a href="#" class="deletespan"></a></span>'
 					}
 					$("#roomsblock").html(roomsBlock)
 				} else {
-					$("#overlay #modal .content .button.close.active").css("visibility", "hidden")
-					$("#overlay #modal .maintitle").text("Додавання пари")
-					$('#edit_lesson_teachers, #edit_lesson_rooms, #edit_lesson_type, label[for="edit_lesson_teachers"], label[for="edit_lesson_rooms"]').css("display", "none")
-					$('#edit_lesson_name, label[for="edit_lesson_name"]').css("display", "block")
-					$("#edit_lesson_button").text("Додати").addClass("addlesson")
+					$("#adding.modal").css("opacity", 1).fadeIn(300)
 					$("#edit_lesson_name").removeClass("inputcorrect")
 				}
 			})
@@ -269,11 +276,11 @@
 			$(document).on("click", ".deletespan", function() {
 				if ($(this).parent().hasClass("right")) {
 					for (i = 0; i < lesson__right_arr.length; i++)
-						if ($(this).parent().attr("data-id") == lesson__right_arr[i])
+						if ($(this).parent().data("id") == lesson__right_arr[i])
 							lesson__right_arr.splice(i, i + 1)
 				} else {
 					for (i = 0; i < lesson__left_arr.length; i++)
-						if ($(this).parent().attr("data-id") == lesson__left_arr[i])
+						if ($(this).parent().data("id") == lesson__left_arr[i])
 							lesson__left_arr.splice(i, i + 1)
 				}
 				($(this).parent().siblings.length == 1) ? $(this).parent().parent().empty() : $(this).parent().remove()
@@ -282,26 +289,26 @@
 			$(document).on("click", "#search_proposals a", function() {
 				if ($(this).hasClass("lesson_name")) {
 					$("#edit_lesson_name").val($(this).text())
-					$("#edit_lesson_name").addClass("inputcorrect").attr("data-id", $(this).attr("data-id"))
+					$("#edit_lesson_name").addClass("inputcorrect").attr("data-id", $(this).data("id"))
 				}
 				else if ($(this).hasClass("room_name")) {
 					isAlreadyTaken = false
 					for (i = 0; i < lesson__right_arr[i]; i++)
-						if 	(lesson__right_arr[i] == $(this).attr("data-id")) 
+						if 	(lesson__right_arr[i] == $(this).data("id")) 
 							isAlreadyTaken = true
 					if (!isAlreadyTaken) {
-						$("#roomsblock").append('<span class="right" contenteditable="false" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
-						lesson__right_arr.push($(this).attr("data-id"))
+						$("#roomsblock").append('<span class="right" contenteditable="false" data-id="' + $(this).data("id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
+						lesson__right_arr.push($(this).data("id"))
 					}
 					$("#edit_lesson_rooms").val('')
 				} else {
 					isAlreadyTaken = false
 					for (i = 0; i < lesson__left_arr[i]; i++)
-						if 	(lesson__left_arr[i] == $(this).attr("data-id")) 
+						if 	(lesson__left_arr[i] == $(this).data("id")) 
 							isAlreadyTaken = true
 					if (!isAlreadyTaken) {
-						$("#teachersblock").append('<span class="left" contenteditable="false" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
-						lesson__left_arr.push($(this).attr("data-id"))
+						$("#teachersblock").append('<span class="left" contenteditable="false" data-id="' + $(this).data("id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
+						lesson__left_arr.push($(this).data("id"))
 					}
 					$("#edit_lesson_teachers").val('')
 				}
@@ -312,7 +319,7 @@
 			$("#edit_lesson_name").keyup(function(e){
 				if ($(this).hasClass("inputcorrect")) {
 					$("#search_proposals").addClass("noday")
-					$(this).removeClass("inputcorrect").val("").attr("data-id", "")
+					$(this).removeClass("inputcorrect").val("").removeData("id")
 					$("#search_proposals").fadeOut(300)
 					$("#search_proposals ul li").remove()
 					$("#search_proposals").removeClass("noday")
@@ -321,20 +328,21 @@
 
 			$(document).on("click", "#areyousure .close", function() {
 				$("#areyousure").fadeOut(300)
-				$("#modal").animate({"opacity": 1}, 300)
+				$(".modal").animate({"opacity": 1}, 300)
 			})
-			$(document).on("click", "#edit_lesson_button", function() {
+			$(document).on("click", "#add_lesson", function() {
 				if (($("#edit_lesson_name").val().length == 0) && //нужна проверка на то, правильно ли введено имя в соответствии с базой
 					($("#edit_lesson_rooms").children().length == 0) &&
 					($("#edit_lesson_teachers").children().length == 0))
-					$(".error").animate({opacity: 1}, 400)
+					$(".error").animate({opacity: 1}, 300)
 				else // надо решить, перезагружаем ли мы страницу после сохранение сам щит. 
 					 // если нет,то мне надо поебаться с перекрашиванием прикола и заполнением полей.
 					 // легче перезагрузить короч
-					 if ($(this).hasClass("addlesson")) {//вот сюда ещё свою проверку печальную на то, есть ли одинаковые пары
-					 	$("#areyousure").fadeIn("300")
-					 	$("#modal").animate({"opacity": 0.6}, 300)
-					 }
+					if ($("#edit_lesson_name").hasClass("inputcorrect")) { //вот сюда ещё свою проверку печальную на то, есть ли одинаковые пары
+						$(".modal").css({"opacity": 0.6})
+					 	$("#areyousure").css({"opacity": 1}).fadeIn("300")
+					 } else 
+					 	$(".error").animate({opacity: 1}, 400)
 					// $("#overlay").fadeOut(300)
 			})
 		})
