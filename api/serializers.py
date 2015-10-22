@@ -12,7 +12,7 @@ class GroupSerializer(serializers.ModelSerializer):
 class BuildingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Building
-        fields = ('id', 'number', 'latitude', 'longitude')
+        fields = ('id', 'name', 'latitude', 'longitude')
 
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:

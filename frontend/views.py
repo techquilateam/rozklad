@@ -7,6 +7,8 @@ from django.db.models import Q
 from settings import domains
 from data.models import Lesson, Group, Teacher, Room, Building, Discipline
 
+bad_request = HttpResponseBadRequest('Bad request')
+
 def index(request):
     return render(request, 'index.html', {})
 
@@ -131,7 +133,7 @@ def timetable(request, type, id):
 @require_http_methods(['GET'])
 def search(request, type):
     if 'search' not in request.GET.keys() or request.GET['search'] == '':
-        return HttpResponseBadRequest('Bad request')
+        return bad_request
 
     search_str = request.GET['search']
 
@@ -173,8 +175,66 @@ def search(request, type):
     return JsonResponse(result)
 
 @require_http_methods(['POST'])
+def create_lesson(request):
+    request_data = json.loads(request.body.decode('utf-8'))
+
+    if request_data['sender'] == 'group':
+        group = Group.objects.get(id=int(request_data['id']))
+
+        if not (request.user.has_perm('edit_group_timetable', group) or request.user.has_perm('data.edit_group_timetable')):
+            return bad_request
+
+        week = int(request_data['week'])
+        day = int(request_data['day'])
+        number = int(request_data['number'])
+
+        if Lesson.objects.filter(week=week, day=day, number=number, groups=group).exists():
+            return bad_request
+
+        discipline = Discipline.objects.get(id=int(request_data['discipline_id']))
+
+        if int(request_data['y']) == 0:
+            link_lessons = Lesson.objects.filter(number=number, day=day, week=week, discipline=discipline)
+
+            if link_lessons.count() > 0:
+                response = {'status': 'CAN_LINK'}
+                response['lessons'] = []
+                
+                for lesson in link_lessons:
+                    lesson_data = {}
+                    lesson_data['id'] = lesson.id
+                    lesson_data['number'] = lesson.number
+                    lesson_data['day'] = lesson.day
+                    lesson_data['week'] = lesson.week
+                    lesson_data['type'] = lesson.type
+                    lesson_data['discipline_id'] = lesson.discipline.id
+                    lesson_data['group_names'] = []
+                    for group in lesson.groups.all():
+                        lesson_data['group_names'].append(group.name)
+                    lesson_data['teacher_names'] = []
+                    for teacher in lesson.teachers.all():
+                        lesson_data['teacher_names'].append(teacher.short_name())
+                    lesson_data['room_names'] = []
+                    for room in lesson.rooms.all():
+                        lesson_data['room_names'].append(room.name)
+
+                    response['lessons'].append(lesson_data)
+
+                return JsonResponse(response)
+
+        new_lesson = Lesson(number=number, day=day, week=week, discipline=discipline)
+        new_lesson.save()
+        new_lesson.groups.add(group)
+
+        return JsonResponse({'status': 'OK'})
+    else:
+        pass
+
+@require_http_methods(['POST'])
 def edit_lesson(request):
-    return HttpResponse('OK')
+    request_data = json.loads(request.body.decode('utf-8'))
+
+    return JsonResponse(request_data)
 
 @require_http_methods(['POST'])
 def auth_login(request):

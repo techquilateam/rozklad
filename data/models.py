@@ -30,12 +30,12 @@ class Group(IdOrderingModelAbstract):
         )
 
 class Building(IdOrderingModelAbstract):
-    number = models.IntegerField(unique=True)
+    name = models.CharField(unique=True, max_length=10)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
     def __str__(self):
-        return str(self.number)
+        return str(self.name)
 
 class Room(IdOrderingModelAbstract):
     name = models.CharField(max_length=10)
@@ -51,11 +51,14 @@ class Room(IdOrderingModelAbstract):
         )
 
 class Discipline(IdOrderingModelAbstract):
-    name = models.TextField(unique=True)
-    full_name = models.TextField(unique=True)
+    name = models.TextField()
+    full_name = models.TextField()
 
     def __str__(self):
         return self.name
+
+    class Meta(IdOrderingModelAbstract.Meta):
+        unique_together = (('name', 'full_name'),)
 
 class Teacher(IdOrderingModelAbstract):
     last_name = models.TextField()
@@ -64,27 +67,45 @@ class Teacher(IdOrderingModelAbstract):
     degree = models.TextField(blank=True)
 
     def name(self):
-        return self.last_name + ' ' + self.first_name + ' ' + self.middle_name
+        name = self.last_name
+        if self.first_name:
+            name += ' ' + self.first_name
+        if self.middle_name:
+            name += ' ' + self.middle_name
+        return name
 
     def full_name(self):
-        return self.degree + ' ' + self.last_name + ' ' + self.first_name + ' ' + self.middle_name
+        full_name = self.last_name
+        if self.degree:
+            full_name = self.degree + ' ' + full_name
+        if self.first_name:
+            full_name += ' ' + self.first_name
+        if self.middle_name:
+            full_name += ' ' + self.middle_name
+
+        return full_name
 
     def short_name(self):
-        degree_parts = self.degree.split()
-        result = ''
-        for part in degree_parts:
-            result += part[0:2]
-            part = part[2:]
-            for ch in part:
-                if ch not in 'aeiouyAEIOUYауоыиэяюёеіїєАУОЫИЭЯЮЁЕІЇЄ':
-                    result += ch
-                else:
-                    break
-            result += '. '
+        short_name = ''
+        if self.degree:
+            degree_parts = self.degree.split()
+            for part in degree_parts:
+                short_name += part[0:2]
+                part = part[2:]
+                for ch in part:
+                    if ch not in 'aeiouyAEIOUYауоыиэяюёеіїєАУОЫИЭЯЮЁЕІЇЄ':
+                        short_name += ch
+                    else:
+                        break
+                short_name += '. '
 
-        result += self.last_name + ' ' + self.first_name[0] + '. ' + self.middle_name[0] + '.'
+        short_name += self.last_name
+        if self.first_name:
+            short_name += ' ' + self.first_name[0] + '.'
+        if self.middle_name:
+            short_name += ' ' + self.middle_name[0] + '.'
 
-        return result
+        return short_name
 
     def __str__(self):
         return self.name()
@@ -128,7 +149,7 @@ class Lesson(IdOrderingModelAbstract):
     number = models.IntegerField(choices=NUMBER_CHOICES)
     day = models.IntegerField(choices=DAY_CHOICES)
     week = models.IntegerField(choices=WEEK_CHOICES)
-    type = models.IntegerField(choices=TYPE_CHOICES, null=True)
+    type = models.IntegerField(choices=TYPE_CHOICES, null=True, blank=True)
     discipline = models.ForeignKey(Discipline)
     groups = models.ManyToManyField(Group)
     teachers = models.ManyToManyField(Teacher, blank=True)

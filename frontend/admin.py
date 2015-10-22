@@ -12,7 +12,7 @@ class GuardedModelAdmin(GuardedModelAdminMixin, admin.ModelAdmin):
     pass
 
 class BuildingAdmin(GuardedModelAdmin):
-    list_display = ('number', 'latitude', 'longitude')
+    list_display = ('name', 'latitude', 'longitude')
 
 class RoomAdmin(GuardedModelAdmin):
     list_display = ('name', 'building')
