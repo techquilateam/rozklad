@@ -75,7 +75,7 @@
 				<label for="edit_lesson_rooms">Кабінети:</label>
 				<div id="roomsblock"></div>
 				<input type="text" id="edit_lesson_rooms" placeholder="Додати аудиторію">
-				<p class="error">Перевірте правильність уведених даних</p>
+				<!-- <p class="error">Перевірте правильність уведених даних</p> -->
 				<button class="button close active" id="delete">Видалити</button>
 				<button class="button" id="save_lesson">Зберегти</button>
 			</div>
@@ -175,6 +175,7 @@
 
 			//search for lesson name
 			$("#edit_lesson_name").keyup(function() {
+				$(".error").animate({"opacity": 0}, 300)
 				if (($(this).val().length >= 2) && (!$("#edit_lesson_name").hasClass("inputcorrect"))) {
 					$.ajax({
 						method: "GET",
@@ -319,7 +320,7 @@
 			$("#edit_lesson_name").keyup(function(e){
 				if ($(this).hasClass("inputcorrect")) {
 					$("#search_proposals").addClass("noday")
-					$(this).removeClass("inputcorrect").val("").removeData("id")
+					$(this).removeClass("inputcorrect").val("").removeAttr("data-id")
 					$("#search_proposals").fadeOut(300)
 					$("#search_proposals ul li").remove()
 					$("#search_proposals").removeClass("noday")
@@ -427,7 +428,7 @@
 										"data-id": data.lessons[i].id
 									}).text("поєднати")))
 
-									$("#areyousure_proposal_list").append(lesson_proposal_ul)
+									$("#areyousure_proposal_list").append(lesson_proposal_ul).append('<div class="clear"></div>')
 								}
 
 								$("#areyousure").fadeIn("300")

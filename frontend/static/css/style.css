@@ -339,7 +339,9 @@ footer {
     #overlay #areyousure .maintitle {
       margin: 0 auto; }
     #overlay #areyousure .content {
-      text-align: center; }
+      text-align: center;
+      overflow-y: scroll;
+      max-height: 450px; }
       #overlay #areyousure .content p {
         margin-top: 0; }
       #overlay #areyousure .content .day {
@@ -502,7 +504,7 @@ footer {
   background: #f1fbff; }
 
 .noday {
-  opacity: 0; }
+  opacity: 0.3; }
 
 i.type {
   width: 6px;
