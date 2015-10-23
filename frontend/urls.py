@@ -8,6 +8,8 @@ urlpatterns = [
     url(r'^(?P<type>groups|teachers|rooms|disciplines)/search/$', views.search),
     url(r'^create-lesson/$', views.create_lesson),
     url(r'^edit-lesson/$', views.edit_lesson),
+    url(r'^remove-lesson/$', views.remove_lesson),
+    url(r'^link-lesson/$', views.link_lesson),
     url(r'^login/$', views.auth_login),
     url(r'^logout/$', views.auth_logout),
     url(r'^admin/', include(admin.site.urls)),

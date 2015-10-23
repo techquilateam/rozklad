@@ -94,21 +94,8 @@
 			<h1 class="maintitle">Що саме зробити?</h1>
 			<div class="content">
 				<p>Є підозри, що ця пара у вас разом з іншими групами? <br>Тож що робити?</p>
-				<div class="day">
-					<ul>
-						<li class="" data-week="1" data-day="4" data-lesson="1" data-id="8">
-							<i class="edit"></i>
-							<i class="type" data-type="0" data-typename="Лекція"></i>
-							<h1 class="lesson__title" data-id="5">Захист інформації в комп'ютерних системах</h1>
-							<p class="lesson__right"></p>
-							<p class="lesson__left"><a href="/teachers/2" data-id="2">Кучмій О. О.</a><br></p>
-						</li>
-					</ul>
+				<div id="areyousure_proposal_list">
 				</div>
-				<ul class="groups">
-					<li><span class="groupname">КВ-31, КП-32</span><button class="button merge_lesson">поєднати</button><div class="clear"></div></li>
-				</ul>
-				<br>
 				<button class="button" id="new_lesson">створити нову</button><br>
 				<button class="button close" id="idontneedthisshit">відмінити</button><br>
 			</div>
@@ -373,10 +360,78 @@
 							if (data.status == "OK") {
 								location.reload()
 							} else if (data.status == "CAN_LINK") {
+								$("#areyousure_proposal_list").html("")
+
+								for (var i = 0; i < data.lessons.length; i++) {
+									var lesson_type = "None"
+									if (data.lessons[i].type != null) {
+										lesson_type = data.lessons[i].type
+									}
+
+									var lesson__right_html = ""
+									for (var j = 0; j < data.lessons[i].room_names.length; j++) {
+										lesson__right_html += data.lessons[i].room_names[j] + "<br>"
+									}
+
+									var lesson__left_html = ""
+									for (var j = 0; j < data.lessons[i].teacher_names.length; j++) {
+										lesson__left_html += data.lessons[i].teacher_names[j] + "<br>"
+									}
+
+									var lesson_proposal_div = $("<div>", {
+										class: "day"
+									}).append($("<ul>").append($("<li>").append($("<h1>", {
+										class: "lesson__title"
+									}).text(data.lessons[i].discipline_name)).append($("<p>", {
+										class: "lesson__right"
+									}).html(lesson__right_html)).append($("<p>", {
+										class: "lesson__left"
+									}).html(lesson__left_html))))
+
+									if (lesson_type == 0) {
+										lesson_proposal_div.children("ul").children("li").prepend($("<i>", {
+											class: "type",
+											"data-type": 0,
+											"data-typename": "Лекція"
+										}).on("mousemove", mousemove_tooltip_event_handler).on("mouseout", mouseout_tooltip_event_handler))
+									} else if (lesson_type == 1) {
+										lesson_proposal_div.children("ul").children("li").prepend($("<i>", {
+											class: "type",
+											"data-type": 1,
+											"data-typename": "Практика"
+										}).on("mousemove", mousemove_tooltip_event_handler).on("mouseout", mouseout_tooltip_event_handler))
+									} else if (lesson_type == 2) {
+										lesson_proposal_div.children("ul").children("li").prepend($("<i>", {
+											class: "type",
+											"data-type": 2,
+											"data-typename": "Лабораторна"
+										}).on("mousemove", mousemove_tooltip_event_handler).on("mouseout", mouseout_tooltip_event_handler))
+									}
+
+									$("#areyousure_proposal_list").append(lesson_proposal_div)
+
+									var group_str = ""
+									for (var j = 0; j < data.lessons[i].group_names.length; j++) {
+										group_str += data.lessons[i].group_names[j].toUpperCase()
+										if (j != data.lessons[i].group_names.length - 1) {
+											group_str += ", "
+										}
+									}
+
+									var lesson_proposal_ul = $("<ul>", {
+										class: "groups"
+									}).append($("<li>").append($("<span>", {
+										class: "groupname"
+									}).text(group_str)).append($("<button>", {
+										class: "button merge_lesson",
+										"data-id": data.lessons[i].id
+									}).text("поєднати")))
+
+									$("#areyousure_proposal_list").append(lesson_proposal_ul)
+								}
+
 								$("#areyousure").fadeIn("300")
 								$("#modal").animate({"opacity": 0.6}, 300)
-								console.log(data)
-								/////////////////////////////////
 							} else {
 								$(".error").text("Невідома помилка")
 								$(".error").animate({opacity: 1}, 400)
@@ -428,7 +483,16 @@
 						if (data.status == "OK") {
 							location.reload()
 						} else if (data.status == "ERROR") {
+							var error_text
+							
+							if (data.error_code == 0) {
+								error_text = "Викладач " + data.teacher_name + " вже зайнятий на цій парі "
+							} else {
+								error_text = "Аудиторія " + data.room_name + " вже зайнята на цій парі"
+							}
 
+							$(".error").text(error_text)
+							$(".error").animate({opacity: 1}, 400)
 						} else {
 							$(".error").text("Невідома помилка")
 							$(".error").animate({opacity: 1}, 400)
@@ -440,6 +504,86 @@
 				}).fail(function() {
 					$(".error").text("Невідома помилка")
 					$(".error").animate({opacity: 1}, 400)
+				})
+			})
+
+			$(document).on("click", "#delete", function() {
+				var ajax_data = {
+					sender: "group", //потом сделаем и для teacher
+					id: {{ id }},
+					lesson_id: current_lesson_id,
+				}
+
+				$.ajax({
+					method: "POST",
+					url: "/remove-lesson/",
+					dataType: "json",
+					data: JSON.stringify(ajax_data),
+					contentType: "application/json",
+					headers: {
+						"X-CSRFToken": "{{ csrf_token }}"
+					}
+				}).done(function(data) {
+					if (data.status) {
+						if (data.status == "OK") {
+							location.reload()
+						} else {
+							$(".error").text("Невідома помилка")
+							$(".error").animate({opacity: 1}, 400)
+						}
+					} else {
+						$(".error").text("Невідома помилка")
+						$(".error").animate({opacity: 1}, 400)
+					}
+				}).fail(function() {
+					$(".error").text("Невідома помилка")
+					$(".error").animate({opacity: 1}, 400)
+				})
+			})
+
+			$(document).on("click", ".merge_lesson", function() {
+				var ajax_data = {
+					sender: "group", //потом сделаем и для teacher
+					id: {{ id }},
+					lesson_id: parseInt($(this).data("id")),
+				}
+
+				$.ajax({
+					method: "POST",
+					url: "/link-lesson/",
+					dataType: "json",
+					data: JSON.stringify(ajax_data),
+					contentType: "application/json",
+					headers: {
+						"X-CSRFToken": "{{ csrf_token }}"
+					}
+				}).done(function(data) {
+					location.reload()
+				})
+			})
+
+			$(document).on("click", "#new_lesson", function() {
+				var ajax_data = {
+					sender: "group", //потом сделаем и для teacher
+					id: {{ id }},
+					discipline_id: parseInt($("#edit_lesson_name").data("id")),
+					week: current_week,
+					day: current_day,
+					number: current_number,
+					y: 1,
+				}
+
+				$.ajax({
+					method: "POST",
+					url: "/create-lesson/",
+					dataType: "json",
+					data: JSON.stringify(ajax_data),
+					contentType: "application/json",
+					headers: {
+						"X-CSRFToken": "{{ csrf_token }}"
+					}
+				}).done(function(data) {
+					location.reload()
 				})
 			})
 		})

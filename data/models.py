@@ -52,13 +52,10 @@ class Room(IdOrderingModelAbstract):
 
 class Discipline(IdOrderingModelAbstract):
     name = models.TextField()
-    full_name = models.TextField()
+    full_name = models.TextField(unique=True)
 
     def __str__(self):
         return self.name
-
-    class Meta(IdOrderingModelAbstract.Meta):
-        unique_together = (('name', 'full_name'),)
 
 class Teacher(IdOrderingModelAbstract):
     last_name = models.TextField()

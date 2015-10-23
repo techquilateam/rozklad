@@ -159,23 +159,24 @@
 						}
 					})
 				})
-				$('i.type[data-type="0"], i.type[data-type="1"], i.type[data-type="2"]').mousemove(function (eventObject) {
-			        $data_tooltip = $(this).data("typename");
-			        $("#tooltip").text($data_tooltip)
-			                     .css({ 
-			                         "top" : eventObject.pageY - 20,
-			                        "left" : eventObject.pageX + 20
-			                     })
-			                     .show();
-			    }).mouseout(function () {
-			        $("#tooltip").hide()
-			                     .text("")
-			                     .css({
-			                         "top" : 0,
-			                        "left" : 0
-			                     });
-			    });
+
+				$('i.type[data-type="0"], i.type[data-type="1"], i.type[data-type="2"]').on("mousemove", mousemove_tooltip_event_handler).on("mouseout", mouseout_tooltip_event_handler);
 			})
+
+			function mousemove_tooltip_event_handler(eventObject) {
+				$data_tooltip = $(this).data("typename")
+				$("#tooltip").text($data_tooltip).css({ 
+					"top": eventObject.pageY - 20,
+					"left": eventObject.pageX + 20
+				}).show()
+			}
+
+			function mouseout_tooltip_event_handler() {
+				$("#tooltip").hide().text("").css({
+					"top": 0,
+					"left": 0
+				})
+			}
 		</script>
 	</body>
 </html>

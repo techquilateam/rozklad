@@ -1,5 +1,5 @@
 import json
-from django.http import HttpResponse, JsonResponse, Http404, HttpResponseBadRequest
+from django.http import HttpResponse, JsonResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
@@ -8,6 +8,7 @@ from settings import domains
 from data.models import Lesson, Group, Teacher, Room, Building, Discipline
 
 bad_request = HttpResponseBadRequest('Bad request')
+forbidden_request = HttpResponseForbidden('Forbidden')
 
 def index(request):
     return render(request, 'index.html', {})
@@ -130,6 +131,8 @@ def timetable(request, type, id):
 
         return render(request, 'timetable.html', context)
 
+max_results = 10
+
 @require_http_methods(['GET'])
 def search(request, type):
     if 'search' not in request.GET.keys() or request.GET['search'] == '':
@@ -140,7 +143,7 @@ def search(request, type):
     result = {}
 
     if type == 'groups':
-        groups = Group.objects.filter(name__istartswith=search_str)
+        groups = Group.objects.filter(name__istartswith=search_str)[:max_results]
         result['data'] = [{'id': group.id, 'name': group.name} for group in groups]
     elif type == 'teachers':
         search_parts = search_str.split(' ')
@@ -151,12 +154,12 @@ def search(request, type):
             for part in search_parts:
                 complex_lookup &= Q(last_name__istartswith=part) | Q(first_name__istartswith=part) | Q(middle_name__istartswith=part)
 
-            teachers = Teacher.objects.filter(complex_lookup)
+            teachers = Teacher.objects.filter(complex_lookup)[:max_results]
             result['data'] = [{'id': teacher.id, 'name': teacher.name()} for teacher in teachers]
         else:
             result['data'] = []
     elif type == 'rooms':
-        rooms = Room.objects.filter(name__istartswith=search_str)
+        rooms = Room.objects.filter(name__istartswith=search_str)[:max_results]
         result['data'] = [{'id': room.id, 'name': room.name} for room in rooms]
     else:
         search_parts = search_str.split(' ')
@@ -167,7 +170,7 @@ def search(request, type):
             for part in search_parts:
                 complex_lookup &= Q(name__icontains=part) | Q(full_name__icontains=part)
 
-            disciplines = Discipline.objects.filter(complex_lookup)
+            disciplines = Discipline.objects.filter(complex_lookup)[:max_results]
             result['data'] = [{'id': discipline.id, 'name': discipline.name} for discipline in disciplines]
         else:
             result['data'] = []
@@ -179,21 +182,21 @@ def create_lesson(request):
     request_data = json.loads(request.body.decode('utf-8'))
 
     if request_data['sender'] == 'group':
-        group = Group.objects.get(id=int(request_data['id']))
+        group = Group.objects.get(id=request_data['id'])
 
         if not (request.user.has_perm('edit_group_timetable', group) or request.user.has_perm('data.edit_group_timetable')):
-            return bad_request
+            return forbidden_request
 
-        week = int(request_data['week'])
-        day = int(request_data['day'])
-        number = int(request_data['number'])
+        week = request_data['week']
+        day = request_data['day']
+        number = request_data['number']
 
         if Lesson.objects.filter(week=week, day=day, number=number, groups=group).exists():
             return bad_request
 
-        discipline = Discipline.objects.get(id=int(request_data['discipline_id']))
+        discipline = Discipline.objects.get(id=request_data['discipline_id'])
 
-        if int(request_data['y']) == 0:
+        if request_data['y'] == 0:
             link_lessons = Lesson.objects.filter(number=number, day=day, week=week, discipline=discipline)
 
             if link_lessons.count() > 0:
@@ -207,7 +210,7 @@ def create_lesson(request):
                     lesson_data['day'] = lesson.day
                     lesson_data['week'] = lesson.week
                     lesson_data['type'] = lesson.type
-                    lesson_data['discipline_id'] = lesson.discipline.id
+                    lesson_data['discipline_name'] = lesson.discipline.name
                     lesson_data['group_names'] = []
                     for group in lesson.groups.all():
                         lesson_data['group_names'].append(group.name)
@@ -233,6 +236,116 @@ def create_lesson(request):
 @require_http_methods(['POST'])
 def edit_lesson(request):
     request_data = json.loads(request.body.decode('utf-8'))
+
+    if request_data['sender'] == 'group':
+        lesson = Lesson.objects.get(id=request_data['lesson_id'])
+
+        is_group_timetable_edit_permitted = None
+        for group in lesson.groups.all():
+            if request.user.has_perm('edit_group_timetable', group) or request.user.has_perm('data.edit_group_timetable'):
+                is_group_timetable_edit_permitted = True
+                break
+        if not is_group_timetable_edit_permitted:
+            return forbidden_request
+
+        old_teachers_id = [teacher.id for teacher in lesson.teachers.all()]
+        old_rooms_id = [room.id for room in lesson.rooms.all()]
+        new_teachers_id = request_data['teachers_id']
+        new_rooms_id = request_data['rooms_id']
+
+        add_teachers_id = [id for id in new_teachers_id if id not in old_teachers_id]
+        remove_teachers_id = [id for id in old_teachers_id if id not in new_teachers_id]
+        add_rooms_id = [id for id in new_rooms_id if id not in old_rooms_id]
+        remove_rooms_id = [id for id in old_rooms_id if id not in new_rooms_id]
+
+        group_exclude_lesson_queryset = Lesson.objects.all()
+        for group in lesson.groups.all():
+            group_exclude_lesson_queryset = group_exclude_lesson_queryset.filter(~Q(groups=group))
+
+        for teacher_id in new_teachers_id:
+            teacher = Teacher.objects.get(id=teacher_id)
+            if group_exclude_lesson_queryset.filter(number=lesson.number, day=lesson.day, week=lesson.week, teachers=teacher).exists():
+                return JsonResponse({
+                    'status': 'ERROR',
+                    'error_code': 0,
+                    'teacher_name': teacher.name(),
+                })
+
+        for room_id in new_rooms_id:
+            room = Room.objects.get(id=room_id)
+            if group_exclude_lesson_queryset.filter(number=lesson.number, day=lesson.day, week=lesson.week, rooms=room).exists():
+                return JsonResponse({
+                    'status': 'ERROR',
+                    'error_code': 1,
+                    'room_name': room.name,
+                })
+
+        type_choices_keys = [choice[0] for choice in Lesson.TYPE_CHOICES]
+        
+        if request_data['lesson_type'] == 'None':
+            lesson.type = None
+            lesson.save()
+        elif int(request_data['lesson_type']) in type_choices_keys:
+            lesson.type = int(request_data['lesson_type'])
+            lesson.save()
+        else:
+            return bad_request
+
+        for teacher_id in remove_teachers_id:
+            lesson.teachers.remove(Teacher.objects.get(id=teacher_id))
+        for room_id in remove_rooms_id:
+            lesson.rooms.remove(Room.objects.get(id=room_id))
+
+        for teacher_id in add_teachers_id:
+            lesson.teachers.add(Teacher.objects.get(id=teacher_id))
+        for room_id in add_rooms_id:
+            lesson.rooms.add(Room.objects.get(id=room_id))
+
+        return JsonResponse({'status': 'OK'})
+    else:
+        pass
+
+@require_http_methods(['POST'])
+def remove_lesson(request):
+    request_data = json.loads(request.body.decode('utf-8'))
+
+    if request_data['sender'] == 'group':
+        group = Group.objects.get(id=request_data['id'])
+
+        if not (request.user.has_perm('edit_group_timetable', group) or request.user.has_perm('data.edit_group_timetable')):
+            return forbidden_request
+
+        lesson = Lesson.objects.get(id=request_data['lesson_id'])
+
+        if group not in lesson.groups.all():
+            return bad_request
+
+        if lesson.groups.all().count() == 1:
+            lesson.delete()
+        else:
+            lesson.groups.remove(group)
+
+        return JsonResponse({'status': 'OK'})
+    else:
+        pass
+
+@require_http_methods(['POST'])
+def link_lesson(request):
+    request_data = json.loads(request.body.decode('utf-8'))
+
+    if request_data['sender'] == 'group':
+        group = Group.objects.get(id=request_data['id'])
+
+        if not (request.user.has_perm('edit_group_timetable', group) or request.user.has_perm('data.edit_group_timetable')):
+            return forbidden_request
+
+        lesson = Lesson.objects.get(id=request_data['lesson_id'])
+
+        lesson.groups.add(group)
+
+        return JsonResponse({'status': 'OK'})
+    else:
+        pass
 
     return JsonResponse(request_data)
 
