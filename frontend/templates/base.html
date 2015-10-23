@@ -59,9 +59,9 @@
 		</footer>
 		{% if not user.is_authenticated %}
 		<div id="overlay" class="modal_login">
-			<div id="modal">
+			<div id="login" class="modal">
 				<h1 class="maintitle">Вікно логіну</h1>
-				<i id="close"></i>
+				<i class="closeicon"></i>
 				<div class="content">
 					<input type="text" placeholder="Ім'я користувача" id="login_username_input">
 					<input type="password" placeholder="Пароль" id="login_password_input">
@@ -119,18 +119,13 @@
 			$(document).ready(function() {
 				{% if not user.is_authenticated %}
 					$(".login").click(function() {
-						$("#overlay").css("opacity", 1).fadeIn(300)
+						$("#overlay, #login.modal").css("opacity", 1).fadeIn(300)
 					})
 				{% endif %}
-				$("#close").click(function() {
-					$("#overlay").animate({opacity: 0}, 300, function() {
+				$(".closeicon").click(function() {
+					$("#overlay, #search_proposals, .modal").animate({opacity: 0}, 300, function() {
 						$(this).hide()
 					})
-
-					$("#search_proposals").animate({opacity: 0}, 300, function() {
-						$(this).hide()
-					})
-
 					return false
 				})
 
@@ -165,7 +160,7 @@
 					})
 				})
 				$('i.type[data-type="0"], i.type[data-type="1"], i.type[data-type="2"]').mousemove(function (eventObject) {
-			        $data_tooltip = $(this).attr("data-typename");
+			        $data_tooltip = $(this).data("typename");
 			        $("#tooltip").text($data_tooltip)
 			                     .css({ 
 			                         "top" : eventObject.pageY - 20,
