@@ -17,7 +17,7 @@ class BuildingSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name', 'building')
+        fields = ('id', 'name', 'kpimaps_id', 'building')
 
 class NestedRoomSerializer(serializers.ModelSerializer):
     building = BuildingSerializer()
@@ -34,7 +34,7 @@ class DisciplineSerializer(serializers.ModelSerializer):
 class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
-        fields = ('id', 'last_name', 'first_name', 'middle_name', 'name', 'full_name', 'short_name', 'degree')
+        fields = ('id', 'last_name', 'first_name', 'middle_name', 'name', 'full_name', 'short_name', 'short_name_with_degree', 'degree')
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:

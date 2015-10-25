@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q
+from django.core.cache import caches
 from settings import domains
 from data.models import Lesson, Group, Teacher, Room, Building, Discipline
 
@@ -14,122 +15,132 @@ def index(request):
     return render(request, 'index.html', {})
 
 def timetable(request, type, id):
-    context = {}
+    cache = caches['default']
+    cache_key = 'timetable_{0}_{1}'.format(type, str(id))
 
-    context['id'] = id
-    context['type'] = type
-    context['top_menu_str'] = ''
-
-    if type == 'groups':
-        if not Group.objects.filter(id=id).exists():
-            raise Http404()
-        context['top_menu_str'] = Group.objects.get(id=id).name.upper()
-    elif type == 'teachers':
-        if not Teacher.objects.filter(id=id).exists():
-            raise Http404()
-        context['top_menu_str'] = Teacher.objects.get(id=id).name().upper()
+    cache_res = cache.get(cache_key)
+    if (request.user.is_anonymous() and
+        (cache_res != None)):
+        return cache_res
     else:
-        if not Room.objects.filter(id=id).exists():
-            raise Http404()
-        context['top_menu_str'] = Room.objects.get(id=id).name.upper()
+        context = {}
 
-    queryset = None
-    if type == 'groups':
-        queryset = Lesson.objects.filter(groups=Group.objects.get(id=id))
-    elif type == 'teachers':
-        queryset = Lesson.objects.filter(teachers=Teacher.objects.get(id=id))
-    else:
-        queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
+        context['id'] = id
+        context['type'] = type
+        context['top_menu_str'] = ''
 
-    if ((type == 'groups' and (request.user.has_perm('edit_group_timetable', Group.objects.get(id=id)) or request.user.has_perm('data.edit_group_timetable'))) or
-        (type == 'teachers' and (request.user.has_perm('edit_teacher_timetable', Teacher.objects.get(id=id)) or request.user.has_perm('data.edit_teacher_timetable'))) or
-        (type == 'rooms' and (request.user.has_perm('edit_room_timetable', Room.objects.get(id=id)) or request.user.has_perm('data.edit_room_timetable')))):
-        
-        initial_data = {}
-        initial_data['groups'] = []
-        initial_data['teachers'] = []
-        initial_data['rooms'] = []
-        initial_data['disciplines'] = []
-        for lesson in queryset:
-            for group in lesson.groups.all():
-                group_dict = {
-                    'id': group.id,
-                    'name': group.name,
+        if type == 'groups':
+            if not Group.objects.filter(id=id).exists():
+                raise Http404()
+            context['top_menu_str'] = Group.objects.get(id=id).name.upper()
+        elif type == 'teachers':
+            if not Teacher.objects.filter(id=id).exists():
+                raise Http404()
+            context['top_menu_str'] = Teacher.objects.get(id=id).name().upper()
+        else:
+            if not Room.objects.filter(id=id).exists():
+                raise Http404()
+            context['top_menu_str'] = Room.objects.get(id=id).name.upper()
+
+        queryset = None
+        if type == 'groups':
+            queryset = Lesson.objects.filter(groups=Group.objects.get(id=id))
+        elif type == 'teachers':
+            queryset = Lesson.objects.filter(teachers=Teacher.objects.get(id=id))
+        else:
+            queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
+
+        if ((type == 'groups' and (request.user.has_perm('edit_group_timetable', Group.objects.get(id=id)) or request.user.has_perm('data.edit_group_timetable'))) or
+            (type == 'teachers' and (request.user.has_perm('edit_teacher_timetable', Teacher.objects.get(id=id)) or request.user.has_perm('data.edit_teacher_timetable'))) or
+            (type == 'rooms' and (request.user.has_perm('edit_room_timetable', Room.objects.get(id=id)) or request.user.has_perm('data.edit_room_timetable')))):
+            
+            initial_data = {}
+            initial_data['groups'] = []
+            initial_data['teachers'] = []
+            initial_data['rooms'] = []
+            initial_data['disciplines'] = []
+            for lesson in queryset:
+                for group in lesson.groups.all():
+                    group_dict = {
+                        'id': group.id,
+                        'name': group.name,
+                    }
+
+                    if group_dict not in initial_data['groups']:
+                        initial_data['groups'].append(group_dict)
+
+                for teacher in lesson.teachers.all():
+                    teacher_dict = {
+                        'id': teacher.id,
+                        'name': teacher.name(),
+                    }
+
+                    if teacher_dict not in initial_data['teachers']:
+                        initial_data['teachers'].append(teacher_dict)
+
+                for room in lesson.rooms.all():
+                    room_dict = {
+                        'id': room.id,
+                        'name': room.name,
+                    }
+
+                    if room_dict not in initial_data['rooms']:
+                        initial_data['rooms'].append(room_dict)
+            
+                discipline_dict = {
+                    'id': lesson.discipline.id,
+                    'name': lesson.discipline.name,
                 }
 
-                if group_dict not in initial_data['groups']:
-                    initial_data['groups'].append(group_dict)
+                if discipline_dict not in initial_data['disciplines']:
+                    initial_data['disciplines'].append(discipline_dict)
 
-            for teacher in lesson.teachers.all():
-                teacher_dict = {
-                    'id': teacher.id,
-                    'name': teacher.name(),
-                }
+            context['initial_data'] = json.dumps(initial_data)
 
-                if teacher_dict not in initial_data['teachers']:
-                    initial_data['teachers'].append(teacher_dict)
+            context['timetable'] = []
 
-            for room in lesson.rooms.all():
-                room_dict = {
-                    'id': room.id,
-                    'name': room.name,
-                }
+            for week_choice in Lesson.WEEK_CHOICES:
+                week = week_choice[0] - 1
+                context['timetable'].append([])
 
-                if room_dict not in initial_data['rooms']:
-                    initial_data['rooms'].append(room_dict)
-        
-            discipline_dict = {
-                'id': lesson.discipline.id,
-                'name': lesson.discipline.name,
-            }
+                for day_choice in Lesson.DAY_CHOICES:
+                    day = day_choice[0] - 1
+                    context['timetable'][week].append([])
 
-            if discipline_dict not in initial_data['disciplines']:
-                initial_data['disciplines'].append(discipline_dict)
+                    for number_choice in Lesson.NUMBER_CHOICES:
+                        number = number_choice[0] - 1
 
-        context['initial_data'] = json.dumps(initial_data)
-
-        context['timetable'] = []
-
-        for week_choice in Lesson.WEEK_CHOICES:
-            week = week_choice[0] - 1
-            context['timetable'].append([])
-
-            for day_choice in Lesson.DAY_CHOICES:
-                day = day_choice[0] - 1
-                context['timetable'][week].append([])
-
-                for number_choice in Lesson.NUMBER_CHOICES:
-                    number = number_choice[0] - 1
-
-                    if queryset.filter(week=week + 1, day=day + 1, number=number + 1).exists():
-                        context['timetable'][week][day].append(queryset.get(week=week + 1, day=day + 1, number=number + 1))
-                    else:
-                        context['timetable'][week][day].append(None)
-
-        return render(request, 'timetable_edit.html', context)
-    else:
-        context['timetable'] = []
-
-        for week_choice in Lesson.WEEK_CHOICES:
-            week = week_choice[0] - 1
-            context['timetable'].append([])
-
-            for day_choice in Lesson.DAY_CHOICES:
-                day = day_choice[0] - 1
-                context['timetable'][week].append([])
-
-                for number_choice in Lesson.NUMBER_CHOICES:
-                    number = number_choice[0] - 1
-
-                    if queryset.filter(week=week + 1, day=day + 1, number=number + 1).exists():
-                        lesson = queryset.get(week=week + 1, day=day + 1, number=number + 1)
-
-                        for i in range(len(context['timetable'][week][day]), number):
+                        if queryset.filter(week=week + 1, day=day + 1, number=number + 1).exists():
+                            context['timetable'][week][day].append(queryset.get(week=week + 1, day=day + 1, number=number + 1))
+                        else:
                             context['timetable'][week][day].append(None)
 
-                        context['timetable'][week][day].append(lesson)
+            return render(request, 'timetable_edit.html', context)
+        else:
+            context['timetable'] = []
 
-        return render(request, 'timetable.html', context)
+            for week_choice in Lesson.WEEK_CHOICES:
+                week = week_choice[0] - 1
+                context['timetable'].append([])
+
+                for day_choice in Lesson.DAY_CHOICES:
+                    day = day_choice[0] - 1
+                    context['timetable'][week].append([])
+
+                    for number_choice in Lesson.NUMBER_CHOICES:
+                        number = number_choice[0] - 1
+
+                        if queryset.filter(week=week + 1, day=day + 1, number=number + 1).exists():
+                            lesson = queryset.get(week=week + 1, day=day + 1, number=number + 1)
+
+                            for i in range(len(context['timetable'][week][day]), number):
+                                context['timetable'][week][day].append(None)
+
+                            context['timetable'][week][day].append(lesson)
+
+            page = render(request, 'timetable.html', context)
+            cache.set(cache_key, page, 1800)
+            return page
 
 max_results = 10
 

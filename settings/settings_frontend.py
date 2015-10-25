@@ -27,3 +27,10 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'frontend.urls'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': 'unix:/var/run/memcached.sock',
+    }
+}

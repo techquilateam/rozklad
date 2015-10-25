@@ -4,3 +4,4 @@ django-filter
 django-cors-headers
 django-guardian
 psycopg2
+python-memcached

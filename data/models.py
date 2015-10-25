@@ -30,7 +30,7 @@ class Group(IdOrderingModelAbstract):
         )
 
 class Building(IdOrderingModelAbstract):
-    name = models.CharField(unique=True, max_length=10)
+    name = models.CharField(unique=True, max_length=30)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
@@ -38,8 +38,9 @@ class Building(IdOrderingModelAbstract):
         return str(self.name)
 
 class Room(IdOrderingModelAbstract):
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=30)
     building = models.ForeignKey(Building)
+    kpimaps_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -83,24 +84,30 @@ class Teacher(IdOrderingModelAbstract):
         return full_name
 
     def short_name(self):
-        short_name = ''
-        if self.degree:
-            degree_parts = self.degree.split()
-            for part in degree_parts:
-                short_name += part[0:2]
-                part = part[2:]
-                for ch in part:
-                    if ch not in 'aeiouyAEIOUYауоыиэяюёеіїєАУОЫИЭЯЮЁЕІЇЄ':
-                        short_name += ch
-                    else:
-                        break
-                short_name += '. '
-
-        short_name += self.last_name
+        short_name = self.last_name
         if self.first_name:
             short_name += ' ' + self.first_name[0] + '.'
         if self.middle_name:
             short_name += ' ' + self.middle_name[0] + '.'
+
+        return short_name
+
+    def short_name_with_degree(self):
+        short_name = self.short_name()
+        short_degree = ''
+        if self.degree:
+            degree_parts = self.degree.split()
+            for part in degree_parts:
+                short_degree += part[0:2]
+                part = part[2:]
+                for ch in part:
+                    if ch not in 'aeiouyAEIOUYауоыиэяюёеіїєАУОЫИЭЯЮЁЕІЇЄ':
+                        short_degree += ch
+                    else:
+                        break
+                short_degree += '. '
+
+            short_name = short_degree + short_name
 
         return short_name
 
