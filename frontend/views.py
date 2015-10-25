@@ -139,7 +139,8 @@ def timetable(request, type, id):
                             context['timetable'][week][day].append(lesson)
 
             page = render(request, 'timetable.html', context)
-            cache.set(cache_key, page, 1800)
+            if request.user.is_anonymous():
+                cache.set(cache_key, page, 1800)
             return page
 
 max_results = 10
