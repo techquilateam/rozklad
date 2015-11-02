@@ -1,0 +1,550 @@
+@charset "utf-8"
+$darker: #012e3e
+$white: #fff
+$dark: #012e3e
+$linkhover: #2194be
+$font: "Open Sans Condensed", Arial, sans-serif
+$containerwidth: 1280px
+$red: #FF6140
+$blue: #00729b
+.transition
+	-webkit-transition: all 0.2s
+	-moz-transition: all 0.2s
+	transition: all 0.2s
+body
+	margin: 0
+	padding: 0
+	font-family: $font
+	font-size: 20px
+	color: $white
+	@extend .background
+.clear 
+	clear: both
+.container 
+	max-width: $containerwidth
+	margin: 0 auto
+	position: relative
+.button
+	border: 1px solid #fff
+	height: 39px
+	padding: 3px 35px 36px
+	text-transform: uppercase
+	font-size: 1.1em
+	font-family: $font
+	color: $white
+	background: transparent
+	margin-left: -3px
+	cursor: pointer
+	outline: none
+	position: relative
+	margin-left: -5px
+	@extend .transition
+.button:after
+	width: 0%
+	height: 100%
+	top: 0
+	left: 0
+	background: $white
+	content: ''
+	position: absolute
+	z-index: -1
+	@extend .transition
+.button:hover 
+	color: $dark
+.button:hover:after
+	width: 100%
+header:after
+	width: 100%
+	height: 100%
+	top: 0
+	left: 0
+	background: $dark
+	content: ''
+	position: absolute
+	z-index: -2
+header
+	color: $white
+	padding: 5px
+	text-align: center
+	position: relative
+	@extend .shadow
+	#logo
+		float: left
+		margin: 20px 0 10px 50px
+		position: relative
+		a
+			text-decoration: none
+			color: $white
+			@extend .transition
+		a:hover
+			color: $linkhover
+	#logo:after
+		display: inline-block
+		content: 'beta'
+		color: #000
+		background-color: rgba(255,255,255,0.5)
+		position: absolute
+		top: 0
+		padding: 0 5px
+		font-size: 0.4em
+		right: -25px
+	#searchbar
+		position: absolute
+		top: 10px
+		left: 0
+		right: 0
+		width: 70%
+		overflow: auto
+		margin: auto
+		// option[selected="selected"]
+		// 	color: #e6e6e6
+		select
+			font-family: $font
+			font-size: 1em
+			padding: 5px 10px
+			outline: none
+			border: 1px solid #fff
+			border-radius: 0
+			background: #fff
+			width: 105px
+			-webkit-appearance: none
+			-moz-appearance: none
+			text-indent: 0.01px
+			text-overflow: ''
+			color: black
+			-ms-appearance: none
+			appearance: none !important
+			background-image: url('../img/arrow.png')
+			background-position: right center
+			background-repeat: no-repeat
+		input
+			@extend select
+			padding: 6px 10px
+			width: 300px
+			margin-left: -5px
+			background: #fff
+.login
+	float: right
+	padding-bottom: 0
+	margin-top: 20px
+	text-decoration: none
+	@extend .transition
+	color: #cfcfcf
+	z-index: 999
+.login:hover
+	color: $linkhover
+.login.exit
+	margin-left: 25px
+footer
+	background: $dark
+	width: 100%
+	padding: 10px 0
+	font-size: 0.7em
+	color: $white
+	position: absolute
+	bottom: -3px
+	@extend .shadow
+	.createdby
+		float: right
+		color: #cfcfcf
+	.links
+		float: left
+	a
+		text-decoration: none
+		color: #cfcfcf
+		@extend .transition	
+	a:hover
+		color: $linkhover
+		opacity: 1
+.background
+	// background: rgb(255,255,255) /* Old browsers */
+	// background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%) /* FF3.6+ */
+	// background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))) /* Chrome,Safari4+ */
+	// background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* Chrome10+,Safari5.1+ */
+	// background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* Opera 12+ */
+	// background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* IE10+ */
+	// background: radial-gradient(ellipse at center,  rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%) /* W3C */
+	// filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f4f4f4',GradientType=1 ) /* IE6-9 fallback on horizontal gradient */
+	background: $blue
+.shadow
+	-webkit-box-shadow: 0px 0px 25px -5px rgba(0,0,0,0.56)
+	-moz-box-shadow: 0px 0px 25px -5px rgba(0,0,0,0.56)
+	box-shadow: 0px 0px 25px -5px rgba(0,0,0,0.56)
+.day
+	width: $containerwidth / 6.299999
+	float: left
+	margin: 0 5px
+	.day__title
+		font-size: 1.1em
+		color: $white
+		background: $dark
+		font-weight: 100
+		padding: 5px 10px
+		margin-bottom: 0
+	ul
+		margin: 0
+		padding: 0
+		li
+			list-style-type: none
+			font-size: 0.7em
+			padding: 5px 10px
+			color: black
+			background: $white
+			height: 90px
+			border-bottom: 1px solid #e6e6e6
+			width: $containerwidth / 6.299999 - 20
+			display: block
+			position: relative
+			@extend .transition
+			h1, p
+				font-size: 1em
+				margin: 0
+			.lesson__right
+				position: absolute
+				right: 10px
+				bottom: 5px
+			p
+				a
+					color: $dark
+					text-decoration: none
+					@extend .transition
+				a:hover
+					color: $darker
+					text-decoration: underline
+		li.window
+			background: #e6e6e6
+			border-bottom: 1px solid #c0c0c0
+		li.nolesson
+			display: none
+.day.holiday
+	opacity: 0
+.handle
+	display: block
+	content: ' '	
+	height: 10px
+	width: 20px
+	bottom: 10px
+	opacity: 0.1
+	cursor: pointer
+	position: absolute
+	background: linear-gradient(to bottom, #000 0%, #000 20%, transparent 20%, transparent 40%, #000 40%, #000 60%, transparent 60%, transparent 80%, #000 80%, #000 100%)
+	@extend .transition
+.sortable-ghost
+	opacity: .5
+	@extend .shadow
+.edit
+	height: 11px
+	width: 11px
+	background: url('../img/edit.png')
+	display: block
+	position: absolute
+	opacity: 0.2
+	cursor: pointer
+	right: 10px
+	top: 10px
+	@extend .transition
+.edit:hover
+	opacity: 0.5	
+.plus
+	@extend .edit
+	background: url('../img/add.png')
+	opacity: 0.5
+	height: 12px
+	width: 12px
+.plus:hover
+	opacity: 1
+#w--1
+	height: 650px
+#overlay
+	width: 100%
+	min-height: 100%
+	background-color: rgba(0,0,0,0.5)
+	overflow: hidden
+	position: fixed
+	top: 0px
+	display: none
+	.modal
+		margin: 50px auto 0px auto
+		width: 500px
+		background-color: $white
+		border-radius: 5px
+		position: relative
+		color: black
+		display: none
+		@extend .shadow
+		.maintitle
+			font-size: 1.1em
+			background: $darker
+			padding: 25px 25px 15px
+			color: $white
+		.content
+			padding: 25px
+			// option[selected="selected"]
+			// 	color: #e6e6e6
+			select
+				font-family: $font
+				font-size: 1em
+				padding: 5px 10px
+				outline: none
+				border: 1px solid $dark
+				color: black
+				display: block
+				border-radius: 0
+				width: 98.8%
+				margin-bottom: 10px
+				background-color: #fff
+				-webkit-appearance: none
+				-moz-appearance: none
+				text-indent: 0.01px
+				text-overflow: ''
+				-ms-appearance: none
+				appearance: none !important
+				background-image: url('../img/arrow.png')
+				background-position: right center
+				background-repeat: no-repeat
+			label
+				margin-bottom: 10px
+				display: inline-block
+			.error
+				line-height: 0
+				color: $red
+				opacity: 0
+			input
+				@extend select
+				background: #fff
+				padding: 6px 10px
+				width: 94%
+			.button
+				background: $dark
+				-webkit-appearance: none
+			.button:hover
+				color: $white
+				opacity: .9
+			.button:after
+				background: $linkhover
+			.button.close
+				float: right
+			.button.close:after,
+			.button.close.active
+				background: $red
+	#areyousure
+		position: absolute
+		z-index: 9999
+		top: 10px
+		display: none
+		left: 0
+		right: 0
+		overflow: auto
+		margin: auto
+		@extend .modal
+		ul
+			padding: 0
+			list-style-type: none
+			text-align: left
+		.groups
+			width: 60%
+			margin: 0 auto
+			.groupname
+				float: left
+				display: block
+				padding: 10px 0
+		.maintitle
+			margin: 0 auto
+		.content
+			text-align: center
+			overflow-y: scroll
+			max-height: 450px
+			p
+				margin-top: 0
+			.day
+				float: initial
+				margin: 15px auto
+				li
+					border: none
+					color: #fff
+					background: $blue
+					i.edit,
+					i.plus
+						display: none
+					i.type[data-type="0"]
+						background: #84E900
+					i.type[data-type="1"]
+						background: #62B1D0
+					i.type[data-type="2"]
+						background: #FFA340
+					i.type[data-type="0"],
+					i.type[data-type="1"],
+					i.type[data-type="2"]
+						cursor: help
+					p
+						a
+							color: #fff
+			.button
+				background: $dark
+				-webkit-appearance: none
+				float: none !important
+				width: 60%
+				margin: 5px auto
+			.button:hover
+				color: $white
+				opacity: .9
+			.button:after
+				background: $linkhover
+			#new_lesson:after
+				background: #37DC74
+			.button.close
+				float: right
+			.button.close:after,
+			.button.close.active
+				background: $red
+			.merge_lesson
+				float: right !important
+				font-size: 0.8em
+				padding: 0
+				width: 50%
+#search_proposals
+	background-color: #F9F9F9
+	position: absolute
+	width: 40%
+	margin: auto
+	overflow: auto
+	left: 0
+	right: 0
+	z-index: 999
+	top: 67px
+	color: $dark
+	display: none
+	// @extend .shadow
+	padding: 5px 25px
+	ul
+		margin: 0
+		padding: 0
+		li
+			list-style-type: none
+			padding: 5px 0
+			text-transform: uppercase
+			a
+				color: $dark
+				text-decoration: none
+				display: inline-block
+				width: 100%
+				border-bottom: 1px solid #fff
+#index_block
+	max-width: 600px
+	margin: 50px auto
+	font-size: 0.9em
+	.title
+		text-align: center
+	#shield
+		margin: 25px auto
+		width: 255px
+		height: 361px
+		background-image: url('../img/shield.png')
+		background-size: 100% 100%
+	p
+		padding-left: 20px
+		width: 325px
+.one_half
+	float: left
+	margin-right: 4%
+	position: relative
+	width: 48%
+.last 
+	margin-right: 0px !important
+	clear: right
+.closeicon
+	@extend .edit
+	width: 20px
+	height: 20px
+	background-image: url('../img/close.png')
+	right: 30px
+	top: 25px
+#teachersblock,
+#roomsblock
+	margin-bottom: 10px
+	white-space: pre-wrap
+	line-height: 35px
+#teachersblock span,
+#roomsblock span
+	color: #fff
+	background: $blue
+	padding: 0 10px
+	line-height: 30px
+	margin-right: 10px
+	border-radius: 20px
+	display: inline-block
+	font-size: 0.8em
+	-moz-user-select: text
+	-khtml-user-select: text
+	-webkit-user-select: text
+	-o-user-select: text
+#teachersblock span a,
+#roomsblock span a
+	width: 10px
+	height: 10px
+	background-image: url('../img/close.png')
+	background-size: 100% 100%
+	opacity: 0.3
+	display: inline-block
+	margin-left: 5px
+	@extend .transition
+#teachersblock span a:hover,
+#roomsblock span a:hover
+	opacity: 0.5
+.week
+	position: relative
+.week:before 
+	display: block
+	content: 'Тиждень 1'
+	font-size: 1.3em
+	font-weight: bold
+	opacity: 0.5
+	margin-left: 10px
+	margin-top: 15px
+#w--2:before
+	content: 'Тиждень 2'
+#overlay .modal .content input#edit_lesson_name.inputcorrect
+	background: #f1fbff
+	@extend .transition
+.noday
+	opacity: 0.3
+i.type 
+	width: 6px
+	height: 6px
+	display: block
+	position: absolute
+	border-radius: 100%
+	bottom: 11px
+	left: 12px
+	opacity: 0.5
+	-webkit-box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
+	-moz-box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
+	box-shadow: 0px 0px 10px 0px rgba(164,244,61,1)
+	@extend .transition
+i.type[data-type = "0"]
+	cursor: help
+	background: #00782D
+i.type[data-type = "1"]
+	cursor: help
+	background: #024C68
+i.type[data-type = "2"]
+	cursor: help
+	background: #A65600
+i.type:hover
+	opacity: 0.8
+
+#tooltip 
+	z-index: 9999
+	position: absolute
+	display: none
+	top: 0px
+	left: 0px
+	background-color: $dark
+	padding: 5px 10px 5px 10px
+	color: white
+	opacity: 0.8
+	border-radius: 5px 
+#index_block .title
+	color: #012e3e
+#index_block #shield
+	background-image: url("../img/shield--gradient.png")

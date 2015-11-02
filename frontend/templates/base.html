@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="uk">
+	<head>
+		<title>Розклад КПІ</title>
+		<link rel="stylesheet" href="/static/css/normalize.css">
+		<link rel="stylesheet" href="/static/css/style.css">
+		<link rel="stylesheet" href="/static/css/fonts.css">
+		<link rel="stylesheet" href="/static/css/responsive.css">
+		<link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta charset="utf-8">
+		<script src="/static/js/jquery-2.1.4.min.js"></script>
+	</head>
+	<body>
+		<header>
+			<div class="container">
+				<div id="logo">
+					<a href="/">Новий Розклад КПІ</a>
+				</div>
+				<form action="" id="searchbar">
+					<select name="">
+						<option class="groups" value="groups" {% if not type or type == 'groups' %}selected="selected"{% endif %}>Група</option>
+						<option class="teachers" value="teachers" {% if type == 'teachers' %}selected="selected"{% endif %}>Викладач</option>
+						<option class="rooms" value="rooms" {% if type == 'rooms' %}selected="selected"{% endif %}>Аудиторія</option>
+						<option class="disciplines" value="disciplines" {% if type == 'disciplines' %}selected="selected"{% endif %}>Предмет</option>
+					</select>
+					<input type="text" placeholder="Введіть запит" name="" id="search__input" autocomplete="off" value="{{ top_menu_str }}">
+					<button class="button">знайти</button>
+				</form>
+				{% if user.is_authenticated %}
+					<a href="#" class="login exit">Вийти</a>
+					<span class="login">{{ user.get_username }}</span>
+				{% else %}
+					<a href="#" class="login">Увійти</a>
+				{% endif %}
+				<div class="clear"></div>
+			</div>
+		</header>
+		<div id="search_proposals">
+			<ul>
+			</ul>
+		</div>
+			{% block content %}{% endblock %}
+		<div id="tooltip"></div>
+		<p>&nbsp;</p>
+		<footer>
+			<div class="container">
+				<div class="links">
+					<a href="#">API</a> &nbsp; <a href="http://telegram.me/kpibot" class="foretelegram">КПИ Бот</a>
+				</div>
+				<div class="createdby">
+					created by <a href="http://vk.com/antontimenko">Anton Timenko</a>, <a href="http://vk.com/vladkampov">Vlad Kampov</a> and <a href="http://vk.com/vlad_sidorenko">Vlad Sidorenko</a>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</footer>
+		{% if not user.is_authenticated %}
+		<div id="overlay" class="modal_login">
+			<div id="login" class="modal">
+				<h1 class="maintitle">Вікно логіну</h1>
+				<i class="closeicon"></i>
+				<div class="content">
+					<input type="text" placeholder="Ім'я користувача" id="login_username_input">
+					<input type="password" placeholder="Пароль" id="login_password_input">
+					<p class="error">Перевірте правильність уведених даних</p>
+					<button name="" class="button" id="login_button">Увійти</button>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		<script>
+			function getCookie(name)
+			{
+				var cookieValue = null;
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';');
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = jQuery.trim(cookies[i]);
+						if (cookie.substring(0, name.length + 1) == (name + '=')) {
+							cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+							break;
+						}
+					}
+				}
+				return cookieValue;
+			}
+
+			$.ajaxSetup({ 
+				beforeSend: function(xhr, settings) {
+					if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+						xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'))
+					}
+				}
+			})
+		</script>
+		<script>
+			$(document).ready(function() {
+				$("#search__input").keyup(function() {
+					var base_url = "/" + $("#searchbar option:selected").attr("class") + "/"
+					if ($(this).val().length >= 2) {
+						var search_url = "/" + $("#searchbar option:selected").attr("class") + "/search/?search=" + $("#search__input").val()
+
+						$.ajax({
+							method: "GET",
+							url: search_url,
+							dataType: "json"
+						}).done(function(data) {
+							data = data.data
+
+							$("#search_proposals ul li").remove()
+							if (data.length == 0) {
+								$("#search_proposals").fadeOut(300)
+							} else {
+								$("#search_proposals").fadeIn(300).css({"opacity": 1, "top": $("#search__input").offset().top + $("#search__input").outerHeight()}).outerWidth($("#search__input").outerWidth() + $("#searchbar select").outerWidth() + $("#searchbar button").outerWidth())
+								data.forEach(function(entry) {
+									li = $("<li>")
+									a = $("<a>", {
+										href: base_url + entry.id + "/"
+									})
+									a.text(entry.name)
+									li.append(a)
+									$("#search_proposals ul").append(li)
+								})
+								
+								$("#searchbar").attr("action", base_url + data[0].id) + "/"
+							}
+						})
+					} else {
+						$("#search_proposals").fadeOut(300)
+						$("#search_proposals ul li").remove()
+					}
+				})
+			})
+		</script>
+		<script>
+			$(document).ready(function() {
+				{% if not user.is_authenticated %}
+					$(".login").click(function() {
+						$("#overlay, #login.modal").css("opacity", 1).fadeIn(300)
+					})
+				{% endif %}
+				$(".closeicon").click(function() {
+					$("#overlay, #search_proposals, .modal").animate({opacity: 0}, 300, function() {
+						$(this).hide()
+					})
+					return false
+				})
+
+				$("#login_button").click(function() {
+					$.ajax({
+						method: "POST",
+						url: "/login/",
+						dataType: "json",
+						data: {
+							username: $("#login_username_input").val(),
+							password: $("#login_password_input").val()
+						}
+					}).done(function(data) {
+						if (data.result == "OK") {
+							window.location.reload()
+						} else {
+							$(".error").animate({opacity: 1}, 400)
+						}
+					})
+				})
+
+				$(".exit").click(function() {
+					$.ajax({
+						methond: "POST",
+						url: "/logout/",
+						dataType: "json"
+					}).done(function(data) {
+						if (data.result == "OK") {
+							window.location.reload()
+						}
+					})
+				})
+
+				$('i.type[data-type="0"], i.type[data-type="1"], i.type[data-type="2"]').on("mousemove", mousemove_tooltip_event_handler).on("mouseout", mouseout_tooltip_event_handler);
+			})
+
+			function mousemove_tooltip_event_handler(eventObject) {
+				$data_tooltip = $(this).data("typename")
+				$("#tooltip").text($data_tooltip).css({ 
+					"top": eventObject.pageY - 20,
+					"left": eventObject.pageX + 20
+				}).show()
+			}
+
+			function mouseout_tooltip_event_handler() {
+				$("#tooltip").hide().text("").css({
+					"top": 0,
+					"left": 0
+				})
+			}
+		</script>
+	</body>
+</html>

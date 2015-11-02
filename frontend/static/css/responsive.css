@@ -1,0 +1,233 @@
+@media only screen and (min-device-width: 480px) and (max-device-width: 1024px), only screen and (max-width: 950px){
+	footer{
+		position: relative;
+	}
+	header #searchbar{
+		width: 288px;
+		overflow: hidden;
+	}
+	header #logo{
+	    float: none;
+    	margin: 20px auto;
+	}
+	form#searchbar {
+	    position: relative;
+        font-size: 0.8em;
+	}
+	header #searchbar input{
+		width: 100px
+	}
+	header button{
+	    width: 288px;
+		display: block;
+	    float: none;
+	    margin: auto !important;
+	}
+	header #searchbar select,
+	header #searchbar input{
+		display: block;
+	    width: 288px;
+		width: 100%;
+		margin: 0;
+		border-bottom: 1px solid #ececec;
+		-webkit-appearance: none;
+	}
+	header #searchbar input{
+		padding-left: 14px;
+	}
+	.one_half{
+		float: none;
+		width: 90%;
+	}
+	footer .links,
+	footer .createdby{
+		float: none;
+		margin: auto;
+		text-align: center;
+	}
+	.login {
+	    margin-right: 10px;
+	    opacity: 0;
+        visibility: hidden;
+	}
+	.login.exit {
+	    margin-left: 10px;
+	}
+	div#search_proposals {
+        width: 238px !important;
+    	font-size: 0.8em;
+	}
+	.day {
+	    float: none;
+	    width: 288px;
+	    margin: auto;
+	}
+	.day ul li {
+        width: 268px;
+	    font-size: 0.8em;
+	}
+	#overlay #modal{
+		width: 90%;
+		top: 0;
+		margin: 0 auto;
+		font-size: 0.8em;
+	}
+	#overlay #modal .content select{
+		width: 100%
+	}
+	#overlay #modal .content input,
+	div.editable{
+		width: 217px
+	}
+	#overlay #modal button{
+	    float: none;
+	    width: 100%;
+	    margin: auto;
+	}
+	#overlay #modal .content label{
+		margin-bottom: 0;
+	}
+	#w--1{
+		height: initial;
+	}
+	.week:before{
+		position: initial;
+		text-align: center;
+		opacity: 0.7;
+		margin: 5px auto;
+	}
+	i.type:after{
+		display: inline-block;
+		position: absolute;
+	    margin-left: 15px;
+	    margin-top: -10px;
+	}
+	i.type[data-type = "0"]:after{
+		content: 'Лекція';
+	}
+	i.type[data-type = "1"]:after{
+		content: 'Практика';
+	}
+	i.type[data-type = "2"]:after{
+		content: 'Лабораторна';
+	}
+	#tooltip{
+	    visibility: hidden;
+	}
+	.noday {
+	    visibility: hidden;
+	    display: none;
+	}
+	.day ul li:before {
+	    display: block;
+	    position: absolute;
+	    left: -15px;
+	    color: #CECECE;
+        font-size: 0.6em;
+	    padding: 5px;
+	    width: 5px;
+	    text-align: center;
+	    opacity: 0.5;
+        background-color: rgba(0,0,0,0.2);
+	}
+	.day ul li:nth-child(1):before{
+		content: '1';
+	}
+	.day ul li:nth-child(2):before{
+		content: '2';
+	}
+	.day ul li:nth-child(3):before{
+		content: '3';
+	}
+	.day ul li:nth-child(4):before{
+		content: '4';
+	}
+	.day ul li:nth-child(5):before{
+		content: '5';
+	}
+	.day ul li:nth-child(6):before{
+		content: '6';
+	}
+	#index_block{
+		text-align: center;
+		width: 280px
+	}
+	#index_block p{
+		width: initial;
+		padding: 0
+	}
+	#index_block #shield {
+        width: 140px;
+	    background-size: 100%;
+	    height: 198px;
+	}
+	#logo:after{
+		right: initial !important;
+		margin-left: 5px !important;
+	}
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px), only screen and (min-width: 749px) and (max-width: 950px){
+	.container{
+		width: 656px
+	}
+	.day {
+	    float: left;
+	    width: 288px;
+	    margin: 0 20px;
+	}
+	.day ul li {
+        width: 268px;
+	    font-size: 0.8em;
+	}
+	#index_block{
+		width: 656px
+	}
+	#index_block p {
+	    width: 55%;
+	    margin: auto !important;
+	    padding: 0;
+	}
+}
+select::-ms-expand {
+  	display: none;
+}
+@-moz-document url-prefix(){
+	.button{
+		padding: 4px 35px 36px;
+	}
+	.editable br{
+		display: none;
+	}
+}
+@media only screen and (min-width: 951px) and (max-width: 1300px) {
+	.container{
+		max-width: 1200px
+	}
+	.day{
+	    width: 190px;
+	}
+	.day ul li{
+		width: 170px
+	}
+	footer{
+		position: fixed;
+	}
+}
+@media only screen and (min-width: 1400px){
+	footer{
+		position: fixed;
+	}
+	#index_block{
+	    margin-top: 10%;
+	}
+}
+@media only screen and (max-width: 1400px){
+	footer{
+		position: relative;
+	}
+}
+@media only screen and (min-width: 1025px) and (max-width: 1400px){
+	footer{
+		position: fixed;
+	}
+}

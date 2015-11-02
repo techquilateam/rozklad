@@ -61,3 +61,7 @@ target/
 *.sqlite3
 *.sublime-project
 *.sublime-workspace
+*.css.map
+/static/
+touchme
+settings_secure.py
