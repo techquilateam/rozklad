@@ -241,6 +241,10 @@ def create_lesson(request):
         new_lesson.save()
         new_lesson.groups.add(group)
 
+        cache = caches['default']
+
+        cache.delete('timetable_groups_{0}'.format(str(group.id)))
+
         return JsonResponse({'status': 'OK'})
     else:
         pass
@@ -267,8 +271,10 @@ def edit_lesson(request):
 
         add_teachers_id = [id for id in new_teachers_id if id not in old_teachers_id]
         remove_teachers_id = [id for id in old_teachers_id if id not in new_teachers_id]
+        static_teachers_id = [id for id in new_teachers_id if id in old_teachers_id]
         add_rooms_id = [id for id in new_rooms_id if id not in old_rooms_id]
         remove_rooms_id = [id for id in old_rooms_id if id not in new_rooms_id]
+        static_rooms_id = [id for id in new_rooms_id if id in old_rooms_id]
 
         group_exclude_lesson_queryset = Lesson.objects.all()
         for group in lesson.groups.all():
@@ -303,15 +309,29 @@ def edit_lesson(request):
         else:
             return bad_request
 
+        cache = caches['default']
+
         for teacher_id in remove_teachers_id:
             lesson.teachers.remove(Teacher.objects.get(id=teacher_id))
+            cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
         for room_id in remove_rooms_id:
             lesson.rooms.remove(Room.objects.get(id=room_id))
+            cache.delete('timetable_rooms_{0}'.format(str(room_id)))
 
         for teacher_id in add_teachers_id:
             lesson.teachers.add(Teacher.objects.get(id=teacher_id))
+            cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
         for room_id in add_rooms_id:
             lesson.rooms.add(Room.objects.get(id=room_id))
+            cache.delete('timetable_rooms_{0}'.format(str(room_id)))
+
+        for teacher_id in static_teachers_id:
+            cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
+        for room_id in static_rooms_id:
+            cache.delete('timetable_rooms_{0}'.format(str(room_id)))
+
+        for group_id in [group.id for group in lesson.groups.all()]:
+            cache.delete('timetable_groups_{0}'.format(str(group_id)))
 
         return JsonResponse({'status': 'OK'})
     else:
@@ -331,6 +351,15 @@ def remove_lesson(request):
 
         if group not in lesson.groups.all():
             return bad_request
+
+        cache = caches['default']
+
+        for group in lesson.groups.all():
+            cache.delete('timetable_groups_{0}'.format(str(group.id)))
+        for teacher in lesson.teachers.all():
+            cache.delete('timetable_teachers_{0}'.format(str(teacher.id)))
+        for room in lesson.rooms.all():
+            cache.delete('timetable_rooms_{0}'.format(str(room.id)))
 
         if lesson.groups.all().count() == 1:
             lesson.delete()
@@ -354,6 +383,15 @@ def link_lesson(request):
         lesson = Lesson.objects.get(id=request_data['lesson_id'])
 
         lesson.groups.add(group)
+
+        cache = caches['default']
+
+        for group in lesson.groups.all():
+            cache.delete('timetable_groups_{0}'.format(str(group.id)))
+        for teacher in lesson.teachers.all():
+            cache.delete('timetable_teachers_{0}'.format(str(teacher.id)))
+        for room in lesson.rooms.all():
+            cache.delete('timetable_rooms_{0}'.format(str(room.id)))
 
         return JsonResponse({'status': 'OK'})
     else:
