@@ -10,7 +10,6 @@
 		<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
 		<meta name="format-detection" content="telephone=no">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-		<!-- <link rel="stylesheet" href="../static/css/style.css"> -->
 		<meta charset="utf-8">
 		<script src="/static/js/jquery-2.1.4.min.js"></script>
 	</head>
@@ -66,18 +65,38 @@
 					<input type="text" placeholder="Ім'я користувача" id="login_username_input">
 					<input type="password" placeholder="Пароль" id="login_password_input">
 					<p class="error">Перевірте правильність уведених даних</p>
-					<!-- <button name="" class="button close">закрити</button> -->
 					<button name="" class="button" id="login_button">Увійти</button>
 				</div>
 			</div>
 		</div>
 		{% endif %}
 		<script>
+			function getCookie(name)
+			{
+				var cookieValue = null;
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';');
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = jQuery.trim(cookies[i]);
+						if (cookie.substring(0, name.length + 1) == (name + '=')) {
+							cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+							break;
+						}
+					}
+				}
+				return cookieValue;
+			}
+
+			$.ajaxSetup({ 
+				beforeSend: function(xhr, settings) {
+					if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+						xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'))
+					}
+				}
+			})
+		</script>
+		<script>
 			$(document).ready(function() {
-				$("#search_proposals").css({
-					// top: $("header").height() * 1.1
-				})
-				
 				$("#search__input").keyup(function() {
 					var base_url = "/" + $("#searchbar option:selected").attr("class") + "/"
 					if ($(this).val().length >= 2) {
@@ -136,8 +155,7 @@
 						dataType: "json",
 						data: {
 							username: $("#login_username_input").val(),
-							password: $("#login_password_input").val(),
-							csrfmiddlewaretoken: "{{ csrf_token }}",
+							password: $("#login_password_input").val()
 						}
 					}).done(function(data) {
 						if (data.result == "OK") {

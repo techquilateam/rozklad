@@ -352,10 +352,7 @@
 						url: "/create-lesson/",
 						dataType: "json",
 						data: JSON.stringify(ajax_data),
-						contentType: "application/json",
-						headers: {
-							"X-CSRFToken": "{{ csrf_token }}"
-						}
+						contentType: "application/json"
 					}).done(function(data) {
 						if (data.status) {
 							if (data.status == "OK") {
@@ -475,10 +472,7 @@
 					url: "/edit-lesson/",
 					dataType: "json",
 					data: JSON.stringify(ajax_data),
-					contentType: "application/json",
-					headers: {
-						"X-CSRFToken": "{{ csrf_token }}"
-					}
+					contentType: "application/json"
 				}).done(function(data) {
 					if (data.status) {
 						if (data.status == "OK") {
@@ -520,10 +514,7 @@
 					url: "/remove-lesson/",
 					dataType: "json",
 					data: JSON.stringify(ajax_data),
-					contentType: "application/json",
-					headers: {
-						"X-CSRFToken": "{{ csrf_token }}"
-					}
+					contentType: "application/json"
 				}).done(function(data) {
 					if (data.status) {
 						if (data.status == "OK") {
@@ -554,10 +545,7 @@
 					url: "/link-lesson/",
 					dataType: "json",
 					data: JSON.stringify(ajax_data),
-					contentType: "application/json",
-					headers: {
-						"X-CSRFToken": "{{ csrf_token }}"
-					}
+					contentType: "application/json"
 				}).done(function(data) {
 					location.reload()
 				})
@@ -579,10 +567,7 @@
 					url: "/create-lesson/",
 					dataType: "json",
 					data: JSON.stringify(ajax_data),
-					contentType: "application/json",
-					headers: {
-						"X-CSRFToken": "{{ csrf_token }}"
-					}
+					contentType: "application/json"
 				}).done(function(data) {
 					location.reload()
 				})
