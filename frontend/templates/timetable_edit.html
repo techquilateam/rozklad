@@ -209,6 +209,7 @@
 
 			//search for teachers
 			$("#edit_lesson_teachers").keyup(function() {
+				$(".error").animate({"opacity": 0}, 300)
 				if ($(this).val().length >= 2) {
 					$.ajax({
 						method: "GET",
@@ -242,6 +243,7 @@
 
 			//search for rooms
 			$("#edit_lesson_rooms").keyup(function() {
+				$(".error").animate({"opacity": 0}, 300)
 				if ($(this).val().length >= 2) {
 					$.ajax({
 						method: "GET",
@@ -274,6 +276,7 @@
 			})
 
 			$(document).on("click", ".deletespan", function() {
+				$(".error").animate({"opacity": 0}, 300)
 				if ($(this).parent().hasClass("right")) {
 					for (i = 0; i < lesson__right_arr.length; i++)
 						if ($(this).parent().data("id") == lesson__right_arr[i])
@@ -318,6 +321,7 @@
 			})
 
 			$("#edit_lesson_name").keyup(function(e){
+				$(".error").animate({"opacity": 0}, 300)
 				if ($(this).hasClass("inputcorrect")) {
 					$("#search_proposals").addClass("noday")
 					$(this).removeClass("inputcorrect").val("").removeAttr("data-id")
