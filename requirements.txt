@@ -1,7 +1,8 @@
-django
-djangorestframework
-django-filter
-django-cors-headers
-django-guardian
-psycopg2
-python-memcached
+Django==1.8.5
+django-cors-headers==1.1.0
+django-filter==0.11.0
+django-guardian==1.3
+djangorestframework==3.2.4
+psycopg2==2.6.1
+python-memcached==1.57
+six==1.10.0

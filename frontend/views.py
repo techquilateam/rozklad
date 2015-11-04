@@ -5,15 +5,18 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q
 from django.core.cache import caches
+from django.views.decorators.csrf import ensure_csrf_cookie
 from settings import domains
 from data.models import Lesson, Group, Teacher, Room, Building, Discipline
 
 bad_request = HttpResponseBadRequest('Bad request')
 forbidden_request = HttpResponseForbidden('Forbidden')
 
+@ensure_csrf_cookie
 def index(request):
     return render(request, 'index.html', {})
 
+@ensure_csrf_cookie
 def timetable(request, type, id):
     cache = caches['default']
     cache_key = 'timetable_{0}_{1}'.format(type, str(id))
