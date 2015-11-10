@@ -156,7 +156,9 @@
 					})
 					return false
 				})
-
+				$("#login_username_input, #login_password_input").keyup(function() {
+					$(".error").animate({"opacity": 0}, 300)
+				})
 				$("#login_button").click(function() {
 					$.ajax({
 						method: "POST",

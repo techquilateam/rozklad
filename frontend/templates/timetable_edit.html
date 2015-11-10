@@ -75,6 +75,7 @@
 				<label for="edit_lesson_rooms">Кабінети:</label>
 				<div id="roomsblock"></div>
 				<input type="text" id="edit_lesson_rooms" placeholder="Додати аудиторію">
+				<p id="edit_with_another_week"><input type="checkbox">Редагувати таку саму пару на іншому тижні? </p>
 				<p class="error">Перевірте правильність уведених даних</p>
 				<button class="button close active" id="delete">Видалити</button>
 				<button class="button" id="save_lesson">Зберегти</button>
@@ -86,6 +87,7 @@
 			<div class="content">
 				<label for="edit_lesson_name">Назва пари:</label>
 				<input type="text" id="edit_lesson_name">
+				<p id="add_to_another_week"><input type="checkbox">Додати таку саму пару на інший тиждень? </p>
 				<p class="error">Перевірте правильність уведених даних</p>
 				<button class="button" id="add_lesson">Додати</button>
 				</div>
@@ -98,6 +100,14 @@
 				</div>
 				<button class="button" id="new_lesson">створити нову</button><br>
 				<button class="button close" id="idontneedthisshit">відмінити</button><br>
+			</div>
+		</div>
+		<div id="another_lesson" class="modal">
+			<h1 class="maintitle">Трапилась біда!</h1>
+			<div class="content">
+				<p>Є підозри, що ця пара у вас разом з іншими групами? <br>Тож що робити?</p>
+				<button class="button" id="add_to_another_lesson">АГА</button>
+				<button class="button close" id="idontneedthisshit">БЕГІМ ЗВІДСИ</button><br>
 			</div>
 		</div>
 	</div>
@@ -124,6 +134,8 @@
 				$("#teachersblock, #roomsblock").empty()
 				$("p.error").css("opacity", 0)
 				$("#overlay").css("opacity", 1).fadeIn(300)
+				$("#add_to_another_week").css("display", "none")
+				$("#edit_with_another_week").css("display", "none")
 				
 				current_week = parseInt($(this).parent().data("week"))
 				current_day = parseInt($(this).parent().data("day"))
@@ -140,6 +152,13 @@
 				for (i = 0; i < lesson__left_children.length; i++)
 					lesson__left_arr.push($(lesson__left_children[i]).data("id"))
 				
+				var thisDate = {
+					week: $(this).parent().data("week"),
+					day: $(this).parent().data("day"),
+					lesson: $(this).parent().data("lesson")
+				}
+				thisDate.week == 1 ? anotherWeek = 2 : anotherWeek = 1
+				anotherWeekLesson = $("li[data-week=\"" + anotherWeek + "\"][data-day=\"" + thisDate.day + "\"][data-lesson=\"" + thisDate.lesson + "\"]")
 				if ($(this).hasClass("edit")) {
 					current_lesson_id = parseInt($(this).parent().data("id"))
 
@@ -167,9 +186,16 @@
 						roomsBlock += '<span class="right" data-id="' + lesson__right_arr[i] + '">' + roomName + '<a href="#" class="deletespan"></a></span>'
 					}
 					$("#roomsblock").html(roomsBlock)
+					if (anotherWeekLesson.find(".lesson__title").data("id") ==  $(this).parent().find(".lesson__title").data("id")) {
+						$("#edit_with_another_week").css("display", "block")
+						$("#edit_with_another_week input").prop( "checked", true );
+					}
 				} else {
 					$("#adding.modal").css("opacity", 1).fadeIn(300)
 					$("#edit_lesson_name").removeClass("inputcorrect")
+					if (anotherWeekLesson.find(".lesson__title").length == 0) 
+						$("#add_to_another_week").css("display", "block")
+					
 				}
 			})
 
@@ -333,6 +359,11 @@
 
 			$(document).on("click", "#areyousure .close", function() {
 				$("#areyousure").fadeOut(300)
+				$(".modal").animate({"opacity": 1}, 300)
+			})
+
+			$(document).on("click", "#another_lesson .close", function() {
+				$("#another_lesson").fadeOut(300)
 				$(".modal").animate({"opacity": 1}, 300)
 			})
 
