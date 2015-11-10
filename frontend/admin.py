@@ -16,6 +16,7 @@ class BuildingAdmin(GuardedModelAdmin):
 
 class RoomAdmin(GuardedModelAdmin):
     list_display = ('name', 'building')
+    list_filter = ('building',)
     search_fields = ('^name',)
 
 class DisciplineAdmin(GuardedModelAdmin):
@@ -24,6 +25,7 @@ class DisciplineAdmin(GuardedModelAdmin):
 
 class GroupAdmin(GuardedModelAdmin):
     list_display = ('name', 'okr', 'type')
+    list_filter = ('okr', 'type')
     search_fields = ('^name',)
 
 class TeacherAdmin(GuardedModelAdmin):

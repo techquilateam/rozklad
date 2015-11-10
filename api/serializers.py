@@ -1,8 +1,7 @@
 import re
 from django.db.models import Q
-from django.contrib.auth.models import User
 from rest_framework import serializers
-from data.models import Group, Building, Room, Discipline, Teacher, Lesson
+from data.models import *
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,7 +16,7 @@ class BuildingSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name', 'kpimaps_id', 'building')
+        fields = ('id', 'name', 'full_name', 'kpimaps_id', 'building')
 
 class NestedRoomSerializer(serializers.ModelSerializer):
     building = BuildingSerializer()
@@ -52,8 +51,3 @@ class NestedLessonSerializer(serializers.ModelSerializer):
     class Meta(LessonSerializer.Meta):
         model = Lesson
         fields = ('id', 'type', 'discipline', 'groups', 'teachers', 'rooms')
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email')

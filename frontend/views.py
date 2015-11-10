@@ -7,7 +7,8 @@ from django.db.models import Q
 from django.core.cache import caches
 from django.views.decorators.csrf import ensure_csrf_cookie
 from settings import domains
-from data.models import Lesson, Group, Teacher, Room, Building, Discipline
+from data.models import *
+from data.search import *
 
 bad_request = HttpResponseBadRequest('Bad request')
 forbidden_request = HttpResponseForbidden('Forbidden')
@@ -43,7 +44,7 @@ def timetable(request, type, id):
         else:
             if not Room.objects.filter(id=id).exists():
                 raise Http404()
-            context['top_menu_str'] = Room.objects.get(id=id).name.upper()
+            context['top_menu_str'] = Room.objects.get(id=id).full_name().upper()
 
         queryset = None
         if type == 'groups':
@@ -54,8 +55,7 @@ def timetable(request, type, id):
             queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
 
         if ((type == 'groups' and (request.user.has_perm('edit_group_timetable', Group.objects.get(id=id)) or request.user.has_perm('data.edit_group_timetable'))) or
-            (type == 'teachers' and (request.user.has_perm('edit_teacher_timetable', Teacher.objects.get(id=id)) or request.user.has_perm('data.edit_teacher_timetable'))) or
-            (type == 'rooms' and (request.user.has_perm('edit_room_timetable', Room.objects.get(id=id)) or request.user.has_perm('data.edit_room_timetable')))):
+            (type == 'teachers' and (request.user.has_perm('edit_teacher_timetable', Teacher.objects.get(id=id)) or request.user.has_perm('data.edit_teacher_timetable')))):
             
             initial_data = {}
             initial_data['groups'] = []
@@ -84,7 +84,7 @@ def timetable(request, type, id):
                 for room in lesson.rooms.all():
                     room_dict = {
                         'id': room.id,
-                        'name': room.name,
+                        'name': room.full_name(),
                     }
 
                     if room_dict not in initial_data['rooms']:
@@ -158,37 +158,17 @@ def search(request, type):
     result = {}
 
     if type == 'groups':
-        groups = Group.objects.filter(name__istartswith=search_str)[:max_results]
+        groups = search_group(search_str, Group.objects.all())[:max_results]
         result['data'] = [{'id': group.id, 'name': group.name} for group in groups]
     elif type == 'teachers':
-        search_parts = search_str.split(' ')
-        search_parts = [part for part in search_parts if part != '']
-
-        if len(search_parts) > 0:
-            complex_lookup = Q()
-            for part in search_parts:
-                complex_lookup &= Q(last_name__istartswith=part) | Q(first_name__istartswith=part) | Q(middle_name__istartswith=part)
-
-            teachers = Teacher.objects.filter(complex_lookup)[:max_results]
-            result['data'] = [{'id': teacher.id, 'name': teacher.name()} for teacher in teachers]
-        else:
-            result['data'] = []
+        teachers = search_teacher(search_str, Teacher.objects.all())[:max_results]
+        result['data'] = [{'id': teacher.id, 'name': teacher.name()} for teacher in teachers]
     elif type == 'rooms':
-        rooms = Room.objects.filter(name__istartswith=search_str)[:max_results]
-        result['data'] = [{'id': room.id, 'name': room.name} for room in rooms]
+        rooms = search_room(search_str, Room.objects.all())[:max_results]
+        result['data'] = [{'id': room.id, 'name': room.full_name()} for room in rooms]
     else:
-        search_parts = search_str.split(' ')
-        search_parts = [part for part in search_parts if part != '']
-
-        if len(search_parts) > 0:
-            complex_lookup = Q()
-            for part in search_parts:
-                complex_lookup &= Q(name__icontains=part) | Q(full_name__icontains=part)
-
-            disciplines = Discipline.objects.filter(complex_lookup)[:max_results]
-            result['data'] = [{'id': discipline.id, 'name': discipline.name} for discipline in disciplines]
-        else:
-            result['data'] = []
+        disciplines = search_discipline(search_str, Discipline.objects.all())[:max_results]
+        result['data'] = [{'id': discipline.id, 'name': discipline.name} for discipline in disciplines]
 
     return JsonResponse(result)
 

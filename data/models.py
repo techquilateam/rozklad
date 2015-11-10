@@ -42,8 +42,11 @@ class Room(IdOrderingModelAbstract):
     building = models.ForeignKey(Building)
     kpimaps_id = models.IntegerField(null=True, blank=True)
 
+    def full_name(self):
+        return '{0}-{1}'.format(self.name, self.building.name)
+
     def __str__(self):
-        return self.name
+        return self.full_name()
 
     class Meta(IdOrderingModelAbstract.Meta):
         unique_together = (('name', 'building'),)

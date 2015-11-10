@@ -1,8 +1,9 @@
 from rest_framework import viewsets, pagination, filters
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
-from data.models import Group, Building, Room, Discipline, Teacher, Lesson
+from data.models import *
 from . import serializers
+from .filters import *
 
 class GlobalViewPagination(pagination.LimitOffsetPagination):
     default_limit = 10
@@ -34,8 +35,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.GroupSerializer
     pagination_class = GlobalViewPagination
 
-    filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
-    search_fields = ('^name',)
+    filter_backends = (SearchGroupFilterBackend, filters.DjangoFilterBackend)
     filter_fields = ('name', 'okr', 'type')
 
     @detail_route(methods=['GET'])
@@ -52,8 +52,7 @@ class RoomViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.RoomSerializer
     pagination_class = GlobalViewPagination
 
-    filter_backends = (filters.SearchFilter, filters.DjangoFilterBackend)
-    search_fields = ('^name',)
+    filter_backends = (SearchRoomFilterBackend, filters.DjangoFilterBackend)
     filter_fields = ('name', 'building')
 
     @detail_route(methods=['GET'])
@@ -65,16 +64,14 @@ class DisciplineViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.DisciplineSerializer
     pagination_class = GlobalViewPagination
 
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'full_name')
+    filter_backends = (SearchDisciplineFilterBackend,)
 
 class TeacherViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = serializers.TeacherSerializer
     pagination_class = GlobalViewPagination
 
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^last_name', '^first_name', '^middle_name')
+    filter_backends = (SearchTeacherFilterBackend,)
 
     @detail_route(methods=['GET'])
     def timetable(self, request, pk, format=None):
