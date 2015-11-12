@@ -284,6 +284,18 @@ def edit_lesson(request):
         if not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm(data.edit_group_timetable)):
             return forbidden_request
 
+        type_choices_keys = [choice[0] for choice in Lesson.TYPE_CHOICES]
+        
+        current_lesson_type = None
+        if request_data['lesson_type'] == 'None':
+            pass
+        elif int(request_data['lesson_type']) in type_choices_keys:
+            current_lesson_type = int(request_data['lesson_type'])
+        else:
+            return bad_request
+
+        conflicts = []
+
         old_teachers_id = [teacher.id for teacher in current_lesson.teachers.all()]
         old_rooms_id = [room.id for room in current_lesson.rooms.all()]
         new_teachers_id = request_data['teachers_id']
@@ -303,30 +315,20 @@ def edit_lesson(request):
         for teacher_id in new_teachers_id:
             teacher = Teacher.objects.get(id=teacher_id)
             if group_exclude_lesson_queryset.filter(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week, teachers=teacher).exists():
-                return JsonResponse({
-                    'status': 'ERROR',
-                    'error_code': 0,
-                    'teacher_name': teacher.name(),
+                conflicts.append({
+                    'type': 'teacher',
+                    'lesson': group_exclude_lesson_queryset.get(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week, teachers=teacher),
+                    'teacher': teacher,
                 })
 
         for room_id in new_rooms_id:
             room = Room.objects.get(id=room_id)
             if group_exclude_lesson_queryset.filter(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week, rooms=room).exists():
-                return JsonResponse({
-                    'status': 'ERROR',
-                    'error_code': 1,
-                    'room_name': room.name,
+                conflicts.append({
+                    'type': 'room',
+                    'lesson': group_exclude_lesson_queryset.get(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week, rooms=room),
+                    'room': room,
                 })
-
-        type_choices_keys = [choice[0] for choice in Lesson.TYPE_CHOICES]
-        
-        current_lesson_type = None
-        if request_data['lesson_type'] == 'None':
-            pass
-        elif int(request_data['lesson_type']) in type_choices_keys:
-            current_lesson_type = int(request_data['lesson_type'])
-        else:
-            return bad_request
 
         another_week = True if request_data['another_week'] == 1 else False
 
@@ -359,22 +361,57 @@ def edit_lesson(request):
             for teacher_id in new_teachers_id:
                 teacher = Teacher.objects.get(id=teacher_id)
                 if group_exclude_lesson_queryset_2.filter(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week, teachers=teacher).exists():
-                    return JsonResponse({
-                        'status': 'ERROR',
-                        'error_code': 0,
-                        'teacher_name': teacher.name(),
+                    conflicts.append({
+                        'type': 'teacher',
+                        'lesson': group_exclude_lesson_queryset_2.get(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week, teachers=teacher),
+                        'teacher': teacher,
                     })
 
             for room_id in new_rooms_id:
                 room = Room.objects.get(id=room_id)
                 if group_exclude_lesson_queryset_2.filter(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week, rooms=room).exists():
-                    return JsonResponse({
-                        'status': 'ERROR',
-                        'error_code': 1,
-                        'room_name': room.name,
+                    conflicts.append({
+                        'type': 'room',
+                        'lesson': group_exclude_lesson_queryset_2.get(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week, rooms=room),
+                        'room': room,
                     })
 
         cache = caches['default']
+
+        if conflicts:
+            if request_data['y'] == 1:
+                for conflict in conflicts:
+                    if conflict['type'] == 'teacher':
+                        conflict['lesson'].teachers.remove(conflict['teacher'])
+                    else:
+                        conflict['lesson'].rooms.remove(conflict['room'])
+            else:
+                conflict_response = {
+                    'status': 'CONFLICT',
+                    'conflicts': [],
+                }
+
+                for conflict in conflicts:
+                    if conflict['type'] == 'teacher':
+                        conflict_response['conflicts'].append({
+                            'type': 'teacher',
+                            'name': conflict['teacher'].name(),
+                            'number': conflict['lesson'].number,
+                            'day': conflict['lesson'].day,
+                            'week': conflict['lesson'].week,
+                            'groups': [{'id': group.id, 'name': group.name} for group in conflict['lesson'].groups.all()],
+                        })
+                    else:
+                        conflict_response['conflicts'].append({
+                            'type': 'room',
+                            'name': conflict['room'].full_name(),
+                            'number': conflict['lesson'].number,
+                            'day': conflict['lesson'].day,
+                            'week': conflict['lesson'].week,
+                            'groups': [{'id': group.id, 'name': group.name} for group in conflict['lesson'].groups.all()],
+                        })
+
+                return JsonResponse(conflict_response)
 
         current_lesson.type = current_lesson_type
         current_lesson.save()

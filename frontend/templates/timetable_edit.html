@@ -103,11 +103,14 @@
 			</div>
 		</div>
 		<div id="another_lesson" class="modal">
-			<h1 class="maintitle">Трапилась біда!</h1>
+			<h1 class="maintitle">Виявлено конфлікти!</h1>
 			<div class="content">
-				<p>Є підозри, що ця пара у вас разом з іншими групами? <br>Тож що робити?</p>
-				<button class="button" id="add_to_another_lesson">АГА</button>
-				<button class="button close" id="idontneedthisshit">БЕГІМ ЗВІДСИ</button><br>
+				<p>
+					<span id="another_lesson_conflicts" style="color: brown"></span>
+					Все одно продовжити?
+				</p>
+				<button class="button" id="another_lesson_continue_button">ТАК</button>
+				<button class="button close" id="idontneedthisshit">ПОВЕРНУТИСЯ</button><br>
 			</div>
 		</div>
 	</div>
@@ -366,6 +369,23 @@
 				$(".modal").animate({"opacity": 1}, 300)
 			})
 
+			function get_day_str(num) {
+				switch (num) {
+					case 1:
+						return "понеділок"
+					case 2:
+						return "вівторок"
+					case 3:
+						return "середа"
+					case 4:
+						return "четвер"
+					case 5:
+						return "п'ятниця"
+					case 6:
+						return "субота"
+				}
+			}
+
 			$(document).on("click", "#add_lesson", function() {
 				if (!$("#edit_lesson_name").data("id")) {
 					$(".error").text("Введіть та виберіть с випадаючого списку назву пари")
@@ -506,6 +526,7 @@
 					lesson_type: $("#edit_lesson_type").val(),
 					teachers_id: teacher_id_array,
 					rooms_id: room_id_array,
+					y: 0,
 					another_week: $("#edit_with_another_week input").is(":checked") ? 1 : 0
 				}
 
@@ -519,17 +540,50 @@
 					if (data.status) {
 						if (data.status == "OK") {
 							location.reload()
-						} else if (data.status == "ERROR") {
-							var error_text
-							
-							if (data.error_code == 0) {
-								error_text = "Викладач " + data.teacher_name + " вже зайнятий на цій парі"
-							} else {
-								error_text = "Аудиторія " + data.room_name + " вже зайнята на цій парі"
+						} else if (data.status == "CONFLICT") {
+							$("#another_lesson_conflicts").html('')
+
+							var conflict_strings = Array()
+							for (var i = 0; i < data.conflicts.length; i++) {
+								var conflict = data.conflicts[i]
+								var conflict_string = ""
+								
+								if (conflict.type == "teacher") {
+									conflict_string += "Викладач "
+									conflict_string += conflict.name.toUpperCase()
+									conflict_string += " вже має пару у цей час "
+									conflict_string += "(" + conflict.number + " пара, " + get_day_str(conflict.day) + ", " + conflict.week + " тиждень). "
+									conflict_string += "Групи: "
+									for (var j = 0; j < conflict.groups.length; j++) {
+										conflict_string += conflict.groups[j].name.toUpperCase()
+										if (j < conflict.groups.length - 1) {
+											conflict_string += ", "
+										}
+									}
+								} else {
+									conflict_string += "Аудиторія "
+									conflict_string += conflict.name.toUpperCase()
+									conflict_string += " вже зайнята у цей час "
+									conflict_string += "(" + conflict.number + " пара, " + get_day_str(conflict.day) + ", " + conflict.week + " тиждень). "
+									conflict_string += "Групи: "
+									for (var j = 0; j < conflict.groups.length; j++) {
+										conflict_string += conflict.groups[j].name.toUpperCase()
+										if (j < conflict.groups.length - 1) {
+											conflict_string += ", "
+										}
+									}
+								}
+
+								conflict_strings.push(conflict_string)
 							}
 
-							$(".error").text(error_text)
-							$(".error").animate({opacity: 1}, 400)
+							for (var i = 0; i < conflict_strings.length; i++) {
+								$("#another_lesson_conflicts").append(conflict_strings[i])
+								$("#another_lesson_conflicts").append("<br>")
+								$("#another_lesson_conflicts").append("<br>")
+							}
+
+							$("#overlay, #another_lesson").css("opacity", 1).fadeIn(300)
 						} else {
 							$(".error").text("Невідома помилка")
 							$(".error").animate({opacity: 1}, 400)
@@ -615,6 +669,41 @@
 				$.ajax({
 					method: "POST",
 					url: "/create-lesson/",
+					dataType: "json",
+					data: JSON.stringify(ajax_data),
+					contentType: "application/json"
+				}).done(function(data) {
+					location.reload()
+				})
+			})
+
+			$(document).on("click", "#another_lesson_continue_button", function() {
+				var teacher_id_array = Array()
+				var teachers_block = $("#teachersblock span")
+				for (var i = 0; i < teachers_block.length; i++) {
+					teacher_id_array.push($(teachers_block[i]).data("id"))
+				}
+				
+				var room_id_array = Array()
+				var rooms_block = $("#roomsblock span")
+				for (var i = 0; i < rooms_block.length; i++) {
+					room_id_array.push($(rooms_block[i]).data("id"))
+				}
+
+				var ajax_data = {
+					sender: "group", //потом сделаем и для teacher
+					id: {{ id }},
+					lesson_id: current_lesson_id,
+					lesson_type: $("#edit_lesson_type").val(),
+					teachers_id: teacher_id_array,
+					rooms_id: room_id_array,
+					y: 1,
+					another_week: $("#edit_with_another_week input").is(":checked") ? 1 : 0
+				}
+
+				$.ajax({
+					method: "POST",
+					url: "/edit-lesson/",
 					dataType: "json",
 					data: JSON.stringify(ajax_data),
 					contentType: "application/json"
