@@ -117,7 +117,8 @@ header
 			background-image: url('../img/arrow.png')
 			background-position: right center
 			background-repeat: no-repeat
-		input
+		input[type=text],
+		input[type=password]
 			@extend select
 			padding: 6px 10px
 			width: 300px
@@ -277,6 +278,7 @@ footer
 			background: $darker
 			padding: 25px 25px 15px
 			color: $white
+			margin: 0
 		.content
 			padding: 25px
 			// option[selected="selected"]
@@ -309,7 +311,8 @@ footer
 				line-height: 0
 				color: $red
 				opacity: 0
-			input
+			input[type=text],
+			input[type=password]
 				@extend select
 				background: #fff
 				padding: 6px 10px
@@ -327,7 +330,8 @@ footer
 			.button.close:after,
 			.button.close.active
 				background: $red
-	#areyousure
+	#areyousure,
+	#another_lesson
 		position: absolute
 		z-index: 9999
 		top: 10px
@@ -503,7 +507,8 @@ footer
 	margin-top: 15px
 #w--2:before
 	content: 'Тиждень 2'
-#overlay .modal .content input#edit_lesson_name.inputcorrect
+#overlay .modal .content input#edit_lesson_name.inputcorrect[type=text],
+#overlay .modal .content input#edit_lesson_name.inputcorrect[type=password]
 	background: #f1fbff
 	@extend .transition
 .noday
@@ -548,3 +553,9 @@ i.type:hover
 	color: #012e3e
 #index_block #shield
 	background-image: url("../img/shield--gradient.png")
+input[type=checkbox],
+input[type=password]
+	margin-right: 15px
+#add_to_another_week,
+#edit_with_another_week
+	display: none

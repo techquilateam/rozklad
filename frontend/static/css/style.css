@@ -1,6 +1,10 @@
 @charset "UTF-8";
 .transition, .button, .button:after, header #logo a, .login, footer a, .day ul li, .day ul li p a, .handle, .edit, .plus, .closeicon, #teachersblock span a,
-#roomsblock span a, #overlay .modal .content input#edit_lesson_name.inputcorrect, #overlay #areyousure .content input#edit_lesson_name.inputcorrect, i.type {
+#roomsblock span a, #overlay .modal .content input#edit_lesson_name.inputcorrect[type=text], #overlay #areyousure .content input#edit_lesson_name.inputcorrect[type=text],
+#overlay #another_lesson .content input#edit_lesson_name.inputcorrect[type=text],
+#overlay .modal .content input#edit_lesson_name.inputcorrect[type=password],
+#overlay #areyousure .content input#edit_lesson_name.inputcorrect[type=password],
+#overlay #another_lesson .content input#edit_lesson_name.inputcorrect[type=password], i.type {
   -webkit-transition: all 0.2s;
   -moz-transition: all 0.2s;
   transition: all 0.2s; }
@@ -93,7 +97,16 @@ header {
     width: 70%;
     overflow: auto;
     margin: auto; }
-    header #searchbar select, header #searchbar input, header #searchbar #overlay .modal .content input, #overlay .modal .content header #searchbar input, header #searchbar #overlay #areyousure .content input, #overlay #areyousure .content header #searchbar input {
+    header #searchbar select, header #searchbar input[type=text],
+    header #searchbar input[type=password], header #searchbar #overlay .modal .content input[type=text], #overlay .modal .content header #searchbar input[type=text], header #searchbar #overlay #areyousure .content input[type=text], #overlay #areyousure .content header #searchbar input[type=text],
+    header #searchbar #overlay #another_lesson .content input[type=text],
+    #overlay #another_lesson .content header #searchbar input[type=text],
+    header #searchbar #overlay .modal .content input[type=password],
+    #overlay .modal .content header #searchbar input[type=password],
+    header #searchbar #overlay #areyousure .content input[type=password],
+    #overlay #areyousure .content header #searchbar input[type=password],
+    header #searchbar #overlay #another_lesson .content input[type=password],
+    #overlay #another_lesson .content header #searchbar input[type=password] {
       font-family: "Open Sans Condensed", Arial, sans-serif;
       font-size: 1em;
       padding: 5px 10px;
@@ -112,7 +125,8 @@ header {
       background-image: url("../img/arrow.png");
       background-position: right center;
       background-repeat: no-repeat; }
-    header #searchbar input {
+    header #searchbar input[type=text],
+    header #searchbar input[type=password] {
       padding: 6px 10px;
       width: 300px;
       margin-left: -5px;
@@ -155,7 +169,8 @@ footer {
 .background, body {
   background: #00729b; }
 
-.shadow, header, footer, .sortable-ghost, #overlay .modal, #overlay #areyousure {
+.shadow, header, footer, .sortable-ghost, #overlay .modal, #overlay #areyousure,
+#overlay #another_lesson {
   -webkit-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.56);
   -moz-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.56);
   box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.56); }
@@ -255,7 +270,8 @@ footer {
   position: fixed;
   top: 0px;
   display: none; }
-  #overlay .modal, #overlay #areyousure {
+  #overlay .modal, #overlay #areyousure,
+  #overlay #another_lesson {
     margin: 50px auto 0px auto;
     width: 500px;
     background-color: #fff;
@@ -263,14 +279,22 @@ footer {
     position: relative;
     color: black;
     display: none; }
-    #overlay .modal .maintitle, #overlay #areyousure .maintitle {
+    #overlay .modal .maintitle, #overlay #areyousure .maintitle,
+    #overlay #another_lesson .maintitle {
       font-size: 1.1em;
       background: #012e3e;
       padding: 25px 25px 15px;
-      color: #fff; }
-    #overlay .modal .content, #overlay #areyousure .content {
+      color: #fff;
+      margin: 0; }
+    #overlay .modal .content, #overlay #areyousure .content,
+    #overlay #another_lesson .content {
       padding: 25px; }
-      #overlay .modal .content select, #overlay #areyousure .content select, #overlay .modal .content input, #overlay #areyousure .content input {
+      #overlay .modal .content select, #overlay #areyousure .content select,
+      #overlay #another_lesson .content select, #overlay .modal .content input[type=text], #overlay #areyousure .content input[type=text],
+      #overlay #another_lesson .content input[type=text],
+      #overlay .modal .content input[type=password],
+      #overlay #areyousure .content input[type=password],
+      #overlay #another_lesson .content input[type=password] {
         font-family: "Open Sans Condensed", Arial, sans-serif;
         font-size: 1em;
         padding: 5px 10px;
@@ -291,32 +315,45 @@ footer {
         background-image: url("../img/arrow.png");
         background-position: right center;
         background-repeat: no-repeat; }
-      #overlay .modal .content label, #overlay #areyousure .content label {
+      #overlay .modal .content label, #overlay #areyousure .content label,
+      #overlay #another_lesson .content label {
         margin-bottom: 10px;
         display: inline-block; }
-      #overlay .modal .content .error, #overlay #areyousure .content .error {
+      #overlay .modal .content .error, #overlay #areyousure .content .error,
+      #overlay #another_lesson .content .error {
         line-height: 0;
         color: #FF6140;
         opacity: 0; }
-      #overlay .modal .content input, #overlay #areyousure .content input {
+      #overlay .modal .content input[type=text], #overlay #areyousure .content input[type=text],
+      #overlay #another_lesson .content input[type=text],
+      #overlay .modal .content input[type=password],
+      #overlay #areyousure .content input[type=password],
+      #overlay #another_lesson .content input[type=password] {
         background: #fff;
         padding: 6px 10px;
         width: 94%; }
-      #overlay .modal .content .button, #overlay #areyousure .content .button {
+      #overlay .modal .content .button, #overlay #areyousure .content .button,
+      #overlay #another_lesson .content .button {
         background: #012e3e;
         -webkit-appearance: none; }
-      #overlay .modal .content .button:hover, #overlay #areyousure .content .button:hover {
+      #overlay .modal .content .button:hover, #overlay #areyousure .content .button:hover,
+      #overlay #another_lesson .content .button:hover {
         color: #fff;
         opacity: 0.9; }
-      #overlay .modal .content .button:after, #overlay #areyousure .content .button:after {
+      #overlay .modal .content .button:after, #overlay #areyousure .content .button:after,
+      #overlay #another_lesson .content .button:after {
         background: #2194be; }
-      #overlay .modal .content .button.close, #overlay #areyousure .content .button.close {
+      #overlay .modal .content .button.close, #overlay #areyousure .content .button.close,
+      #overlay #another_lesson .content .button.close {
         float: right; }
       #overlay .modal .content .button.close:after, #overlay #areyousure .content .button.close:after,
+      #overlay #another_lesson .content .button.close:after,
       #overlay .modal .content .button.close.active,
-      #overlay #areyousure .content .button.close.active {
+      #overlay #areyousure .content .button.close.active,
+      #overlay #another_lesson .content .button.close.active {
         background: #FF6140; }
-  #overlay #areyousure {
+  #overlay #areyousure,
+  #overlay #another_lesson {
     position: absolute;
     z-index: 9999;
     top: 10px;
@@ -325,66 +362,93 @@ footer {
     right: 0;
     overflow: auto;
     margin: auto; }
-    #overlay #areyousure ul {
+    #overlay #areyousure ul,
+    #overlay #another_lesson ul {
       padding: 0;
       list-style-type: none;
       text-align: left; }
-    #overlay #areyousure .groups {
+    #overlay #areyousure .groups,
+    #overlay #another_lesson .groups {
       width: 60%;
       margin: 0 auto; }
-      #overlay #areyousure .groups .groupname {
+      #overlay #areyousure .groups .groupname,
+      #overlay #another_lesson .groups .groupname {
         float: left;
         display: block;
         padding: 10px 0; }
-    #overlay #areyousure .maintitle {
+    #overlay #areyousure .maintitle,
+    #overlay #another_lesson .maintitle {
       margin: 0 auto; }
-    #overlay #areyousure .content {
+    #overlay #areyousure .content,
+    #overlay #another_lesson .content {
       text-align: center;
       overflow-y: scroll;
       max-height: 450px; }
-      #overlay #areyousure .content p {
+      #overlay #areyousure .content p,
+      #overlay #another_lesson .content p {
         margin-top: 0; }
-      #overlay #areyousure .content .day {
+      #overlay #areyousure .content .day,
+      #overlay #another_lesson .content .day {
         float: initial;
         margin: 15px auto; }
-        #overlay #areyousure .content .day li {
+        #overlay #areyousure .content .day li,
+        #overlay #another_lesson .content .day li {
           border: none;
           color: #fff;
           background: #00729b; }
           #overlay #areyousure .content .day li i.edit, #overlay #areyousure .content .day li i.plus, #overlay #areyousure .content .day li i.closeicon,
-          #overlay #areyousure .content .day li i.plus {
+          #overlay #areyousure .content .day li i.plus,
+          #overlay #another_lesson .content .day li i.edit,
+          #overlay #another_lesson .content .day li i.plus,
+          #overlay #another_lesson .content .day li i.closeicon,
+          #overlay #another_lesson .content .day li i.plus {
             display: none; }
-          #overlay #areyousure .content .day li i.type[data-type="0"] {
+          #overlay #areyousure .content .day li i.type[data-type="0"],
+          #overlay #another_lesson .content .day li i.type[data-type="0"] {
             background: #84E900; }
-          #overlay #areyousure .content .day li i.type[data-type="1"] {
+          #overlay #areyousure .content .day li i.type[data-type="1"],
+          #overlay #another_lesson .content .day li i.type[data-type="1"] {
             background: #62B1D0; }
-          #overlay #areyousure .content .day li i.type[data-type="2"] {
+          #overlay #areyousure .content .day li i.type[data-type="2"],
+          #overlay #another_lesson .content .day li i.type[data-type="2"] {
             background: #FFA340; }
           #overlay #areyousure .content .day li i.type[data-type="0"],
           #overlay #areyousure .content .day li i.type[data-type="1"],
-          #overlay #areyousure .content .day li i.type[data-type="2"] {
+          #overlay #areyousure .content .day li i.type[data-type="2"],
+          #overlay #another_lesson .content .day li i.type[data-type="0"],
+          #overlay #another_lesson .content .day li i.type[data-type="1"],
+          #overlay #another_lesson .content .day li i.type[data-type="2"] {
             cursor: help; }
-          #overlay #areyousure .content .day li p a {
+          #overlay #areyousure .content .day li p a,
+          #overlay #another_lesson .content .day li p a {
             color: #fff; }
-      #overlay #areyousure .content .button {
+      #overlay #areyousure .content .button,
+      #overlay #another_lesson .content .button {
         background: #012e3e;
         -webkit-appearance: none;
         float: none !important;
         width: 60%;
         margin: 5px auto; }
-      #overlay #areyousure .content .button:hover {
+      #overlay #areyousure .content .button:hover,
+      #overlay #another_lesson .content .button:hover {
         color: #fff;
         opacity: 0.9; }
-      #overlay #areyousure .content .button:after {
+      #overlay #areyousure .content .button:after,
+      #overlay #another_lesson .content .button:after {
         background: #2194be; }
-      #overlay #areyousure .content #new_lesson:after {
+      #overlay #areyousure .content #new_lesson:after,
+      #overlay #another_lesson .content #new_lesson:after {
         background: #37DC74; }
-      #overlay #areyousure .content .button.close {
+      #overlay #areyousure .content .button.close,
+      #overlay #another_lesson .content .button.close {
         float: right; }
       #overlay #areyousure .content .button.close:after,
-      #overlay #areyousure .content .button.close.active {
+      #overlay #areyousure .content .button.close.active,
+      #overlay #another_lesson .content .button.close:after,
+      #overlay #another_lesson .content .button.close.active {
         background: #FF6140; }
-      #overlay #areyousure .content .merge_lesson {
+      #overlay #areyousure .content .merge_lesson,
+      #overlay #another_lesson .content .merge_lesson {
         float: right !important;
         font-size: 0.8em;
         padding: 0;
@@ -500,7 +564,11 @@ footer {
 #w--2:before {
   content: "Тиждень 2"; }
 
-#overlay .modal .content input#edit_lesson_name.inputcorrect, #overlay #areyousure .content input#edit_lesson_name.inputcorrect {
+#overlay .modal .content input#edit_lesson_name.inputcorrect[type=text], #overlay #areyousure .content input#edit_lesson_name.inputcorrect[type=text],
+#overlay #another_lesson .content input#edit_lesson_name.inputcorrect[type=text],
+#overlay .modal .content input#edit_lesson_name.inputcorrect[type=password],
+#overlay #areyousure .content input#edit_lesson_name.inputcorrect[type=password],
+#overlay #another_lesson .content input#edit_lesson_name.inputcorrect[type=password] {
   background: #f1fbff; }
 
 .noday {
@@ -551,5 +619,13 @@ i.type:hover {
 
 #index_block #shield {
   background-image: url("../img/shield--gradient.png"); }
+
+input[type=checkbox],
+input[type=password] {
+  margin-right: 15px; }
+
+#add_to_another_week,
+#edit_with_another_week {
+  display: none; }
 
 /*# sourceMappingURL=style.css.map */

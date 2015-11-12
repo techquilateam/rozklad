@@ -1,2 +1,2 @@
-API_DOMAIN = 'api.rozklad.timenko.com'
-FRONTEND_DOMAIN = 'rozklad.timenko.com'
+API_DOMAIN = 'api.rozklad.hub.kpi.ua'
+FRONTEND_DOMAIN = 'rozklad.hub.kpi.ua'
