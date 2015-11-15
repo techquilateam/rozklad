@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<section id="profile-settings">
+		<div class="container">
+			<h2 class="title">Редагування аккаунту</h2>
+			<div class="one_half">
+				<h3>Змінити логін: </h3>
+				<p class="hint">- тількі цифри та латинські літери</p>
+				<div class="content">
+					<p>
+						<label for="Логін">Новий логін:</label><br>
+						<input type="text" id="new_login">
+					</p>
+					<p>
+						<label for="Логін">Новий логін ще раз:</label><br>
+						<input type="text" id="new_login_again">
+					</p>
+				</div>
+			</div>
+			<div class="one_half last">
+				<h3>Редагування персональних даних:</h3>
+				<div class="content">
+					<p>
+						<label for="Логін">Ім'я:</label><br>
+						<input type="text" id="Логін">
+					</p>
+					<p>
+						<label for="Логін">Прізвище:</label><br>
+						<input type="text" id="Логін">
+					</p>
+				</div>
+			</div>
+			<div class="clear"></div>
+			<div class="one_half">
+				<h3>Змінити пароль: </h3>
+				<p class="hint">- тількі цифри та латинські літери <br>
+				- обов'язково повинен містити великі та маленькі літери <br>
+				- обов'язково повинен містити цифри</p>
+				<div class="content">
+					<p>
+						<label for="Логін">Старий пароль:</label><br>
+						<input type="text" id="Логін">
+					</p>
+					<p>
+						<label for="Логін">Новий пароль:</label><br>
+						<input type="text" id="Логін">
+					</p>
+					<p>
+						<label for="Логін">Новий пароль ще раз:</label><br>
+						<input type="text" id="Логін">
+					</p>
+				</div>
+			</div>
+			<div class="one_half last">
+				<h3>Змінити email:</h3>
+				<div class="content">
+					<p>
+						<label for="Логін">Старий email:</label><br>
+						<input type="text" id="Логін">
+					</p>
+					<p>
+						<label for="Логін">Новий email:</label><br>
+						<input type="text" id="Логін">
+					</p>
+				</div>
+			</div>
+			<div class="clear"></div>
+			<p class="error">Перевірте правильність уведених даних</p>
+			<button class="button close" id="delete">Видалити</button>
+			<button class="button" id="save_lesson">Зберегти</button>
+			<div class="clear"></div>
+		</div>
+	</section>
+	<script>
+		$(document).ready(function() {
+			$("#new_login").keyup(function() {
+				$(this).removeClass("has-error").removeClass("has-success").removeClass("has-warning")
+				var reg=/^(?:[a-z]*[a-z]\d[a-z]*$|[a-z]*[a-z][a-z]*$)/i; //i will fix it, yeah
+				if (reg.test($(this).val())) {
+					$(this).addClass("has-success")
+				} else {
+					$(this).addClass("has-warning")
+				}
+			})
+		})
+	</script>
+{% endblock %}

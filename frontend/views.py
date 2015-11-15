@@ -18,6 +18,10 @@ def index(request):
     return render(request, 'index.html', {})
 
 @ensure_csrf_cookie
+def profile(request):
+    return render(request, 'profile.html', {})
+
+@ensure_csrf_cookie
 def timetable(request, type, id):
     cache = caches['default']
     cache_key = 'timetable_{0}_{1}'.format(type, str(id))

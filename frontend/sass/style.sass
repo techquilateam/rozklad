@@ -308,7 +308,7 @@ footer
 				margin-bottom: 10px
 				display: inline-block
 			.error
-				line-height: 0
+				line-height: 15px
 				color: $red
 				opacity: 0
 			input[type=text],
@@ -544,11 +544,17 @@ i.type:hover
 	display: none
 	top: 0px
 	left: 0px
+	max-width: 350px
 	background-color: $dark
 	padding: 5px 10px 5px 10px
 	color: white
 	opacity: 0.8
-	border-radius: 5px 
+	border-radius: 5px
+	a
+		color: $white
+		text-decoration: none
+	a:hover
+		text-decoration: underline
 #index_block .title
 	color: #012e3e
 #index_block #shield
@@ -559,3 +565,115 @@ input[type=password]
 #add_to_another_week,
 #edit_with_another_week
 	display: none
+.moregroups-detais
+	border-radius: 0 !important
+	font-size: 14px
+	height: 96px
+	-webkit-column-count: 4
+	-moz-column-count: 4
+	column-count: 4
+	opacity: 0.9
+	@extend #tooltip
+	display: block
+	-webkit-box-sizing: border-box
+	-moz-box-sizing: border-box
+	box-sizing: border-box
+	width: 100%
+	height: 101%
+	font-style: normal
+	display: none
+a.moregroups 
+	position: absolute
+	right: 3px
+	bottom: 0
+	width: 10px
+	display: block
+	background-image: url("../img/more.png")
+	background-size: 100% 100%
+	height: 10px
+#profile-settings .container 
+	color: #000
+	background: #fff
+	padding: 25px
+	max-width: 800px
+	margin: 50px auto
+	@extend .shadow
+	.title
+		margin: 0 auto 25px
+	h2, h3
+		color: $darker
+		margin: 0 auto
+	.content
+		margin-left: 30px
+	.error
+		line-height: 15px
+		color: $red
+		text-align: right
+		opacity: 0
+	input
+		width: 250px
+		outline: none
+		display: block
+		height: 34px
+		padding: 6px 12px
+		line-height: 1.42857143
+		color: #555
+		background-color: #fff
+		background-image: none
+		border: 1px solid #ccc
+		border-radius: 4px
+		-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+		-webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s
+		-o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+		transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+	.has-success
+		border-color: #3c763d
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+
+	.has-success:focus 
+		border-color: #2b542c
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168
+	.has-warning 
+		border-color: #8a6d3b
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+	.has-warning:focus 
+		border-color: #66512c
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b
+	.has-error 
+		border-color: #a94442
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+	.has-error:focus 
+		border-color: #843534
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483
+	.btn.disabled
+		cursor: not-allowed
+		filter: alpha(opacity=65)
+		-webkit-box-shadow: none
+		box-shadow: none
+		opacity: .65
+	p.hint 
+		margin-top: 0
+		opacity: 0.8
+		font-size: 0.8em
+		margin-left: 25px
+	.button
+		background: $dark
+		-webkit-appearance: none
+		float: right
+	.button:hover
+		color: $white
+		opacity: .9
+	.button:after
+		background: $linkhover
+	.button.close
+		float: right
+	.button.close:after,
+	.button.close.active
+		background: $red
