@@ -1,14 +1,25 @@
 import json
-from django.http import HttpResponse, JsonResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+import urllib.request
+import urllib.parse
+from django.http import HttpResponse, JsonResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q
 from django.core.cache import caches
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.translation import ugettext as _
 from settings import domains
 from data.models import *
 from data.search import *
+from .forms import EditUserProfile
+
+def check_captcha(captcha_response):
+    captcha_data = bytes(urllib.parse.urlencode({
+        'secret': '6LeqARETAAAAAAsp5Ek43imvW5Ryey-0r5DRWG-g',
+        'response': captcha_response,
+    }).encode())
+    return json.loads(urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify', captcha_data).read().decode('utf-8'))['success']
 
 bad_request = HttpResponseBadRequest('Bad request')
 forbidden_request = HttpResponseForbidden('Forbidden')
@@ -19,7 +30,29 @@ def index(request):
 
 @ensure_csrf_cookie
 def profile(request):
-    return render(request, 'profile.html', {})
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    context = {}
+    context['user_form'] = EditUserProfile(instance=request.user)
+
+    return render(request, 'profile.html', context)
+
+@require_http_methods(['POST'])
+def edit_profile(request):
+    if not request.user.is_authenticated():
+        return forbidden_request
+
+    user_form = EditUserProfile(request.POST, instance=request.user)
+    
+    errors = user_form.errors
+    if (not check_captcha(request.POST['g-recaptcha-response'])):
+        errors['captcha'] = [_('Captcha not passed')]
+
+    if not errors:
+        user_form.save()
+
+    return JsonResponse({'errors': user_form.errors})
 
 @ensure_csrf_cookie
 def timetable(request, type, id):
@@ -587,24 +620,23 @@ def link_lesson(request):
 
 @require_http_methods(['POST'])
 def auth_login(request):
-    if ('username' in request.POST.keys()) and ('password' in request.POST.keys()):
-        username = request.POST['username']
-        password = request.POST['password']
-        print(username)
-        print(password)
-        user = authenticate(username=username, password=password)
+    if (not check_captcha(request.POST['g-recaptcha-response'])):
+        return JsonResponse({'status': 'ERROR', 'error_code': 1})
 
-        if user:
-            login(request, user)
+    username = request.POST['username']
+    password = request.POST['password']
+    
+    user = authenticate(username=username, password=password)
 
-            return JsonResponse({'result': 'OK'})
-        else:
-            return JsonResponse({'result': 'ERROR'})
+    if user:
+        login(request, user)
+
+        return JsonResponse({'status': 'OK'})
     else:
-        return JsonResponse({'result': 'ERROR'})
+        return JsonResponse({'status': 'ERROR', 'error_code': 0})
 
 @require_http_methods(['POST'])
 def auth_logout(request):
     logout(request)
 
-    return JsonResponse({'result': 'OK'})
+    return JsonResponse({'status': 'OK'})

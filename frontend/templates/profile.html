@@ -3,85 +3,132 @@
 {% block content %}
 	<section id="profile-settings">
 		<div class="container">
-			<h2 class="title">Редагування аккаунту</h2>
-			<div class="one_half">
-				<h3>Змінити логін: </h3>
-				<p class="hint">- тількі цифри та латинські літери</p>
-				<div class="content">
-					<p>
-						<label for="Логін">Новий логін:</label><br>
-						<input type="text" id="new_login">
+			<form action="/edit-profile/" method="post" id="profile_edit_form">
+				<h2 class="title">Редагування аккаунту</h2>
+				<div class="one_half">
+					<h3>Змінити логін: </h3>
+					<p class="hint">
+						- тількі цифри та латинські літери
+						<br>
+						- від 5 до 30 символів
 					</p>
-					<p>
-						<label for="Логін">Новий логін ще раз:</label><br>
-						<input type="text" id="new_login_again">
-					</p>
+					<div class="content">
+						<p>
+							{{ user_form.username.label_tag }}
+							{{ user_form.username }}
+							<span class="error" id="id_username_error" data-form_name="username">Error</span>
+						</p>
+					</div>
 				</div>
-			</div>
-			<div class="one_half last">
-				<h3>Редагування персональних даних:</h3>
-				<div class="content">
-					<p>
-						<label for="Логін">Ім'я:</label><br>
-						<input type="text" id="Логін">
-					</p>
-					<p>
-						<label for="Логін">Прізвище:</label><br>
-						<input type="text" id="Логін">
-					</p>
+				<div class="one_half last">
+					<h3>Редагування персональних даних:</h3>
+					<div class="content">
+						<p>
+							{{ user_form.first_name.label_tag }}
+							{{ user_form.first_name }}
+							<span class="error" id="id_first_name_error" data-form_name="first_name">Error</span>
+						</p>
+						<p>
+							{{ user_form.last_name.label_tag }}
+							{{ user_form.last_name }}
+							<span class="error" id="id_last_name_error" data-form_name="last_name">Error</span>
+						</p>
+					</div>
 				</div>
-			</div>
-			<div class="clear"></div>
-			<div class="one_half">
-				<h3>Змінити пароль: </h3>
-				<p class="hint">- тількі цифри та латинські літери <br>
-				- обов'язково повинен містити великі та маленькі літери <br>
-				- обов'язково повинен містити цифри</p>
-				<div class="content">
-					<p>
-						<label for="Логін">Старий пароль:</label><br>
-						<input type="text" id="Логін">
-					</p>
-					<p>
-						<label for="Логін">Новий пароль:</label><br>
-						<input type="text" id="Логін">
-					</p>
-					<p>
-						<label for="Логін">Новий пароль ще раз:</label><br>
-						<input type="text" id="Логін">
-					</p>
+				<div class="clear"></div>
+				<div class="one_half">
+					<h3>Змінити пароль: </h3>
+					<p class="hint">від 8 до 32 символів</p>
+					<div class="content">
+						<p>
+							{{ user_form.new_password.label_tag }}
+							{{ user_form.new_password }}
+							<span class="error" id="id_new_password_error" data-form_name="new_password">Error</span>
+						</p>
+						<p>
+							{{ user_form.new_password_confirm.label_tag }}
+							{{ user_form.new_password_confirm }}
+							<span class="error" id="id_new_password_confirm_error" data-form_name="new_password_confirm">Error</span>
+						</p>
+					</div>
 				</div>
-			</div>
-			<div class="one_half last">
-				<h3>Змінити email:</h3>
-				<div class="content">
-					<p>
-						<label for="Логін">Старий email:</label><br>
-						<input type="text" id="Логін">
-					</p>
-					<p>
-						<label for="Логін">Новий email:</label><br>
-						<input type="text" id="Логін">
-					</p>
+				<div class="one_half last">
+					<h3>Змінити email:</h3>
+					<div class="content">
+						<p>
+							{{ user_form.email.label_tag }}
+							{{ user_form.email }}
+							<span class="error" id="id_email_error" data-form_name="email">Error</span>
+						</p>
+					</div>
 				</div>
-			</div>
-			<div class="clear"></div>
-			<p class="error">Перевірте правильність уведених даних</p>
-			<button class="button close" id="delete">Видалити</button>
-			<button class="button" id="save_lesson">Зберегти</button>
-			<div class="clear"></div>
+				<div class="clear"></div>
+				<p>
+					{{ user_form.old_password.label_tag }}
+					{{ user_form.old_password }}
+					<span class="error" id="id_old_password_error" data-form_name="old_password">Error</span>
+				</p>
+				<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
+				<p>
+					<span class="error" id="id_captcha_error" data-form_name="captcha">Error</span>
+				</p>
+				<p class="error" id="profile_success" style="color: green">Успішно збережено</p>
+				<button class="button" type="submit">Зберегти</button>
+				<div class="clear"></div>
+			</form>
 		</div>
 	</section>
 	<script>
 		$(document).ready(function() {
-			$("#new_login").keyup(function() {
-				$(this).removeClass("has-error").removeClass("has-success").removeClass("has-warning")
-				var reg=/^(?:[a-z]*[a-z]\d[a-z]*$|[a-z]*[a-z][a-z]*$)/i; //i will fix it, yeah
-				if (reg.test($(this).val())) {
-					$(this).addClass("has-success")
-				} else {
-					$(this).addClass("has-warning")
-				}
+			$("#profile_edit_form").on("submit", function(event) {
+				event.preventDefault()
+
+				$.ajax({
+					method: $(this).attr("method"),
+					url: $(this).attr("action"),
+					data: $(this).serialize(),
+					dataType: "json"
+				}).done(function(data) {
+					grecaptcha.reset()
+
+					var have_errors = false
+					var error_spans = $("#profile_edit_form span.error")
+					for (var i = 0; i < error_spans.length; i++) {
+						var error_span = $(error_spans[i])
+						var error_name = error_span.data("form_name")
+
+						if (typeof data.errors[error_name] != "undefined") {
+							have_errors = true
+							if (error_span.css("opacity") == 0) {
+								error_span.text(data.errors[error_name][0])
+								error_span.animate({opacity: 1}, 400)
+							} else {
+								error_span.animate({opacity: 0}, 400, function() {
+									$(this).text(data.errors[$(this).data("form_name")][0])
+									$(this).animate({opacity: 1}, 400)
+								})
+							}
+						} else {
+							if (error_span.css("opacity") == 1) {
+								error_span.animate({opacity: 0}, 400)
+							}
+						}
+					}
+
+					if (!have_errors) {
+						if ($("#id_new_password").val()) {
+							location = "/"
+						}
+
+						$("#id_old_password").val("")
+
+						$("#profile_success").animate({opacity: 1}, 400, function() {
+							setTimeout(function() {
+								$("#profile_success").animate({opacity: 0}, 400)
+							}, 2000)
+						})
+					}
+				})
 			})
 		})
 	</script>
