@@ -3,7 +3,7 @@
 
 {% block content %}
 	<section class="timetable">
-		{% cache 1800 type id %}
+		{% cache 1800 timetable type id %}
 			<div class="container">
 				{% for week in timetable %}
 					<div class="week" id="w--{% cycle '1' '2' as week_number %}">

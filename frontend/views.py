@@ -29,7 +29,7 @@ def get_timetable_cache(type, id):
 def delete_timetable_cache(type, id):
     id = int(id)
     cache_key = make_template_fragment_key('timetable', [type, id])
-    return cache.delete(cache_key)
+    cache.delete(cache_key)
 
 def check_captcha(captcha_response):
     captcha_data = bytes(urllib.parse.urlencode({
