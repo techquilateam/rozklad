@@ -22,6 +22,198 @@
 		  ga('create', 'UA-69632058-4', 'auto');
 		  ga('send', 'pageview');
 		</script>
+		<script>
+			function getCookie(name) {
+				var cookieValue = null
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';')
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = jQuery.trim(cookies[i])
+						if (cookie.substring(0, name.length + 1) == (name + '=')) {
+							cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+							break
+						}
+					}
+				}
+				return cookieValue
+			}
+
+			$.ajaxSetup({ 
+				beforeSend: function(xhr, settings) {
+					if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+						xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'))
+					}
+				}
+			})
+
+			function vk_avatar_callback(data) {
+				$("#vk_avatar_img").attr("src", data.response[0].photo_50)
+			}
+
+			function mousemove_tooltip_event_handler(eventObject) {
+				$data_tooltip = $(this).data("typename")
+				$("#tooltip").text($data_tooltip).css({ 
+					"top": eventObject.pageY - 20,
+					"left": eventObject.pageX + 20
+				}).show()
+			}
+
+			function mousemove_tooltip_event_handler_lessonname(eventObject) {
+				$data_tooltip = $(this).data("fullname")
+				$("#tooltip").text($data_tooltip).css({ 
+					"top": eventObject.pageY - 20,
+					"left": eventObject.pageX + 20
+				}).show().addClass("lesson_name")
+			}
+
+			function mousemove_tooltip_event_handler_currentday(eventObject) {
+				$("#tooltip").text("Сьогодняшній день").css({ 
+					"top": eventObject.pageY - 20,
+					"left": eventObject.pageX + 20
+				}).show().addClass("lesson_name")
+			}
+
+			function mouseout_tooltip_event_handler() {
+				$("#tooltip").fadeOut(150).text("").css({
+					"top": 0,
+					"left": 0
+				}).removeClass("lesson_name")
+			}
+
+			$(document).ready(function() {
+				{% if backends.associated|length > 0 %}
+					var vk_script = document.createElement("SCRIPT")
+					vk_script.src = "https://api.vk.com/method/users.get?user_ids={{ backends.associated.0.uid }}&fields=photo_50&v=5.40&callback=vk_avatar_callback"
+					document.getElementsByTagName("head")[0].appendChild(vk_script)
+				{% endif %}
+
+				$("#search__input").keyup(function() {
+					var base_url = "/" + $("#searchbar option:selected").attr("class") + "/"
+					if ($(this).val().length >= 2) {
+						var search_url = "/" + $("#searchbar option:selected").attr("class") + "/search/?search=" + $("#search__input").val()
+
+						$.ajax({
+							method: "GET",
+							url: search_url,
+							dataType: "json"
+						}).done(function(data) {
+							data = data.data
+
+							$("#search_proposals ul li").remove()
+							if (data.length == 0) {
+								$("#search_proposals").fadeOut(300)
+							} else {
+								$("#search_proposals").fadeIn(300).css({"opacity": 1, "top": $("#search__input").offset().top + $("#search__input").outerHeight()}).outerWidth($("#search__input").outerWidth() + $("#searchbar select").outerWidth() + $("#searchbar button").outerWidth())
+								data.forEach(function(entry) {
+									li = $("<li>")
+									a = $("<a>", {
+										href: base_url + entry.id + "/"
+									})
+									a.text(entry.name)
+									li.append(a)
+									$("#search_proposals ul").append(li)
+								})
+								
+								$("#searchbar").attr("action", base_url + data[0].id) + "/"
+							}
+						})
+					} else {
+						$("#search_proposals").fadeOut(300)
+						$("#search_proposals ul li").remove()
+					}
+				})
+
+				$(".login").click(function() {
+					$("#overlay, #login.modal").css("opacity", 1).fadeIn(300)
+					$("body").addClass("no-scroll")
+				})
+
+				$(".closeicon").click(function() {
+					$("#overlay, #search_proposals, .modal").animate({opacity: 0}, 300, function() {
+						$(this).hide()
+					})
+					$("body").removeClass("no-scroll")
+					return false
+				})
+
+				$("#login_form input").keyup(function() {
+					$(".error").animate({"opacity": 0}, 300)
+				})
+
+				$("#login_form").on("submit", function(event) {
+					event.preventDefault()
+
+					$.ajax({
+						method: $(this).attr("method"),
+						url: $(this).attr("action"),
+						data: $(this).serialize(),
+						dataType: "json"
+					}).done(function(data) {
+						grecaptcha.reset()
+
+						if (data.status == "OK") {
+							location.reload()
+						} else {
+							if (data.error_code == 0) {
+								$(".error").text("Перевірте правильність уведених даних")
+							} else {
+								$(".error").text("Перевірка на робота не пройдена")
+							}
+
+							$(".error").animate({opacity: 1}, 400)
+						}
+					})
+				})
+
+				$(".exit").click(function() {
+					$.ajax({
+						method: "POST",
+						url: "/logout/",
+						dataType: "json"
+					}).done(function(data) {
+						if (data.status == "OK") {
+							location.reload()
+						}
+					})
+				})
+
+				$('i.type[data-type="0"], i.type[data-type="1"], i.type[data-type="2"]').on("mousemove", mousemove_tooltip_event_handler).on("mouseout", mouseout_tooltip_event_handler)
+				
+				$(".moregroups").on("mouseenter", function() {
+					$(this).siblings(".moregroups-detais").fadeIn(300)
+				})
+
+				$(".moregroups-detais").on("mouseleave", function() {
+					$(this).fadeOut(300)
+				})
+				$(".lesson__title").on("mousemove", mousemove_tooltip_event_handler_lessonname).on("mouseout", mouseout_tooltip_event_handler)
+				$(".day.current .day__title").on("mousemove", mousemove_tooltip_event_handler_currentday).on("mouseout", mouseout_tooltip_event_handler)
+				
+			})
+
+			$(document).ready(function() {
+				setTimeout(function() {
+					autoHeight = $('#whatUcanEdit').outerHeight() + 24
+					$('#whatUcanEdit').css({height: 0})
+				}, 1)
+				$(".arrow").click(function() {
+					if ($(this).attr("data-active") == "false")	{
+						$("#whatUcanEdit").animate({
+							height: autoHeight,
+							opacity: 1
+						}, 150)
+						$(this).attr("data-active", "true")
+					} else {
+						$("#whatUcanEdit").animate({
+							height: 0
+						}, 150, function() {
+							$("#whatUcanEdit").animate({opacity: 0}, 150)
+						})
+						$(this).attr("data-active", "false")
+					}
+				})
+			})
+		</script>
 	</head>
 	<body>
 		<header>
@@ -113,196 +305,5 @@
 			</div>
 		</div>
 		{% endif %}
-		<script>
-			function getCookie(name) {
-				var cookieValue = null
-				if (document.cookie && document.cookie != '') {
-					var cookies = document.cookie.split(';')
-					for (var i = 0; i < cookies.length; i++) {
-						var cookie = jQuery.trim(cookies[i])
-						if (cookie.substring(0, name.length + 1) == (name + '=')) {
-							cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
-							break
-						}
-					}
-				}
-				return cookieValue
-			}
-
-			$.ajaxSetup({ 
-				beforeSend: function(xhr, settings) {
-					if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-						xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'))
-					}
-				}
-			})
-
-			function vk_avatar_callback(data) {
-				$("#vk_avatar_img").attr("src", data.response[0].photo_50)
-			}
-
-			$(document).ready(function() {
-				{% if backends.associated|length > 0 %}
-					var vk_script = document.createElement("SCRIPT")
-					vk_script.src = "https://api.vk.com/method/users.get?user_ids={{ backends.associated.0.uid }}&fields=photo_50&v=5.40&callback=vk_avatar_callback"
-					document.getElementsByTagName("head")[0].appendChild(vk_script)
-				{% endif %}
-
-				$("#search__input").keyup(function() {
-					var base_url = "/" + $("#searchbar option:selected").attr("class") + "/"
-					if ($(this).val().length >= 2) {
-						var search_url = "/" + $("#searchbar option:selected").attr("class") + "/search/?search=" + $("#search__input").val()
-
-						$.ajax({
-							method: "GET",
-							url: search_url,
-							dataType: "json"
-						}).done(function(data) {
-							data = data.data
-
-							$("#search_proposals ul li").remove()
-							if (data.length == 0) {
-								$("#search_proposals").fadeOut(300)
-							} else {
-								$("#search_proposals").fadeIn(300).css({"opacity": 1, "top": $("#search__input").offset().top + $("#search__input").outerHeight()}).outerWidth($("#search__input").outerWidth() + $("#searchbar select").outerWidth() + $("#searchbar button").outerWidth())
-								data.forEach(function(entry) {
-									li = $("<li>")
-									a = $("<a>", {
-										href: base_url + entry.id + "/"
-									})
-									a.text(entry.name)
-									li.append(a)
-									$("#search_proposals ul").append(li)
-								})
-								
-								$("#searchbar").attr("action", base_url + data[0].id) + "/"
-							}
-						})
-					} else {
-						$("#search_proposals").fadeOut(300)
-						$("#search_proposals ul li").remove()
-					}
-				})
-
-				function mousemove_tooltip_event_handler(eventObject) {
-					$data_tooltip = $(this).data("typename")
-					$("#tooltip").text($data_tooltip).css({ 
-						"top": eventObject.pageY - 20,
-						"left": eventObject.pageX + 20
-					}).show()
-				}
-
-				function mousemove_tooltip_event_handler_lessonname(eventObject) {
-					$data_tooltip = $(this).data("fullname")
-					$("#tooltip").text($data_tooltip).css({ 
-						"top": eventObject.pageY - 20,
-						"left": eventObject.pageX + 20
-					}).show().addClass("lesson_name")
-				}
-
-				function mousemove_tooltip_event_handler_currentday(eventObject) {
-					$("#tooltip").text("Сьогодняшній день").css({ 
-						"top": eventObject.pageY - 20,
-						"left": eventObject.pageX + 20
-					}).show().addClass("lesson_name")
-				}
-
-				function mouseout_tooltip_event_handler() {
-					$("#tooltip").fadeOut(150).text("").css({
-						"top": 0,
-						"left": 0
-					}).removeClass("lesson_name")
-				}
-
-				$(".login").click(function() {
-					$("#overlay, #login.modal").css("opacity", 1).fadeIn(300)
-					$("body").addClass("no-scroll")
-				})
-
-				$(".closeicon").click(function() {
-					$("#overlay, #search_proposals, .modal").animate({opacity: 0}, 300, function() {
-						$(this).hide()
-					})
-					$("body").removeClass("no-scroll")
-					return false
-				})
-
-				$("#login_form input").keyup(function() {
-					$(".error").animate({"opacity": 0}, 300)
-				})
-
-				$("#login_form").on("submit", function(event) {
-					event.preventDefault()
-
-					$.ajax({
-						method: $(this).attr("method"),
-						url: $(this).attr("action"),
-						data: $(this).serialize(),
-						dataType: "json"
-					}).done(function(data) {
-						grecaptcha.reset()
-
-						if (data.status == "OK") {
-							location.reload()
-						} else {
-							if (data.error_code == 0) {
-								$(".error").text("Перевірте правильність уведених даних")
-							} else {
-								$(".error").text("Перевірка на робота не пройдена")
-							}
-
-							$(".error").animate({opacity: 1}, 400)
-						}
-					})
-				})
-
-				$(".exit").click(function() {
-					$.ajax({
-						method: "POST",
-						url: "/logout/",
-						dataType: "json"
-					}).done(function(data) {
-						if (data.status == "OK") {
-							location.reload()
-						}
-					})
-				})
-
-				$('i.type[data-type="0"], i.type[data-type="1"], i.type[data-type="2"]').on("mousemove", mousemove_tooltip_event_handler).on("mouseout", mouseout_tooltip_event_handler)
-				
-				$(".moregroups").on("mouseenter", function() {
-					$(this).siblings(".moregroups-detais").fadeIn(300)
-				})
-
-				$(".moregroups-detais").on("mouseleave", function() {
-					$(this).fadeOut(300)
-				})
-				$(".lesson__title").on("mousemove", mousemove_tooltip_event_handler_lessonname).on("mouseout", mouseout_tooltip_event_handler)
-				$(".day.current .day__title").on("mousemove", mousemove_tooltip_event_handler_currentday).on("mouseout", mouseout_tooltip_event_handler)
-				
-			})
-			$(document).ready(function() {
-				setTimeout(function() {
-					autoHeight = $('#whatUcanEdit').outerHeight() + 24
-					$('#whatUcanEdit').css({height: 0})
-				}, 1)
-				$(".arrow").click(function() {
-					if ($(this).attr("data-active") == "false")	{
-						$("#whatUcanEdit").animate({
-							height: autoHeight,
-							opacity: 1
-						}, 150)
-						$(this).attr("data-active", "true")
-					} else {
-						$("#whatUcanEdit").animate({
-							height: 0
-						}, 150, function() {
-							$("#whatUcanEdit").animate({opacity: 0}, 150)
-						})
-						$(this).attr("data-active", "false")
-					}
-				})
-			})
-		</script>
 	</body>
 </html>
