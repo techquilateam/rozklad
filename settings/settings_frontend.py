@@ -11,6 +11,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'guardian',
+    'social.apps.django_app.default',
     'data',
     'frontend',
 )
@@ -26,6 +27,22 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'social.apps.django_app.context_processors.backends',
+                'social.apps.django_app.context_processors.login_redirect',
+            ],
+        },
+    },
+]
+
 ROOT_URLCONF = 'frontend.urls'
 
 CACHES = {
@@ -34,3 +51,11 @@ CACHES = {
         'LOCATION': 'unix:/var/run/memcached.sock',
     }
 }
+
+AUTHENTICATION_BACKENDS = (
+    'social.backends.vk.VKOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+)
+
+LOGIN_REDIRECT_URL = '/'

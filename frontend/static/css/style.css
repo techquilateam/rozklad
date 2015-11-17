@@ -4,7 +4,7 @@
 #overlay #another_lesson .content input#edit_lesson_name.inputcorrect[type=text],
 #overlay .modal .content input#edit_lesson_name.inputcorrect[type=password],
 #overlay #areyousure .content input#edit_lesson_name.inputcorrect[type=password],
-#overlay #another_lesson .content input#edit_lesson_name.inputcorrect[type=password], i.type {
+#overlay #another_lesson .content input#edit_lesson_name.inputcorrect[type=password], i.type, .day.current .day__title:after, #login_button_vk {
   -webkit-transition: all 0.2s;
   -moz-transition: all 0.2s;
   transition: all 0.2s; }
@@ -139,12 +139,15 @@ header {
   text-decoration: none;
   color: #cfcfcf;
   z-index: 999; }
-
-.login:hover {
-  color: #2194be; }
-
-.login.exit {
-  margin-left: 25px; }
+  .login img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-top: -5px; }
+  .login:hover {
+    color: #2194be; }
+  .login.exit {
+    margin-left: 25px; }
 
 footer {
   background: #012e3e;
@@ -185,7 +188,16 @@ footer {
     background: #012e3e;
     font-weight: 100;
     padding: 5px 10px;
-    margin-bottom: 0; }
+    margin-bottom: 0;
+    position: relative; }
+  .day.current .day__title:after {
+    content: "";
+    background: #84E900;
+    bottom: 0 !important;
+    top: 0 !important;
+    left: initial !important;
+    right: 15px !important;
+    margin: auto; }
   .day ul {
     margin: 0;
     padding: 0; }
@@ -200,6 +212,8 @@ footer {
       width: 183.17464px;
       display: block;
       position: relative; }
+      .day ul li.current {
+        background-color: #eaf2f4; }
       .day ul li h1, .day ul li p {
         font-size: 1em;
         margin: 0; }
@@ -323,7 +337,8 @@ footer {
       #overlay #another_lesson .content .error {
         line-height: 15px;
         color: #FF6140;
-        opacity: 0; }
+        opacity: 0;
+        margin: 10px 0; }
       #overlay .modal .content input[type=text], #overlay #areyousure .content input[type=text],
       #overlay #another_lesson .content input[type=text],
       #overlay .modal .content input[type=password],
@@ -334,7 +349,7 @@ footer {
         width: 94%; }
       #overlay .modal .content .button, #overlay #areyousure .content .button,
       #overlay #another_lesson .content .button {
-        background: #012e3e;
+        background-color: #012e3e;
         -webkit-appearance: none; }
       #overlay .modal .content .button:hover, #overlay #areyousure .content .button:hover,
       #overlay #another_lesson .content .button:hover {
@@ -403,21 +418,29 @@ footer {
           #overlay #another_lesson .content .day li i.closeicon,
           #overlay #another_lesson .content .day li i.plus {
             display: none; }
-          #overlay #areyousure .content .day li i.type[data-type="0"],
-          #overlay #another_lesson .content .day li i.type[data-type="0"] {
-            background: #84E900; }
-          #overlay #areyousure .content .day li i.type[data-type="1"],
-          #overlay #another_lesson .content .day li i.type[data-type="1"] {
-            background: #62B1D0; }
-          #overlay #areyousure .content .day li i.type[data-type="2"],
-          #overlay #another_lesson .content .day li i.type[data-type="2"] {
-            background: #FFA340; }
-          #overlay #areyousure .content .day li i.type[data-type="0"],
-          #overlay #areyousure .content .day li i.type[data-type="1"],
-          #overlay #areyousure .content .day li i.type[data-type="2"],
+          #overlay #areyousure .content .day li i.type[data-type="0"], #overlay #areyousure .content .day.current li [data-type="0"].day__title:after,
           #overlay #another_lesson .content .day li i.type[data-type="0"],
+          #overlay #another_lesson .content .day.current li [data-type="0"].day__title:after {
+            background: #84E900; }
+          #overlay #areyousure .content .day li i.type[data-type="1"], #overlay #areyousure .content .day.current li [data-type="1"].day__title:after,
           #overlay #another_lesson .content .day li i.type[data-type="1"],
-          #overlay #another_lesson .content .day li i.type[data-type="2"] {
+          #overlay #another_lesson .content .day.current li [data-type="1"].day__title:after {
+            background: #62B1D0; }
+          #overlay #areyousure .content .day li i.type[data-type="2"], #overlay #areyousure .content .day.current li [data-type="2"].day__title:after,
+          #overlay #another_lesson .content .day li i.type[data-type="2"],
+          #overlay #another_lesson .content .day.current li [data-type="2"].day__title:after {
+            background: #FFA340; }
+          #overlay #areyousure .content .day li i.type[data-type="0"], #overlay #areyousure .content .day.current li [data-type="0"].day__title:after,
+          #overlay #areyousure .content .day li i.type[data-type="1"],
+          #overlay #areyousure .content .day.current li [data-type="1"].day__title:after,
+          #overlay #areyousure .content .day li i.type[data-type="2"],
+          #overlay #areyousure .content .day.current li [data-type="2"].day__title:after,
+          #overlay #another_lesson .content .day li i.type[data-type="0"],
+          #overlay #another_lesson .content .day.current li [data-type="0"].day__title:after,
+          #overlay #another_lesson .content .day li i.type[data-type="1"],
+          #overlay #another_lesson .content .day.current li [data-type="1"].day__title:after,
+          #overlay #another_lesson .content .day li i.type[data-type="2"],
+          #overlay #another_lesson .content .day.current li [data-type="2"].day__title:after {
             cursor: help; }
           #overlay #areyousure .content .day li p a,
           #overlay #another_lesson .content .day li p a {
@@ -574,7 +597,7 @@ footer {
 .noday {
   opacity: 0.3; }
 
-i.type {
+i.type, .day.current .day__title:after {
   width: 6px;
   height: 6px;
   display: block;
@@ -587,19 +610,19 @@ i.type {
   -moz-box-shadow: 0px 0px 10px 0px #a4f43d;
   box-shadow: 0px 0px 10px 0px #a4f43d; }
 
-i.type[data-type="0"] {
+i.type[data-type="0"], .day.current [data-type="0"].day__title:after {
   cursor: help;
   background: #00782D; }
 
-i.type[data-type="1"] {
+i.type[data-type="1"], .day.current [data-type="1"].day__title:after {
   cursor: help;
   background: #024C68; }
 
-i.type[data-type="2"] {
+i.type[data-type="2"], .day.current [data-type="2"].day__title:after {
   cursor: help;
   background: #A65600; }
 
-i.type:hover {
+i.type:hover, .day.current .day__title:hover:after {
   opacity: 0.8; }
 
 #tooltip, .moregroups-detais {
@@ -619,6 +642,9 @@ i.type:hover {
     text-decoration: none; }
   #tooltip a:hover, .moregroups-detais a:hover {
     text-decoration: underline; }
+
+#tooltip.lesson_name, .lesson_name.moregroups-detais {
+  font-size: 16px; }
 
 #index_block .title {
   color: #012e3e; }
@@ -674,11 +700,15 @@ a.moregroups {
     margin: 0 auto; }
   #profile-settings .container .content {
     margin-left: 30px; }
-  #profile-settings .container .error {
+  #profile-settings .container .error,
+  #profile-settings .container .success_messege {
     line-height: 15px;
     color: #FF6140;
     text-align: right;
-    opacity: 0; }
+    opacity: 0;
+    margin: 10px 0; }
+  #profile-settings .container .success_messege {
+    color: #37DC74; }
   #profile-settings .container input {
     width: 250px;
     outline: none;
@@ -745,5 +775,80 @@ a.moregroups {
   #profile-settings .container .button.close:after,
   #profile-settings .container .button.close.active {
     background: #FF6140; }
+
+.g-recaptcha div {
+  margin: auto; }
+
+.et-box {
+  margin: 0px 0px 10px;
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  position: relative; }
+
+.et-box-content {
+  text-shadow: 1px 1px 1px #ffffff;
+  padding: 27px 43px 17px 66px;
+  min-height: 35px; }
+
+.et-info {
+  border: 1px solid #e2e2ba; }
+  .et-info:before {
+    width: 22px;
+    height: 20px;
+    background: url("../img/shortcodes-sprite.png") no-repeat -97px -2px; }
+  .et-info .et-box-content {
+    background: #f9f9dc;
+    border: 1px solid #fbfbef;
+    -moz-box-shadow: inset 0 0 45px #efefc0;
+    -webkit-box-shadow: inset 0 0 45px #efefc0;
+    box-shadow: inset 0 0 45px #efefc0; }
+
+.et-bio {
+  border: 1px solid #b3d8d3; }
+  .et-bio:before {
+    width: 19px;
+    height: 15px;
+    background: url("../img/shortcodes-sprite.png") no-repeat -23px -2px;
+    top: 33px; }
+  .et-bio .et-box-content {
+    color: #80acb0;
+    background: #ddf5f7;
+    border: 1px solid #f1fafb;
+    -moz-box-shadow: inset 0 0 45px #c6edf0;
+    -webkit-box-shadow: inset 0 0 45px #c6edf0;
+    box-shadow: inset 0 0 45px #c6edf0; }
+
+.et-warning:before, .et-download:before, .et-info:before, .et-bio:before, .et-shadow:before {
+  content: "";
+  position: absolute;
+  top: 32px;
+  left: 28px; }
+
+.no-scroll {
+  overflow: hidden; }
+
+#login_button_vk {
+  float: right;
+  background-image: url("../img/vk.png");
+  background-repeat: no-repeat;
+  background-position: 90% 50%;
+  padding-right: 50px;
+  padding-left: 25px;
+  background-color: #4c75a3 !important; }
+  #login_button_vk:after {
+    background: none !important; }
+  #login_button_vk:hover {
+    opacity: 0.8 !important; }
+
+#error-block {
+  text-align: center; }
+  #error-block h1 {
+    font-size: 3em; }
+  #error-block h3 {
+    margin-bottom: 0; }
+  #error-block p {
+    margin-top: 10px; }
 
 /*# sourceMappingURL=style.css.map */

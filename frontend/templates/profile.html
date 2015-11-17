@@ -61,18 +61,32 @@
 							<span class="error" id="id_email_error" data-form_name="email">Error</span>
 						</p>
 					</div>
+					<div class="et-box et-info">
+						<div class="et-box-content">
+							<span style="font-size: 17px;">Будьте уважні!</span>
+							<br style="clear: both;">Нікому не передавайте свій логін і пароль!</p>
+							</div>
+						</div>
 				</div>
 				<div class="clear"></div>
-				<p>
-					{{ user_form.old_password.label_tag }}
-					{{ user_form.old_password }}
-					<span class="error" id="id_old_password_error" data-form_name="old_password">Error</span>
-				</p>
-				<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
-				<p>
-					<span class="error" id="id_captcha_error" data-form_name="captcha">Error</span>
-				</p>
-				<p class="error" id="profile_success" style="color: green">Успішно збережено</p>
+				<h3>Введіть пароль, щоб внести зміни:</h3>
+				<div class="one_half">
+					<div class="content">
+						<p>
+							{{ user_form.old_password.label_tag }}
+							{{ user_form.old_password }}
+							<span class="error" id="id_old_password_error" data-form_name="old_password">Error</span>
+						</p>
+					</div>
+				</div>
+				<div class="one_half last">
+					<p>
+						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
+						<p class="error" id="id_captcha_error" data-form_name="captcha">Error</p>
+					</p>
+				</div>
+				<div class="clear"></div>
+				<p class="success_messege" id="profile_success">Успішно збережено</p>
 				<button class="button" type="submit">Зберегти</button>
 				<div class="clear"></div>
 			</form>

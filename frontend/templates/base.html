@@ -34,14 +34,23 @@
 						<option class="groups" value="groups" {% if not type or type == 'groups' %}selected="selected"{% endif %}>Група</option>
 						<option class="teachers" value="teachers" {% if type == 'teachers' %}selected="selected"{% endif %}>Викладач</option>
 						<option class="rooms" value="rooms" {% if type == 'rooms' %}selected="selected"{% endif %}>Аудиторія</option>
-						<option class="disciplines" value="disciplines" {% if type == 'disciplines' %}selected="selected"{% endif %}>Предмет</option>
+						<option style="display: none" class="disciplines" value="disciplines" {% if type == 'disciplines' %}selected="selected"{% endif %}>Предмет</option>
 					</select>
 					<input type="text" placeholder="Введіть запит" name="" id="search__input" autocomplete="off" value="{{ top_menu_str }}">
 					<button class="button">знайти</button>
 				</form>
 				{% if user.is_authenticated %}
+					<a href="#" class="arrow"></a>
 					<a class="login exit" style="cursor: pointer">Вийти</a>
-					<a href="/profile/" class="login">{{ user.get_username }}</a>
+					{% if backends.associated|length == 0 %}
+						<a href="/profile/" class="login">
+							{{ user.username }}
+						</a>
+					{% else %}
+						<a href="https://vk.com/id{{ backends.associated.0.uid }}" class="login" target="_blank">
+							<img src="" alt="" id="vk_avatar_img">
+						</a>
+					{% endif %}
 				{% else %}
 					<a class="login" style="cursor: pointer">Увійти</a>
 				{% endif %}
@@ -58,7 +67,7 @@
 		<footer>
 			<div class="container">
 				<div class="links">
-					<a>API</a> &nbsp; <a href="http://telegram.me/kpibot" class="foretelegram">КПИ Бот</a>
+					<a>API</a> &nbsp; <a href="http://bot.hub.kpi.ua" class="foretelegram">КПИ Бот</a>  &nbsp; <a href="http://hub.kpi.ua" class="foretelegram">КПИ hub</a>
 				</div>
 				<div class="createdby">
 					created by <a href="http://vk.com/antontimenko">Anton Timenko</a>, <a href="http://vk.com/vladkampov">Vlad Kampov</a> and <a href="http://vk.com/vlad_sidorenko">Vlad Sidorenko</a>
@@ -77,7 +86,8 @@
 						<input type="password" placeholder="Пароль" name="password">
 						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
 						<p class="error">Error</p>
-						<button class="button" id="login_button">Увійти</button>
+						<button rtpe="submot" class="button" id="login_button">Увійти</button>
+						<button class="button" id="login_button_vk" onclick="location.href = 'http://rozklad.timenko.com/login/vk-oauth2'">Увійти через</buttona>
 					</form>
 				</div>
 			</div>
@@ -107,7 +117,17 @@
 				}
 			})
 
+			function vk_avatar_callback(data) {
+				$("#vk_avatar_img").attr("src", data.response[0].photo_50)
+			}
+
 			$(document).ready(function() {
+				{% if backends.associated|length > 0 %}
+					var vk_script = document.createElement("SCRIPT")
+					vk_script.src = "https://api.vk.com/method/users.get?user_ids={{ backends.associated.0.uid }}&fields=photo_50&v=5.40&callback=vk_avatar_callback"
+					document.getElementsByTagName("head")[0].appendChild(vk_script)
+				{% endif %}
+
 				$("#search__input").keyup(function() {
 					var base_url = "/" + $("#searchbar option:selected").attr("class") + "/"
 					if ($(this).val().length >= 2) {
@@ -152,22 +172,39 @@
 					}).show()
 				}
 
+				function mousemove_tooltip_event_handler_lessonname(eventObject) {
+					$data_tooltip = $(this).data("fullname")
+					$("#tooltip").text($data_tooltip).css({ 
+						"top": eventObject.pageY - 20,
+						"left": eventObject.pageX + 20
+					}).show().addClass("lesson_name")
+				}
+
+				function mousemove_tooltip_event_handler_currentday(eventObject) {
+					$("#tooltip").text("Сьогодняшній день").css({ 
+						"top": eventObject.pageY - 20,
+						"left": eventObject.pageX + 20
+					}).show().addClass("lesson_name")
+				}
+
 				function mouseout_tooltip_event_handler() {
 					console.log("lalka")
 					$("#tooltip").fadeOut(150).text("").css({
 						"top": 0,
 						"left": 0
-					})
+					}).removeClass("lesson_name")
 				}
 
 				$(".login").click(function() {
 					$("#overlay, #login.modal").css("opacity", 1).fadeIn(300)
+					$("body").addClass("no-scroll")
 				})
 
 				$(".closeicon").click(function() {
 					$("#overlay, #search_proposals, .modal").animate({opacity: 0}, 300, function() {
 						$(this).hide()
 					})
+					$("body").removeClass("no-scroll")
 					return false
 				})
 
@@ -221,6 +258,9 @@
 				$(".moregroups-detais").on("mouseleave", function() {
 					$(this).fadeOut(300)
 				})
+				$(".lesson__title").on("mousemove", mousemove_tooltip_event_handler_lessonname).on("mouseout", mouseout_tooltip_event_handler)
+				$(".day.current .day__title").on("mousemove", mousemove_tooltip_event_handler_currentday).on("mouseout", mouseout_tooltip_event_handler)
+
 			})
 		</script>
 	</body>

@@ -15,7 +15,7 @@
 										{% for lesson in day %}
 											{% if lesson %}
 												<li>
-													<h1 class="lesson__title">{{ lesson.discipline.name|truncatechars:40 }}</h1>
+													<h1 class="lesson__title" data-fullname="{{ lesson.discipline.full_name }}">{{ lesson.discipline.name|truncatechars:40 }}</h1>
 													<i class="type" data-type="{{ lesson.type }}"></i>
 													{% if type == 'rooms' or type == 'teachers' %}
 														{% if lesson.groups.all.count > 3 %}

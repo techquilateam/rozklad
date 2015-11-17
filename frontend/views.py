@@ -46,6 +46,15 @@ def index(request):
     return render(request, 'index.html', context)
 
 @ensure_csrf_cookie
+def error(request):
+    context = {}
+    context['title'] = page_base_title + ' | 404'
+    context['error_text'] = '404'
+    context['error_text2'] = 'Нажаль, такої сторінки не існує'
+    
+    return render(request, 'error.html', context)
+
+@ensure_csrf_cookie
 def profile(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
@@ -101,6 +110,12 @@ def timetable(request, type, id):
         queryset = Lesson.objects.filter(teachers=Teacher.objects.get(id=id))
     else:
         queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
+
+    if queryset.count() == 0:
+        context['error_text'] = 'Для цієї групи, нажаль, розклад відсутній :('
+        context['error_text2'] = 'Зверніться до адміністраторів'
+
+        return render(request, 'error.html', context)
 
     if ((type == 'groups' and (request.user.has_perm('edit_group_timetable', Group.objects.get(id=id)) or request.user.has_perm('data.edit_group_timetable'))) or
         (type == 'teachers' and (request.user.has_perm('edit_teacher_timetable', Teacher.objects.get(id=id)) or request.user.has_perm('data.edit_teacher_timetable')))):
