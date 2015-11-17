@@ -551,7 +551,7 @@ def remove_lesson(request):
         for group in current_lesson.groups.all():
             delete_timetable_cache('groups', group.id)
         for teacher in current_lesson.teachers.all():
-            delete_timetable_cache('teachers', teacher.d)
+            delete_timetable_cache('teachers', teacher.id)
         for room in current_lesson.rooms.all():
             delete_timetable_cache('rooms', room.id)
 
