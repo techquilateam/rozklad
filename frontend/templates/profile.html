@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<section id="profile-settings">
+		<div class="container">
+			<form action="/edit-profile/" method="post" id="profile_edit_form">
+				<h2 class="title">Редагування аккаунту</h2>
+				<div class="one_half">
+					<h3>Змінити логін: </h3>
+					<p class="hint">
+						- тількі цифри та латинські літери
+						<br>
+						- від 5 до 30 символів
+					</p>
+					<div class="content">
+						<p>
+							{{ user_form.username.label_tag }}
+							{{ user_form.username }}
+							<span class="error" id="id_username_error" data-form_name="username">Error</span>
+						</p>
+					</div>
+				</div>
+				<div class="one_half last">
+					<h3>Редагування персональних даних:</h3>
+					<div class="content">
+						<p>
+							{{ user_form.first_name.label_tag }}
+							{{ user_form.first_name }}
+							<span class="error" id="id_first_name_error" data-form_name="first_name">Error</span>
+						</p>
+						<p>
+							{{ user_form.last_name.label_tag }}
+							{{ user_form.last_name }}
+							<span class="error" id="id_last_name_error" data-form_name="last_name">Error</span>
+						</p>
+					</div>
+				</div>
+				<div class="clear"></div>
+				<div class="one_half">
+					<h3>Змінити пароль: </h3>
+					<p class="hint">від 8 до 32 символів</p>
+					<div class="content">
+						<p>
+							{{ user_form.new_password.label_tag }}
+							{{ user_form.new_password }}
+							<span class="error" id="id_new_password_error" data-form_name="new_password">Error</span>
+						</p>
+						<p>
+							{{ user_form.new_password_confirm.label_tag }}
+							{{ user_form.new_password_confirm }}
+							<span class="error" id="id_new_password_confirm_error" data-form_name="new_password_confirm">Error</span>
+						</p>
+					</div>
+				</div>
+				<div class="one_half last">
+					<h3>Змінити email:</h3>
+					<div class="content">
+						<p>
+							{{ user_form.email.label_tag }}
+							{{ user_form.email }}
+							<span class="error" id="id_email_error" data-form_name="email">Error</span>
+						</p>
+					</div>
+					<div class="et-box et-info">
+						<div class="et-box-content">
+							<span style="font-size: 17px;">Будьте уважні!</span>
+							<br style="clear: both;">Нікому не передавайте свій логін і пароль!</p>
+							</div>
+						</div>
+				</div>
+				<div class="clear"></div>
+				<h3>Введіть пароль, щоб внести зміни:</h3>
+				<div class="one_half">
+					<div class="content">
+						<p>
+							{{ user_form.old_password.label_tag }}
+							{{ user_form.old_password }}
+							<span class="error" id="id_old_password_error" data-form_name="old_password">Error</span>
+						</p>
+					</div>
+				</div>
+				<div class="one_half last">
+					<p>
+						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
+						<p class="error" id="id_captcha_error" data-form_name="captcha">Error</p>
+					</p>
+				</div>
+				<div class="clear"></div>
+				<p class="success_messege" id="profile_success">Успішно збережено</p>
+				<button class="button" type="submit">Зберегти</button>
+				<div class="clear"></div>
+			</form>
+		</div>
+	</section>
+	<script>
+		$(document).ready(function() {
+			$("#profile_edit_form").on("submit", function(event) {
+				event.preventDefault()
+
+				$.ajax({
+					method: $(this).attr("method"),
+					url: $(this).attr("action"),
+					data: $(this).serialize(),
+					dataType: "json"
+				}).done(function(data) {
+					grecaptcha.reset()
+
+					var have_errors = false
+					var error_spans = $("#profile_edit_form span.error")
+					for (var i = 0; i < error_spans.length; i++) {
+						var error_span = $(error_spans[i])
+						var error_name = error_span.data("form_name")
+
+						if (typeof data.errors[error_name] != "undefined") {
+							have_errors = true
+							if (error_span.css("opacity") == 0) {
+								error_span.text(data.errors[error_name][0])
+								error_span.animate({opacity: 1}, 400)
+							} else {
+								error_span.animate({opacity: 0}, 400, function() {
+									$(this).text(data.errors[$(this).data("form_name")][0])
+									$(this).animate({opacity: 1}, 400)
+								})
+							}
+						} else {
+							if (error_span.css("opacity") == 1) {
+								error_span.animate({opacity: 0}, 400)
+							}
+						}
+					}
+
+					if (!have_errors) {
+						if ($("#id_new_password").val()) {
+							location = "/"
+						}
+
+						$("#id_old_password").val("")
+
+						$("#profile_success").animate({opacity: 1}, 400, function() {
+							setTimeout(function() {
+								$("#profile_success").animate({opacity: 0}, 400)
+							}, 2000)
+						})
+					}
+				})
+			})
+		})
+	</script>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<section id="error-block">
+		<div class="container">
+			<h1>Ой! Щось пішло не так!</h1>
+			<h3>{{ error_text }}</h3>
+			<p>{{ error_text2 }}</p>
+			<p><button class="button"  onclick="location.href = 'http://rozklad.hub.kpi.ua/'">повернутися на головну</button></p>
+			<div class="panda">
+				<span class="eyes">
+					<span class="eye left"><span class="ball"></span></span>
+					<span class="eye right"><span class="ball"></span></span>
+				</span>
+				<span class="nose"></span>
+				<span class="mouth"></span>
+				<span class="ear left"></span>
+				<span class="ear right"></span>
+			</div>
+		</div>
+	</section>
+	<style>
+		body{
+			overflow: hidden;
+		}
+		/* mixins */
+		/* extends */
+		.circle, .panda, .panda .eyes .eye .ball, .panda .nose, .panda .ear {
+		  -moz-border-radius: 100%;
+		  -webkit-border-radius: 100%;
+		  border-radius: 100%;
+		}
+
+		.panda {
+			text-align: left;
+			position: relative;
+			background-color: white;
+			border: 12px solid black;
+			width: 300px;
+			height: 300px;
+			top: 50%;
+			left: 50%;
+			margin-left: -162px;
+			margin-top: 70px;
+			-webkit-animation: bounce .85s infinite;
+			-moz-animation: bounce .85s infinite;
+			animation: bounce .85s infinite;
+		}
+		.panda .eyes {
+			width: 100%;
+			position: absolute;
+			top: 55%;
+			height: 57.5px;
+			margin-top: -28.75px;
+		}
+		.panda .eyes .eye {
+			position: absolute;
+			width: 115px;
+			height: 57.5px;
+			background-color: black;
+			overflow: hidden;
+			-moz-border-radius: 0 0 115px 115px;
+			-webkit-border-radius: 0;
+			border-radius: 0 0 115px 115px;
+		}
+		.panda .eyes .eye.left {
+			left: 10px;
+			-moz-transform: rotate(30deg);
+			-ms-transform: rotate(30deg);
+			-webkit-transform: rotate(30deg);
+			transform: rotate(30deg);
+		}
+		.panda .eyes .eye.right {
+			right: 10px;
+			-moz-transform: rotate(-30deg);
+			-ms-transform: rotate(-30deg);
+			-webkit-transform: rotate(-30deg);
+			transform: rotate(-30deg);
+		}
+		.panda .eyes .eye .ball {
+			position: absolute;
+			width: 30px;
+			height: 30px;
+			top: 50%;
+			margin-top: -27px;
+			left: 50%;
+			margin-left: -27px;
+			top: 0px;
+			background-color: black;
+			border: 12px solid white;
+		}
+		.panda .eyes .eye.left .ball {
+			left: 55%;
+		}
+		.panda .eyes .eye.right .ball {
+			left: 45%;
+		}
+		.panda .nose {
+			position: absolute;
+			width: 16px;
+			height: 16px;
+			top: 50%;
+			margin-top: -8px;
+			left: 50%;
+			margin-left: -8px;
+			margin-top: 31px;
+			background-color: black;
+		}
+		.panda .mouth {
+			background-color: black;
+			width: 50px;
+			height: 10px;
+			position: absolute;
+			left: 50%;
+			margin-left: -33.33333px;
+			top: 75%;
+			-moz-border-radius: 10px;
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+		}
+		.panda .ear {
+			background-color: black;
+			position: absolute;
+			z-index: -1;
+			top: -30px;
+			width: 130px;
+			height: 130px;
+		}
+		.panda .ear.left {
+			left: -35px;
+		}
+		.panda .ear.right {
+			right: -35px;
+		}
+
+		@-webkit-keyframes bounce {
+			0% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+			25% {
+				top: 55%;
+				left: 51%;
+				padding-top: 20px;
+				padding-left: 2px;
+			}
+			50% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+			75% {
+				top: 55%;
+				left: 49%;
+				padding-top: 20px;
+				padding-right: 2px;
+			}
+			100% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+		}
+		@-moz-keyframes bounce {
+			0% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+			25% {
+				top: 55%;
+				left: 51%;
+				padding-top: 20px;
+				padding-left: 2px;
+			}
+			50% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+			75% {
+				top: 55%;
+				left: 49%;
+				padding-top: 20px;
+				padding-right: 2px;
+			}
+			100% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+		}
+		@keyframes bounce {
+			0% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+			25% {
+				top: 55%;
+				left: 51%;
+				padding-top: 20px;
+				padding-left: 2px;
+			}
+			50% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+			75% {
+				top: 55%;
+				left: 49%;
+				padding-top: 20px;
+				padding-right: 2px;
+			}
+			100% {
+				top: 50%;
+				left: 50%;
+				padding-top: 0px;
+				padding-left: 0px;
+			}
+		}
+	</style>
+{% endblock %}

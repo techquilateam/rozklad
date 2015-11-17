@@ -20,6 +20,20 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+            ],
+        },
+    },
+]
+
 ROOT_URLCONF = 'api.urls'
 
 CORS_ORIGIN_ALLOW_ALL = True

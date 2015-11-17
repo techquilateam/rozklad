@@ -50,9 +50,6 @@ class Room(IdOrderingModelAbstract):
 
     class Meta(IdOrderingModelAbstract.Meta):
         unique_together = (('name', 'building'),)
-        permissions = (
-            ('edit_room_timetable', 'Edit Room Timetable'),
-        )
 
 class Discipline(IdOrderingModelAbstract):
     name = models.TextField()

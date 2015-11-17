@@ -51,23 +51,38 @@ body
 	@extend .transition
 .button:hover 
 	color: $dark
-.button:hover:after
-	width: 100%
-header:after
-	width: 100%
-	height: 100%
-	top: 0
-	left: 0
-	background: $dark
-	content: ''
-	position: absolute
-	z-index: -2
+	&:after
+		width: 100%
 header
 	color: $white
 	padding: 5px
 	text-align: center
 	position: relative
 	@extend .shadow
+	&:after
+		width: 100%
+		height: 100%
+		top: 0
+		left: 0
+		background: $dark
+		content: ''
+		position: absolute
+		z-index: -2
+	.arrow
+		display: block
+		background-image: url("../img/arrow--white.png")
+		width: 15px
+		height: 15px
+		opacity: 0.3
+		right: 170px
+		top: 25px
+		position: absolute
+		background-size: 100% 100%
+		@extend .transition
+		&:hover
+			opacity: 0.8
+		&:hover ~ #whatUcanEdit
+			border: 1px solid #bdc9cd
 	#logo
 		float: left
 		margin: 20px 0 10px 50px
@@ -96,8 +111,6 @@ header
 		width: 70%
 		overflow: auto
 		margin: auto
-		// option[selected="selected"]
-		// 	color: #e6e6e6
 		select
 			font-family: $font
 			font-size: 1em
@@ -132,10 +145,15 @@ header
 	@extend .transition
 	color: #cfcfcf
 	z-index: 999
-.login:hover
-	color: $linkhover
-.login.exit
-	margin-left: 25px
+	img
+		width: 32px
+		height: 32px
+		border-radius: 50%
+		margin-top: -5px
+	&:hover
+		color: $linkhover
+	&.exit
+		margin-left: 25px
 footer
 	background: $dark
 	width: 100%
@@ -182,6 +200,18 @@ footer
 		font-weight: 100
 		padding: 5px 10px
 		margin-bottom: 0
+		position: relative
+	&.current
+		.day__title
+			&:after
+				content: ''
+				@extend i.type
+				background: #84E900
+				bottom: 0 !important
+				top: 0 !important
+				left: initial !important
+				right: 15px !important
+				margin: auto
 	ul
 		margin: 0
 		padding: 0
@@ -197,6 +227,8 @@ footer
 			display: block
 			position: relative
 			@extend .transition
+			&.current
+				background-color: #eaf2f4
 			h1, p
 				font-size: 1em
 				margin: 0
@@ -308,9 +340,10 @@ footer
 				margin-bottom: 10px
 				display: inline-block
 			.error
-				line-height: 0
+				line-height: 15px
 				color: $red
 				opacity: 0
+				margin: 10px 0
 			input[type=text],
 			input[type=password]
 				@extend select
@@ -318,7 +351,7 @@ footer
 				padding: 6px 10px
 				width: 94%
 			.button
-				background: $dark
+				background-color: $dark
 				-webkit-appearance: none
 			.button:hover
 				color: $white
@@ -544,11 +577,19 @@ i.type:hover
 	display: none
 	top: 0px
 	left: 0px
+	max-width: 350px
 	background-color: $dark
 	padding: 5px 10px 5px 10px
 	color: white
 	opacity: 0.8
-	border-radius: 5px 
+	border-radius: 5px
+	a
+		color: $white
+		text-decoration: none
+	a:hover
+		text-decoration: underline
+#tooltip.lesson_name
+	font-size: 16px
 #index_block .title
 	color: #012e3e
 #index_block #shield
@@ -559,3 +600,215 @@ input[type=password]
 #add_to_another_week,
 #edit_with_another_week
 	display: none
+.moregroups-detais
+	border-radius: 0 !important
+	font-size: 14px
+	height: 96px
+	-webkit-column-count: 4
+	-moz-column-count: 4
+	column-count: 4
+	opacity: 0.9
+	@extend #tooltip
+	display: block
+	-webkit-box-sizing: border-box
+	-moz-box-sizing: border-box
+	box-sizing: border-box
+	width: 100%
+	height: 101%
+	font-style: normal
+	display: none
+a.moregroups 
+	position: absolute
+	right: 3px
+	bottom: 0
+	width: 10px
+	display: block
+	background-image: url("../img/more.png")
+	background-size: 100% 100%
+	height: 10px
+#profile-settings .container 
+	color: #000
+	background: #fff
+	padding: 25px
+	max-width: 800px
+	margin: 50px auto
+	@extend .shadow
+	.title
+		margin: 0 auto 25px
+	h2, h3
+		color: $darker
+		margin: 0 auto
+	.content
+		margin-left: 30px
+	.error,
+	.success_messege
+		line-height: 15px
+		color: $red
+		text-align: right
+		opacity: 0
+		margin: 10px 0
+	.success_messege
+		color: #37DC74
+	input
+		width: 250px
+		outline: none
+		display: block
+		height: 34px
+		padding: 6px 12px
+		line-height: 1.42857143
+		color: #555
+		background-color: #fff
+		background-image: none
+		border: 1px solid #ccc
+		border-radius: 4px
+		-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+		-webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s
+		-o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+		transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+	.has-success
+		border-color: #3c763d
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+
+	.has-success:focus 
+		border-color: #2b542c
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168
+	.has-warning 
+		border-color: #8a6d3b
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+	.has-warning:focus 
+		border-color: #66512c
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b
+	.has-error 
+		border-color: #a94442
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
+	.has-error:focus 
+		border-color: #843534
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483
+	.btn.disabled
+		cursor: not-allowed
+		filter: alpha(opacity=65)
+		-webkit-box-shadow: none
+		box-shadow: none
+		opacity: .65
+	p.hint 
+		margin-top: 0
+		opacity: 0.8
+		font-size: 0.8em
+		margin-left: 25px
+	.button
+		background: $dark
+		-webkit-appearance: none
+		float: right
+	.button:hover
+		color: $white
+		opacity: .9
+	.button:after
+		background: $linkhover
+	.button.close
+		float: right
+	.button.close:after,
+	.button.close.active
+		background: $red
+.g-recaptcha div
+	margin: auto
+.et-box 
+	margin: 0px 0px 10px
+	-moz-box-shadow: 0 1px 1px rgba(0,0,0,0.1)
+	-webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.1)
+	box-shadow: 0 1px 1px rgba(0,0,0,0.1)
+	font-size: 14px
+	position: relative
+.et-box-content 
+	text-shadow: 1px 1px 1px #ffffff
+	padding: 27px 43px 17px 66px
+	min-height: 35px
+.et-info 
+	border: 1px solid #e2e2ba
+	&:before
+		width: 22px
+		height: 20px
+		background: url("../img/shortcodes-sprite.png") no-repeat -97px -2px
+	.et-box-content 
+		background: #f9f9dc
+		border: 1px solid #fbfbef
+		-moz-box-shadow: inset 0 0 45px #efefc0
+		-webkit-box-shadow: inset 0 0 45px #efefc0
+		box-shadow: inset 0 0 45px #efefc0
+.et-bio 
+	border: 1px solid #b3d8d3
+	&:before
+		width: 19px
+		height: 15px
+		background: url("../img/shortcodes-sprite.png") no-repeat -23px -2px
+		top: 33px
+	.et-box-content
+		color: #80acb0
+		background: #ddf5f7
+		border: 1px solid #f1fafb
+		-moz-box-shadow: inset 0 0 45px #c6edf0
+		-webkit-box-shadow: inset 0 0 45px #c6edf0
+		box-shadow: inset 0 0 45px #c6edf0
+
+.et-warning:before, .et-download:before, .et-info:before, .et-bio:before, .et-shadow:before
+	content: ''
+	position: absolute
+	top: 32px
+	left: 28px
+.no-scroll
+	overflow: hidden
+#login_button_vk
+	float: right
+	background-image: url("../img/vk.png")
+	background-repeat: no-repeat
+	background-position: 90% 50%
+	padding-right: 50px
+	padding-left: 25px
+	background-color: #4c75a3 !important
+	@extend .transition
+	&:after
+		background: none !important
+	&:hover
+		opacity: 0.8 !important
+#error-block
+	text-align: center
+	h1
+		font-size: 3em
+	h3
+		margin-bottom: 0
+	p
+		margin-top: 10px
+#whatUcanEdit
+	position: absolute
+	top: 38px
+	right: 110px
+	overflow: hidden
+	opacity: 0
+	z-index: 999
+	background-color: $dark
+	border: 1px solid #4b6b76
+	font-size: 0.8em
+	@extend .transition
+	ul
+		list-style-type: none
+		width: 100px
+		padding: 15px
+		margin: 0
+		.title
+			font-weight: bold
+		li
+			border-top: 1px solid #4b6b76
+			padding: 3px 0 
+			a
+				color: #fff
+				text-decoration: none
+				@extend .transition
+				&:hover
+					text-decoration: underline
+					opacity: 0.8

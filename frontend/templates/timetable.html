@@ -1,59 +1,74 @@
 {% extends 'base.html' %}
+{% load cache %}
 
 {% block content %}
 	<section class="timetable">
-		<div class="container">
-			{% for week in timetable %}
-				<div class="week" id="w--{% cycle '1' '2' as week_number %}">
-					{% for day in week %}
-						<div class="day{% if not day %} noday{% endif %}" id="day--{% cycle '1' '2' '3' '4' '5' '6' %}w{{ week_number }}">
-							<h1 class="day__title">{% cycle 'Понеділок' 'Вівторок' 'Середа' 'Четвер' "П'ятниця" 'Субота' %}</h1>
-							{% if day %}
-								<ul>
-									{% for lesson in day %}
-										{% if lesson %}
-											<li>
-												<h1 class="lesson__title">{{ lesson.discipline.name|truncatechars:40 }}</h1>
-												<i class="type" data-type="{{ lesson.type }}"></i>
-												<p class="lesson__right">
-													{% if type == 'groups' or type == 'teachers' %}
-														{% for room in lesson.rooms.all %}
-															<a href="/rooms/{{ room.id }}">{{ room.full_name }}</a>
-															<br>
-														{% endfor %}
-													{% else %}
-														{% for group in lesson.groups.all %}
-															<a href="/groups/{{ group.id }}">{{ group.name|upper }}</a>
-															<br>
-														{% endfor %}
+		{% cache 1800 type id %}
+			<div class="container">
+				{% for week in timetable %}
+					<div class="week" id="w--{% cycle '1' '2' as week_number %}">
+						{% for day in week %}
+							<div class="day{% if not day %} noday{% endif %}" id="day--{% cycle '1' '2' '3' '4' '5' '6' %}w{{ week_number }}">
+								<h1 class="day__title">{% cycle 'Понеділок' 'Вівторок' 'Середа' 'Четвер' "П'ятниця" 'Субота' %}</h1>
+								{% if day %}
+									<ul>
+										{% for lesson in day %}
+											{% if lesson %}
+												<li>
+													<h1 class="lesson__title" data-fullname="{{ lesson.discipline.full_name }}">{{ lesson.discipline.name|truncatechars:40 }}</h1>
+													<i class="type" data-type="{{ lesson.type }}"></i>
+													{% if type == 'rooms' or type == 'teachers' %}
+														{% if lesson.groups.all.count > 3 %}
+															<a href="#" class="moregroups"></a>
+														{% endif %}
 													{% endif %}
-												</p>
-												<p class="lesson__left">
-													{% if type == 'groups' or type == 'rooms' %}
-														{% for teacher in lesson.teachers.all %}
-															<a href="/teachers/{{ teacher.id }}">{{ teacher.short_name }}</a>
-															<br>
-														{% endfor %}
-													{% else %}
+													<p class="lesson__right">
+														{% if type == 'rooms' or type == 'teachers' %}
+															{% for group in lesson.groups.all|slice:":3" %}
+																<a href="/groups/{{ group.id }}">{{ group.name|upper }}</a>
+																{% if not forloop.last %}
+																	<br>
+																{% endif %}
+															{% endfor %}
+														{% else %}
+															{% for room in lesson.rooms.all %}
+																<a href="/rooms/{{ room.id }}">{{ room.full_name }}</a>
+																<br>
+															{% endfor %}
+														{% endif %}
+													</p>
+													<p class="lesson__left">
+														{% if type == 'groups' or type == 'rooms' %}
+															{% for teacher in lesson.teachers.all %}
+																<a href="/teachers/{{ teacher.id }}">{{ teacher.short_name }}</a>
+																<br>
+															{% endfor %}
+														{% else %}
+															{% for room in lesson.rooms.all %}
+																<a href="/rooms/{{ room.id }}">{{ room.full_name }}</a>
+																<br>
+															{% endfor %}
+														{% endif %}
+													</p>
+													<i class="moregroups-detais">
 														{% for group in lesson.groups.all %}
-															<a href="/groups/{{ group.id }}">{{ group.name|upper }}</a>
-															<br>
+															&nbsp;<a href="/groups/{{ group.id }}">{{ group.name|upper }}</a>
 														{% endfor %}
-													{% endif %}
-												</p>
-											</li>
-										{% else %}
-											<li class="window"></li>
-										{% endif %}
-									{% endfor %}
-								</ul>
-							{% endif %}
-						</div>
-					{% endfor %}
-				</div>
-				<div class="clear"></div>
-			{% endfor %}
-		</div>
+													</i>
+												</li>
+											{% else %}
+												<li class="window"></li>
+											{% endif %}
+										{% endfor %}
+									</ul>
+								{% endif %}
+							</div>
+						{% endfor %}
+					</div>
+					<div class="clear"></div>
+				{% endfor %}
+			</div>
+		{% endcache %}
 	</section>
 	<style>
 		#w--1 {

@@ -1,125 +1,189 @@
 import json
-from django.http import HttpResponse, JsonResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+import urllib.request
+import urllib.parse
+from django.http import HttpResponse, JsonResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q
 from django.core.cache import caches
+from django.core.cache.utils import make_template_fragment_key
 from django.views.decorators.csrf import ensure_csrf_cookie
-from settings import domains
+from django.utils.translation import ugettext as _
 from data.models import *
 from data.search import *
+from .forms import EditUserProfile
+
+cache = caches['default']
 
 bad_request = HttpResponseBadRequest('Bad request')
 forbidden_request = HttpResponseForbidden('Forbidden')
 
+page_base_title = 'Розклад КПІ'
+
+def get_timetable_cache(type, id):
+    id = int(id)
+    cache_key = make_template_fragment_key('timetable', [type, id])
+    return cache.get(cache_key)
+
+def delete_timetable_cache(type, id):
+    id = int(id)
+    cache_key = make_template_fragment_key('timetable', [type, id])
+    return cache.delete(cache_key)
+
+def check_captcha(captcha_response):
+    captcha_data = bytes(urllib.parse.urlencode({
+        'secret': '6LeqARETAAAAAAsp5Ek43imvW5Ryey-0r5DRWG-g',
+        'response': captcha_response,
+    }).encode())
+    return json.loads(urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify', captcha_data).read().decode('utf-8'))['success']
+
 @ensure_csrf_cookie
 def index(request):
-    return render(request, 'index.html', {})
+    context = {}
+    context['title'] = page_base_title
+    
+    return render(request, 'index.html', context)
+
+@ensure_csrf_cookie
+def error(request):
+    context = {}
+    context['title'] = page_base_title + ' | 404'
+    context['error_text'] = '404'
+    context['error_text2'] = 'Нажаль, такої сторінки не існує'
+    
+    return render(request, 'error.html', context)
+
+@ensure_csrf_cookie
+def profile(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    context = {}
+    context['user_form'] = EditUserProfile(instance=request.user)
+    context['title'] = page_base_title + ' | Редагування аккаунту'
+
+    return render(request, 'profile.html', context)
+
+@require_http_methods(['POST'])
+def edit_profile(request):
+    if not request.user.is_authenticated():
+        return forbidden_request
+
+    user_form = EditUserProfile(request.POST, instance=request.user)
+    
+    errors = user_form.errors
+    if (not check_captcha(request.POST['g-recaptcha-response'])):
+        errors['captcha'] = [_('Captcha not passed')]
+
+    if not errors:
+        user_form.save()
+
+    return JsonResponse({'errors': user_form.errors})
 
 @ensure_csrf_cookie
 def timetable(request, type, id):
-    cache = caches['default']
-    cache_key = 'timetable_{0}_{1}'.format(type, str(id))
+    context = {}
 
-    cache_res = cache.get(cache_key)
-    if (request.user.is_anonymous() and
-        (cache_res != None)):
-        return cache_res
+    context['id'] = id
+    context['type'] = type
+    context['top_menu_str'] = ''
+
+    if type == 'groups':
+        if not Group.objects.filter(id=id).exists():
+            raise Http404()
+        context['top_menu_str'] = Group.objects.get(id=id).name.upper()
+    elif type == 'teachers':
+        if not Teacher.objects.filter(id=id).exists():
+            raise Http404()
+        context['top_menu_str'] = Teacher.objects.get(id=id).name().upper()
     else:
-        context = {}
+        if not Room.objects.filter(id=id).exists():
+            raise Http404()
+        context['top_menu_str'] = Room.objects.get(id=id).full_name().upper()
+    context['title'] = 'Розклад КПІ | ' + context['top_menu_str']
 
-        context['id'] = id
-        context['type'] = type
-        context['top_menu_str'] = ''
+    queryset = None
+    if type == 'groups':
+        queryset = Lesson.objects.filter(groups=Group.objects.get(id=id))
+    elif type == 'teachers':
+        queryset = Lesson.objects.filter(teachers=Teacher.objects.get(id=id))
+    else:
+        queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
 
-        if type == 'groups':
-            if not Group.objects.filter(id=id).exists():
-                raise Http404()
-            context['top_menu_str'] = Group.objects.get(id=id).name.upper()
-        elif type == 'teachers':
-            if not Teacher.objects.filter(id=id).exists():
-                raise Http404()
-            context['top_menu_str'] = Teacher.objects.get(id=id).name().upper()
-        else:
-            if not Room.objects.filter(id=id).exists():
-                raise Http404()
-            context['top_menu_str'] = Room.objects.get(id=id).full_name().upper()
+    if queryset.count() == 0:
+        context['error_text'] = 'Нажаль, розклад відсутній :('
+        context['error_text2'] = 'Зверніться до адміністраторів'
 
-        queryset = None
-        if type == 'groups':
-            queryset = Lesson.objects.filter(groups=Group.objects.get(id=id))
-        elif type == 'teachers':
-            queryset = Lesson.objects.filter(teachers=Teacher.objects.get(id=id))
-        else:
-            queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
+        return render(request, 'error.html', context)
 
-        if ((type == 'groups' and (request.user.has_perm('edit_group_timetable', Group.objects.get(id=id)) or request.user.has_perm('data.edit_group_timetable'))) or
-            (type == 'teachers' and (request.user.has_perm('edit_teacher_timetable', Teacher.objects.get(id=id)) or request.user.has_perm('data.edit_teacher_timetable')))):
-            
-            initial_data = {}
-            initial_data['groups'] = []
-            initial_data['teachers'] = []
-            initial_data['rooms'] = []
-            initial_data['disciplines'] = []
-            for lesson in queryset:
-                for group in lesson.groups.all():
-                    group_dict = {
-                        'id': group.id,
-                        'name': group.name,
-                    }
-
-                    if group_dict not in initial_data['groups']:
-                        initial_data['groups'].append(group_dict)
-
-                for teacher in lesson.teachers.all():
-                    teacher_dict = {
-                        'id': teacher.id,
-                        'name': teacher.name(),
-                    }
-
-                    if teacher_dict not in initial_data['teachers']:
-                        initial_data['teachers'].append(teacher_dict)
-
-                for room in lesson.rooms.all():
-                    room_dict = {
-                        'id': room.id,
-                        'name': room.full_name(),
-                    }
-
-                    if room_dict not in initial_data['rooms']:
-                        initial_data['rooms'].append(room_dict)
-            
-                discipline_dict = {
-                    'id': lesson.discipline.id,
-                    'name': lesson.discipline.name,
+    if ((type == 'groups' and (request.user.has_perm('edit_group_timetable', Group.objects.get(id=id)) or request.user.has_perm('data.edit_group_timetable'))) or
+        (type == 'teachers' and (request.user.has_perm('edit_teacher_timetable', Teacher.objects.get(id=id)) or request.user.has_perm('data.edit_teacher_timetable')))):
+        
+        initial_data = {}
+        initial_data['groups'] = []
+        initial_data['teachers'] = []
+        initial_data['rooms'] = []
+        initial_data['disciplines'] = []
+        for lesson in queryset:
+            for group in lesson.groups.all():
+                group_dict = {
+                    'id': group.id,
+                    'name': group.name,
                 }
 
-                if discipline_dict not in initial_data['disciplines']:
-                    initial_data['disciplines'].append(discipline_dict)
+                if group_dict not in initial_data['groups']:
+                    initial_data['groups'].append(group_dict)
 
-            context['initial_data'] = json.dumps(initial_data)
+            for teacher in lesson.teachers.all():
+                teacher_dict = {
+                    'id': teacher.id,
+                    'name': teacher.name(),
+                }
 
-            context['timetable'] = []
+                if teacher_dict not in initial_data['teachers']:
+                    initial_data['teachers'].append(teacher_dict)
 
-            for week_choice in Lesson.WEEK_CHOICES:
-                week = week_choice[0] - 1
-                context['timetable'].append([])
+            for room in lesson.rooms.all():
+                room_dict = {
+                    'id': room.id,
+                    'name': room.full_name(),
+                }
 
-                for day_choice in Lesson.DAY_CHOICES:
-                    day = day_choice[0] - 1
-                    context['timetable'][week].append([])
+                if room_dict not in initial_data['rooms']:
+                    initial_data['rooms'].append(room_dict)
+        
+            discipline_dict = {
+                'id': lesson.discipline.id,
+                'name': lesson.discipline.name,
+            }
 
-                    for number_choice in Lesson.NUMBER_CHOICES:
-                        number = number_choice[0] - 1
+            if discipline_dict not in initial_data['disciplines']:
+                initial_data['disciplines'].append(discipline_dict)
 
-                        if queryset.filter(week=week + 1, day=day + 1, number=number + 1).exists():
-                            context['timetable'][week][day].append(queryset.get(week=week + 1, day=day + 1, number=number + 1))
-                        else:
-                            context['timetable'][week][day].append(None)
+        context['initial_data'] = json.dumps(initial_data)
 
-            return render(request, 'timetable_edit.html', context)
-        else:
+        context['timetable'] = []
+
+        for week_choice in Lesson.WEEK_CHOICES:
+            week = week_choice[0] - 1
+            context['timetable'].append([])
+
+            for day_choice in Lesson.DAY_CHOICES:
+                day = day_choice[0] - 1
+                context['timetable'][week].append([])
+
+                for number_choice in Lesson.NUMBER_CHOICES:
+                    number = number_choice[0] - 1
+
+                    if queryset.filter(week=week + 1, day=day + 1, number=number + 1).exists():
+                        context['timetable'][week][day].append(queryset.get(week=week + 1, day=day + 1, number=number + 1))
+                    else:
+                        context['timetable'][week][day].append(None)
+
+        return render(request, 'timetable_edit.html', context)
+    else:
+        if not get_timetable_cache(type, id):
             context['timetable'] = []
 
             for week_choice in Lesson.WEEK_CHOICES:
@@ -141,10 +205,7 @@ def timetable(request, type, id):
 
                             context['timetable'][week][day].append(lesson)
 
-            page = render(request, 'timetable.html', context)
-            if request.user.is_anonymous():
-                cache.set(cache_key, page, 1800)
-            return page
+        return render(request, 'timetable.html', context)
 
 max_results = 10
 
@@ -263,9 +324,7 @@ def create_lesson(request):
             new_lesson.save()
             new_lesson.groups.add(current_group)
 
-        cache = caches['default']
-
-        cache.delete('timetable_groups_{0}'.format(str(current_group.id)))
+        delete_timetable_cache('groups', current_group.id)
 
         return JsonResponse({'status': 'OK'})
     else:
@@ -376,8 +435,6 @@ def edit_lesson(request):
                         'room': room,
                     })
 
-        cache = caches['default']
-
         if conflicts:
             if request_data['y'] == 1:
                 for conflict in conflicts:
@@ -418,25 +475,25 @@ def edit_lesson(request):
 
         for teacher_id in remove_teachers_id:
             current_lesson.teachers.remove(Teacher.objects.get(id=teacher_id))
-            cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
+            delete_timetable_cache('teachers', teacher_id)
         for room_id in remove_rooms_id:
             current_lesson.rooms.remove(Room.objects.get(id=room_id))
-            cache.delete('timetable_rooms_{0}'.format(str(room_id)))
+            delete_timetable_cache('rooms', room_id)
 
         for teacher_id in add_teachers_id:
             current_lesson.teachers.add(Teacher.objects.get(id=teacher_id))
-            cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
+            delete_timetable_cache('teachers', teacher_id)
         for room_id in add_rooms_id:
             current_lesson.rooms.add(Room.objects.get(id=room_id))
-            cache.delete('timetable_rooms_{0}'.format(str(room_id)))
+            delete_timetable_cache('rooms', room_id)
 
         for teacher_id in static_teachers_id:
-            cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
+            delete_timetable_cache('teachers', teacher_id)
         for room_id in static_rooms_id:
-            cache.delete('timetable_rooms_{0}'.format(str(room_id)))
+            delete_timetable_cache('rooms', room_id)
 
-        for group_id in [group.id for group in current_lesson.groups.all()]:
-            cache.delete('timetable_groups_{0}'.format(str(group_id)))
+        for group in current_lesson.groups.all():
+            delete_timetable_cache('groups', group.id)
 
         if another_week:
             current_lesson_2.type = current_lesson_type
@@ -444,25 +501,25 @@ def edit_lesson(request):
 
             for teacher_id in remove_teachers_id_2:
                 current_lesson_2.teachers.remove(Teacher.objects.get(id=teacher_id))
-                cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
+                delete_timetable_cache('teachers', teacher_id)
             for room_id in remove_rooms_id_2:
                 current_lesson_2.rooms.remove(Room.objects.get(id=room_id))
-                cache.delete('timetable_rooms_{0}'.format(str(room_id)))
+                delete_timetable_cache('rooms', room_id)
 
             for teacher_id in add_teachers_id_2:
                 current_lesson_2.teachers.add(Teacher.objects.get(id=teacher_id))
-                cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
+                delete_timetable_cache('teachers', teacher_id)
             for room_id in add_rooms_id_2:
                 current_lesson_2.rooms.add(Room.objects.get(id=room_id))
-                cache.delete('timetable_rooms_{0}'.format(str(room_id)))
+                delete_timetable_cache('rooms', room_id)
 
             for teacher_id in static_teachers_id_2:
-                cache.delete('timetable_teachers_{0}'.format(str(teacher_id)))
+                delete_timetable_cache('teachers', teacher_id)
             for room_id in static_rooms_id_2:
-                cache.delete('timetable_rooms_{0}'.format(str(room_id)))
+                delete_timetable_cache('rooms', room_id)
 
-            for group_id in [group.id for group in current_lesson_2.groups.all()]:
-                cache.delete('timetable_groups_{0}'.format(str(group_id)))
+            for group in current_lesson_2.groups.all():
+                delete_timetable_cache('groups', group.id)
 
         return JsonResponse({'status': 'OK'})
     else:
@@ -491,14 +548,12 @@ def remove_lesson(request):
 
             current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, groups=current_group)
 
-        cache = caches['default']
-
         for group in current_lesson.groups.all():
-            cache.delete('timetable_groups_{0}'.format(str(group.id)))
+            delete_timetable_cache('groups', group.id)
         for teacher in current_lesson.teachers.all():
-            cache.delete('timetable_teachers_{0}'.format(str(teacher.id)))
+            delete_timetable_cache('teachers', teacher.d)
         for room in current_lesson.rooms.all():
-            cache.delete('timetable_rooms_{0}'.format(str(room.id)))
+            delete_timetable_cache('rooms', room.id)
 
         if current_lesson.groups.all().count() == 1:
             current_lesson.delete()
@@ -507,11 +562,11 @@ def remove_lesson(request):
 
         if another_week:
             for group in current_lesson_2.groups.all():
-                cache.delete('timetable_groups_{0}'.format(str(group.id)))
+                delete_timetable_cache('groups', group.id)
             for teacher in current_lesson_2.teachers.all():
-                cache.delete('timetable_teachers_{0}'.format(str(teacher.id)))
+                delete_timetable_cache('teachers', teacher.id)
             for room in current_lesson_2.rooms.all():
-                cache.delete('timetable_rooms_{0}'.format(str(room.id)))
+                delete_timetable_cache('rooms', room.id)
 
             if current_lesson_2.groups.all().count() == 1:
                 current_lesson_2.delete()
@@ -547,33 +602,29 @@ def link_lesson(request):
             first_lesson.groups.add(current_group)
             second_lesson.groups.add(current_group)
 
-            cache = caches['default']
-
             for group in first_lesson.groups.all():
-                cache.delete('timetable_groups_{0}'.format(str(group.id)))
+                delete_timetable_cache('groups', group.id)
             for group in second_lesson.groups.all():
-                cache.delete('timetable_groups_{0}'.format(str(group.id)))
+                delete_timetable_cache('groups', group.id)
             for teacher in first_lesson.teachers.all():
-                cache.delete('timetable_teachers_{0}'.format(str(teacher.id)))
+                delete_timetable_cache('teachers', teacher.id)
             for teacher in second_lesson.teachers.all():
-                cache.delete('timetable_teachers_{0}'.format(str(teacher.id)))
+                delete_timetable_cache('teachers', teacher.id)
             for room in first_lesson.rooms.all():
-                cache.delete('timetable_rooms_{0}'.format(str(room.id)))
+                delete_timetable_cache('rooms', room.id)
             for room in second_lesson.rooms.all():
-                cache.delete('timetable_rooms_{0}'.format(str(room.id)))
+                delete_timetable_cache('rooms', room.id)
         else:
             lesson = Lesson.objects.get(id=request_data['lesson_id'])
 
             lesson.groups.add(current_group)
 
-            cache = caches['default']
-
             for group in lesson.groups.all():
-                cache.delete('timetable_groups_{0}'.format(str(group.id)))
+                delete_timetable_cache('groups', group.id)
             for teacher in lesson.teachers.all():
-                cache.delete('timetable_teachers_{0}'.format(str(teacher.id)))
+                delete_timetable_cache('teachers', teacher.id)
             for room in lesson.rooms.all():
-                cache.delete('timetable_rooms_{0}'.format(str(room.id)))
+                delete_timetable_cache('rooms', room.id)
 
         return JsonResponse({'status': 'OK'})
     else:
@@ -583,24 +634,23 @@ def link_lesson(request):
 
 @require_http_methods(['POST'])
 def auth_login(request):
-    if ('username' in request.POST.keys()) and ('password' in request.POST.keys()):
-        username = request.POST['username']
-        password = request.POST['password']
-        print(username)
-        print(password)
-        user = authenticate(username=username, password=password)
+    if (not check_captcha(request.POST['g-recaptcha-response'])):
+        return JsonResponse({'status': 'ERROR', 'error_code': 1})
 
-        if user:
-            login(request, user)
+    username = request.POST['username']
+    password = request.POST['password']
+    
+    user = authenticate(username=username, password=password)
 
-            return JsonResponse({'result': 'OK'})
-        else:
-            return JsonResponse({'result': 'ERROR'})
+    if user:
+        login(request, user)
+
+        return JsonResponse({'status': 'OK'})
     else:
-        return JsonResponse({'result': 'ERROR'})
+        return JsonResponse({'status': 'ERROR', 'error_code': 0})
 
 @require_http_methods(['POST'])
 def auth_logout(request):
     logout(request)
 
-    return JsonResponse({'result': 'OK'})
+    return JsonResponse({'status': 'OK'})
