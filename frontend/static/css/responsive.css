@@ -50,8 +50,9 @@
 	    opacity: 0;
         visibility: hidden;
 	}
-	.moregroups {
-		display: none;
+	.moregroups,
+	.arrow{
+		display: none !important;
 	}
 	.login.exit {
 	    margin-left: 10px;

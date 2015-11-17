@@ -112,7 +112,7 @@ def timetable(request, type, id):
         queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
 
     if queryset.count() == 0:
-        context['error_text'] = 'Для цієї групи, нажаль, розклад відсутній :('
+        context['error_text'] = 'Нажаль, розклад відсутній :('
         context['error_text2'] = 'Зверніться до адміністраторів'
 
         return render(request, 'error.html', context)

@@ -40,7 +40,27 @@
 					<button class="button">знайти</button>
 				</form>
 				{% if user.is_authenticated %}
-					<a href="#" class="arrow"></a>
+					{% if user_edit_allowed.groups or user_edit_allowed.teachers %}
+						<a href="#" class="arrow" data-active="false"></a>
+						<div id="whatUcanEdit">
+							{% if user_edit_allowed.groups %}
+								<ul class="groups">
+									<span class="title">Групи</span>
+									{% for group in user_edit_allowed.groups %}
+										<li><a href="/groups/{{ group.id }}">{{ group.name|upper }}</a></li>
+									{% endfor %}
+								</ul>
+							{% endif %}
+							{% if user_edit_allowed.teachers %}
+								<ul class="teachers">
+									<span class="title">Викладачі</span>
+									{% for teacher in user_edit_allowed.teachers %}
+										<li><a href="/teachers/{{ teacher.id }}">{{ teacher.short_name|upper }}</a></li>
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</div>
+					{% endif %}
 					<a class="login exit" style="cursor: pointer">Вийти</a>
 					{% if backends.associated|length == 0 %}
 						<a href="/profile/" class="login">
@@ -86,8 +106,8 @@
 						<input type="password" placeholder="Пароль" name="password">
 						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
 						<p class="error">Error</p>
-						<button rtpe="submot" class="button" id="login_button">Увійти</button>
-						<button class="button" id="login_button_vk" onclick="location.href = 'http://rozklad.timenko.com/login/vk-oauth2'">Увійти через</buttona>
+						<button type="submit" class="button" id="login_button">Увійти</button>
+						<button type="button" class="button" id="login_button_vk" onclick="location.href = 'http://rozklad.timenko.com/login/vk-oauth2'">Увійти через</buttona>
 					</form>
 				</div>
 			</div>
@@ -188,7 +208,6 @@
 				}
 
 				function mouseout_tooltip_event_handler() {
-					console.log("lalka")
 					$("#tooltip").fadeOut(150).text("").css({
 						"top": 0,
 						"left": 0
@@ -260,7 +279,29 @@
 				})
 				$(".lesson__title").on("mousemove", mousemove_tooltip_event_handler_lessonname).on("mouseout", mouseout_tooltip_event_handler)
 				$(".day.current .day__title").on("mousemove", mousemove_tooltip_event_handler_currentday).on("mouseout", mouseout_tooltip_event_handler)
-
+				
+			})
+			$(document).ready(function() {
+				setTimeout(function() {
+					autoHeight = $('#whatUcanEdit').outerHeight() + 24
+					$('#whatUcanEdit').css({height: 0})
+				}, 1)
+				$(".arrow").click(function() {
+					if ($(this).attr("data-active") == "false")	{
+						$("#whatUcanEdit").animate({
+							height: autoHeight,
+							opacity: 1
+						}, 150)
+						$(this).attr("data-active", "true")
+					} else {
+						$("#whatUcanEdit").animate({
+							height: 0
+						}, 150, function() {
+							$("#whatUcanEdit").animate({opacity: 0}, 150)
+						})
+						$(this).attr("data-active", "false")
+					}
+				})
 			})
 		</script>
 	</body>
