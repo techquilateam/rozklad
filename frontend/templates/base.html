@@ -22,6 +22,97 @@
 		  ga('create', 'UA-69632058-4', 'auto');
 		  ga('send', 'pageview');
 		</script>
+	</head>
+	<body>
+		<header>
+			<div class="container">
+				<div id="logo">
+					<a href="/">Новий Розклад КПІ</a>
+				</div>
+				<form action="" id="searchbar">
+					<select name="">
+						<option class="groups" value="groups" {% if not type or type == 'groups' %}selected="selected"{% endif %}>Група</option>
+						<option class="teachers" value="teachers" {% if type == 'teachers' %}selected="selected"{% endif %}>Викладач</option>
+						<option class="rooms" value="rooms" {% if type == 'rooms' %}selected="selected"{% endif %}>Аудиторія</option>
+						<option style="display: none" class="disciplines" value="disciplines" {% if type == 'disciplines' %}selected="selected"{% endif %}>Предмет</option>
+					</select>
+					<input type="text" placeholder="Введіть запит" name="" id="search__input" autocomplete="off" value="{{ top_menu_str }}">
+					<button class="button">знайти</button>
+				</form>
+				{% if user.is_authenticated %}
+					{% if user_edit_allowed.groups or user_edit_allowed.teachers %}
+						<a href="#" class="arrow" data-active="false"></a>
+						<div id="whatUcanEdit">
+							{% if user_edit_allowed.groups %}
+								<ul class="groups">
+									<span class="title">Групи</span>
+									{% for group in user_edit_allowed.groups %}
+										<li><a href="/groups/{{ group.id }}">{{ group.name|upper }}</a></li>
+									{% endfor %}
+								</ul>
+							{% endif %}
+							{% if user_edit_allowed.teachers %}
+								<ul class="teachers">
+									<span class="title">Викладачі</span>
+									{% for teacher in user_edit_allowed.teachers %}
+										<li><a href="/teachers/{{ teacher.id }}">{{ teacher.short_name|upper }}</a></li>
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</div>
+					{% endif %}
+					<a class="login exit" style="cursor: pointer">Вийти</a>
+					{% if backends.associated|length == 0 %}
+						<a href="/profile/" class="login">
+							{{ user.username }}
+						</a>
+					{% else %}
+						<a href="https://vk.com/id{{ backends.associated.0.uid }}" class="login" target="_blank">
+							<img src="" alt="" id="vk_avatar_img">
+						</a>
+					{% endif %}
+				{% else %}
+					<a class="login" style="cursor: pointer">Увійти</a>
+				{% endif %}
+				<div class="clear"></div>
+			</div>
+		</header>
+		<div id="search_proposals">
+			<ul>
+			</ul>
+		</div>
+			{% block content %}{% endblock %}
+		<div id="tooltip"></div>
+		<p>&nbsp;</p>
+		<footer>
+			<div class="container">
+				<div class="links">
+					<a>API</a> &nbsp; <a href="http://bot.hub.kpi.ua" class="foretelegram">КПИ Бот</a>  &nbsp; <a href="http://hub.kpi.ua" class="foretelegram">КПИ hub</a>
+				</div>
+				<div class="createdby">
+					created by <a href="http://vk.com/antontimenko">Anton Timenko</a>, <a href="http://vk.com/vladkampov">Vlad Kampov</a> and <a href="http://vk.com/vlad_sidorenko">Vlad Sidorenko</a>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</footer>
+		{% if not user.is_authenticated %}
+		<div id="overlay" class="modal_login">
+			<div id="login" class="modal">
+				<h1 class="maintitle">Вікно логіну</h1>
+				<i class="closeicon"></i>
+				<div class="content">
+					<form action="/login/" method="post" id="login_form">
+						<input type="text" placeholder="Ім'я користувача" name="username">
+						<input type="password" placeholder="Пароль" name="password">
+						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
+						<p class="error">Error</p>
+						<button type="submit" class="button" id="login_button">Увійти</button>
+						<button type="button" class="button" id="login_button_vk" onclick="location.href = '/login/vk-oauth2'">Увійти через</buttona>
+					</form>
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		<script>
 			function getCookie(name) {
 				var cookieValue = null
@@ -214,96 +305,5 @@
 				})
 			})
 		</script>
-	</head>
-	<body>
-		<header>
-			<div class="container">
-				<div id="logo">
-					<a href="/">Новий Розклад КПІ</a>
-				</div>
-				<form action="" id="searchbar">
-					<select name="">
-						<option class="groups" value="groups" {% if not type or type == 'groups' %}selected="selected"{% endif %}>Група</option>
-						<option class="teachers" value="teachers" {% if type == 'teachers' %}selected="selected"{% endif %}>Викладач</option>
-						<option class="rooms" value="rooms" {% if type == 'rooms' %}selected="selected"{% endif %}>Аудиторія</option>
-						<option style="display: none" class="disciplines" value="disciplines" {% if type == 'disciplines' %}selected="selected"{% endif %}>Предмет</option>
-					</select>
-					<input type="text" placeholder="Введіть запит" name="" id="search__input" autocomplete="off" value="{{ top_menu_str }}">
-					<button class="button">знайти</button>
-				</form>
-				{% if user.is_authenticated %}
-					{% if user_edit_allowed.groups or user_edit_allowed.teachers %}
-						<a href="#" class="arrow" data-active="false"></a>
-						<div id="whatUcanEdit">
-							{% if user_edit_allowed.groups %}
-								<ul class="groups">
-									<span class="title">Групи</span>
-									{% for group in user_edit_allowed.groups %}
-										<li><a href="/groups/{{ group.id }}">{{ group.name|upper }}</a></li>
-									{% endfor %}
-								</ul>
-							{% endif %}
-							{% if user_edit_allowed.teachers %}
-								<ul class="teachers">
-									<span class="title">Викладачі</span>
-									{% for teacher in user_edit_allowed.teachers %}
-										<li><a href="/teachers/{{ teacher.id }}">{{ teacher.short_name|upper }}</a></li>
-									{% endfor %}
-								</ul>
-							{% endif %}
-						</div>
-					{% endif %}
-					<a class="login exit" style="cursor: pointer">Вийти</a>
-					{% if backends.associated|length == 0 %}
-						<a href="/profile/" class="login">
-							{{ user.username }}
-						</a>
-					{% else %}
-						<a href="https://vk.com/id{{ backends.associated.0.uid }}" class="login" target="_blank">
-							<img src="" alt="" id="vk_avatar_img">
-						</a>
-					{% endif %}
-				{% else %}
-					<a class="login" style="cursor: pointer">Увійти</a>
-				{% endif %}
-				<div class="clear"></div>
-			</div>
-		</header>
-		<div id="search_proposals">
-			<ul>
-			</ul>
-		</div>
-			{% block content %}{% endblock %}
-		<div id="tooltip"></div>
-		<p>&nbsp;</p>
-		<footer>
-			<div class="container">
-				<div class="links">
-					<a>API</a> &nbsp; <a href="http://bot.hub.kpi.ua" class="foretelegram">КПИ Бот</a>  &nbsp; <a href="http://hub.kpi.ua" class="foretelegram">КПИ hub</a>
-				</div>
-				<div class="createdby">
-					created by <a href="http://vk.com/antontimenko">Anton Timenko</a>, <a href="http://vk.com/vladkampov">Vlad Kampov</a> and <a href="http://vk.com/vlad_sidorenko">Vlad Sidorenko</a>
-				</div>
-				<div class="clear"></div>
-			</div>
-		</footer>
-		{% if not user.is_authenticated %}
-		<div id="overlay" class="modal_login">
-			<div id="login" class="modal">
-				<h1 class="maintitle">Вікно логіну</h1>
-				<i class="closeicon"></i>
-				<div class="content">
-					<form action="/login/" method="post" id="login_form">
-						<input type="text" placeholder="Ім'я користувача" name="username">
-						<input type="password" placeholder="Пароль" name="password">
-						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
-						<p class="error">Error</p>
-						<button type="submit" class="button" id="login_button">Увійти</button>
-						<button type="button" class="button" id="login_button_vk" onclick="location.href = '/login/vk-oauth2'">Увійти через</buttona>
-					</form>
-				</div>
-			</div>
-		</div>
-		{% endif %}
 	</body>
 </html>
