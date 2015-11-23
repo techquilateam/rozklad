@@ -565,7 +565,8 @@ footer {
   right: 30px;
   top: 25px; }
 
-#groupsblock span {
+#groupsblock span,
+#groupsblock--add span {
   text-transform: uppercase; }
 
 #teachersblock,
@@ -613,15 +614,17 @@ footer {
 
 .week {
   position: relative; }
-
-.week:before {
-  display: block;
-  content: "Тиждень 1";
-  font-size: 1.3em;
-  font-weight: bold;
-  opacity: 0.5;
-  margin-left: 10px;
-  margin-top: 15px; }
+  .week:before {
+    display: block;
+    content: "Тиждень 1";
+    font-size: 1.3em;
+    font-weight: bold;
+    opacity: 0.5;
+    margin-left: 10px;
+    margin-top: 15px; }
+  .week.current:before {
+    opacity: 0.8;
+    color: rgba(109, 242, 176, 0.83); }
 
 #w--2:before {
   content: "Тиждень 2"; }
