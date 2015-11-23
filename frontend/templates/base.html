@@ -83,11 +83,10 @@
 		</div>
 			{% block content %}{% endblock %}
 		<div id="tooltip"></div>
-		<p>&nbsp;</p>
 		<footer>
 			<div class="container">
 				<div class="links">
-					<a>API</a> &nbsp; <a href="http://bot.hub.kpi.ua" class="foretelegram">КПИ Бот</a>  &nbsp; <a href="http://hub.kpi.ua" class="foretelegram">КПИ hub</a>
+					<a href="/api">API</a> &nbsp; <a href="http://bot.hub.kpi.ua" class="foretelegram">КПИ Бот</a>  &nbsp; <a href="http://hub.kpi.ua" class="foretelegram">КПИ hub</a>
 				</div>
 				<div class="createdby">
 					created by <a href="http://vk.com/antontimenko">Anton Timenko</a>, <a href="http://vk.com/vladkampov">Vlad Kampov</a> and <a href="http://vk.com/vlad_sidorenko">Vlad Sidorenko</a>
@@ -303,6 +302,114 @@
 						$(this).attr("data-active", "false")
 					}
 				})
+			})
+			$(document).click(function (e) {
+			    var search = $("#search_proposals");
+			    if (search.has(e.target).length === 0) {
+			    	$("#search_proposals").fadeOut(300)
+			    	$("#search_proposals ul li").remove()
+			    }
+
+			    var arrow = $(".arrow");
+			    if (arrow.has(e.target).length === 0) {
+			        $("#whatUcanEdit").animate({
+			        	height: 0
+			        }, 150, function() {
+			        	$("#whatUcanEdit").animate({opacity: 0}, 150)
+			        })
+			        arrow.attr("data-active", "false")
+			    } 
+			});
+
+			
+			//HOW TIME IS IT, BIATCH?!
+			$(document).ready(function() {
+				window.mobileDetection = {
+				    Android:function () {
+				        return navigator.userAgent.match(/Android/i);
+				    },
+				    BlackBerry:function () {
+				        return navigator.userAgent.match(/BlackBerry/i);
+				    },
+				    iOS:function () {
+				        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+				    },
+				    Opera:function () {
+				        return navigator.userAgent.match(/Opera Mini/i);
+				    },
+				    Windows:function () {
+				        return navigator.userAgent.match(/IEMobile/i);
+				    },
+				    any:function () {
+				        return (this.Android() || this.BlackBerry() || this.iOS() || this.Opera() || this.Windows());
+				    }
+				};
+				window.isMobile = mobileDetection.any()
+				{% if type == 'rooms' or type == 'teachers' or type = 'groups' %}
+				var d = new Date()
+				var hours = d.getHours()
+				var minutes = d.getMinutes()
+				var day = d.getDay()
+				var lesson = 0
+				if (day != 0) {
+					$('.day[data-day="' + day + '"]').addClass("current")
+					switch (hours) {
+						case 8:
+							if (minutes > 30)
+								lesson = 1
+							else
+								lesson = 0
+							break;
+						case 9:
+							lesson = 1
+							break;
+						case 10:
+							if (0 < minutes < 5)
+								lesson = 1
+							else
+								lesson = 2
+							break;
+						case 11:
+							lesson = 2;
+							break;
+						case 12:
+							lesson = 3
+							break;
+						case 13:
+							if (minutes < 55)
+								lesson = 3
+							else
+								lesson = 4
+							break;
+						case 14:
+							lesson = 4
+							break;
+						case 15:
+							if (minutes < 50)
+								lesson = 4
+							else
+								lesson = 5
+							break;
+						case 16:
+							lesson = 5
+							break;
+						case 17:
+							if (minutes < 45)
+								lesson = 5
+							else
+								lesson = 0
+							break;
+						default:
+							break;
+					}
+					if (lesson != 0)
+						$(".day.current li[data-lesson=\"" + lesson + "\"]").addClass("current")
+
+					var destination = $(".day.current").offset().top;
+					if (isMobile)
+				   		$('html, body').animate({ scrollTop: destination }, 1100);
+				}
+				{% endif %}
 			})
 		</script>
 	</body>

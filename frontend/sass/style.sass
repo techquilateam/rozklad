@@ -20,7 +20,7 @@ body
 	@extend .background
 .clear 
 	clear: both
-.container 
+.container
 	max-width: $containerwidth
 	margin: 0 auto
 	position: relative
@@ -244,6 +244,8 @@ footer
 				a:hover
 					color: $darker
 					text-decoration: underline
+			h1
+				width: 93%
 		li.window
 			background: #e6e6e6
 			border-bottom: 1px solid #c0c0c0
@@ -481,11 +483,17 @@ footer
 	p
 		padding-left: 20px
 		width: 325px
-.one_half
+.one_half,
+.two_third,
+.one_third
 	float: left
 	margin-right: 4%
 	position: relative
 	width: 48%
+.two_third
+	width: 65.32%
+.one_third
+	width: 310px
 .last 
 	margin-right: 0px !important
 	clear: right
@@ -496,13 +504,19 @@ footer
 	background-image: url('../img/close.png')
 	right: 30px
 	top: 25px
+#groupsblock span
+	text-transform: uppercase
 #teachersblock,
-#roomsblock
+#roomsblock,
+#groupsblock,
+#groupsblock--add
 	margin-bottom: 10px
 	white-space: pre-wrap
 	line-height: 35px
 #teachersblock span,
-#roomsblock span
+#roomsblock span,
+#groupsblock span,
+#groupsblock--add span
 	color: #fff
 	background: $blue
 	padding: 0 10px
@@ -516,7 +530,9 @@ footer
 	-webkit-user-select: text
 	-o-user-select: text
 #teachersblock span a,
-#roomsblock span a
+#roomsblock span a,
+#groupsblock span a,
+#groupsblock--add span a
 	width: 10px
 	height: 10px
 	background-image: url('../img/close.png')
@@ -526,7 +542,9 @@ footer
 	margin-left: 5px
 	@extend .transition
 #teachersblock span a:hover,
-#roomsblock span a:hover
+#roomsblock span a:hover,
+#groupsblock span a:hover,
+#groupsblock--add span a:hover
 	opacity: 0.5
 .week
 	position: relative
@@ -541,7 +559,8 @@ footer
 #w--2:before
 	content: 'Тиждень 2'
 #overlay .modal .content input#edit_lesson_name.inputcorrect[type=text],
-#overlay .modal .content input#edit_lesson_name.inputcorrect[type=password]
+#overlay .modal .content input#edit_lesson_name.inputcorrect[type=password],
+#overlay .modal .content input#add_lesson_room.inputcorrect[type=text]
 	background: #f1fbff
 	@extend .transition
 .noday
@@ -626,7 +645,8 @@ a.moregroups
 	background-image: url("../img/more.png")
 	background-size: 100% 100%
 	height: 10px
-#profile-settings .container 
+#profile-settings .container,
+#api_page .container
 	color: #000
 	background: #fff
 	padding: 25px
@@ -727,7 +747,7 @@ a.moregroups
 	position: relative
 .et-box-content 
 	text-shadow: 1px 1px 1px #ffffff
-	padding: 27px 43px 17px 66px
+	padding: 27px 43px 17px 40px
 	min-height: 35px
 .et-info 
 	border: 1px solid #e2e2ba
@@ -760,7 +780,7 @@ a.moregroups
 	content: ''
 	position: absolute
 	top: 32px
-	left: 28px
+	left: 13px
 .no-scroll
 	overflow: hidden
 #login_button_vk
@@ -812,3 +832,53 @@ a.moregroups
 				&:hover
 					text-decoration: underline
 					opacity: 0.8
+#api_page .container
+	max-width: $containerwidth
+	position: relative
+	width: 80%
+	.one_third
+		position: relative
+	.two_third
+		font-size: 0.8em
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
+		color: #444
+		h2
+			margin: 25px 0
+		.ex 
+			color: #555
+			background: rgba(0, 224, 243, 0.12)
+			border: 1px solid #f1fafb
+			-moz-box-shadow: inset 0 0 45px #c6edf0
+			-webkit-box-shadow: inset 0 0 45px #c6edf0
+			box-shadow: inset 0 0 45px #c6edf0
+		ul, ol
+			padding-left: 0
+			margin-bottom: 20px
+			li
+				position: relative
+				display: block
+				padding: 10px 15px
+				margin-bottom: -1px
+				word-wrap: break-word
+				border: 1px solid #ddd
+				&:first-child
+					border-top-left-radius: 4px
+					border-top-right-radius: 4px
+				&:last-child
+					margin-bottom: 0
+					border-bottom-right-radius: 4px
+					border-bottom-left-radius: 4px
+	.et-box-content
+		font-size: 1.2em
+	#summary_content
+		&.fixed
+			position: fixed
+			top: 0
+			width: 310px
+	a
+		color: #777
+		text-decoration: none
+		@extend .transition
+		&:hover
+			color: #555
+			text-decoration: underline

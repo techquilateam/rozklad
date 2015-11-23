@@ -1,15 +1,7 @@
 from django.contrib import admin
-from guardian import admin as guardian_admin
+from guardian.admin import GuardedModelAdmin
 from functools import partial
 from data.models import Building, Room, Group, Teacher, Discipline, Lesson
-
-class GuardedModelAdminMixin(guardian_admin.GuardedModelAdminMixin):
-    @property
-    def queryset(self):
-        return partial(self.get_queryset)
-
-class GuardedModelAdmin(GuardedModelAdminMixin, admin.ModelAdmin):
-    pass
 
 class BuildingAdmin(GuardedModelAdmin):
     list_display = ('name', 'latitude', 'longitude')

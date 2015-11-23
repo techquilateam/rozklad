@@ -71,7 +71,8 @@ class TeacherViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.TeacherSerializer
     pagination_class = GlobalViewPagination
 
-    filter_backends = (SearchTeacherFilterBackend,)
+    filter_backends = (SearchTeacherFilterBackend, filters.DjangoFilterBackend)
+    filter_fields = ('last_name', 'first_name', 'middle_name', 'degree')
 
     @detail_route(methods=['GET'])
     def timetable(self, request, pk, format=None):

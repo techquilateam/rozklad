@@ -28,3 +28,13 @@
     font-style: normal;
     font-weight: 700;
 }
+/* font-family: "HelveticaLight"; */
+@font-face {
+    font-family: "Helvetica Neue";
+    src: url("../fonts/Helvetica/HelveticaLight.eot");
+    src: url("../fonts/Helvetica/HelveticaLight.eot?#iefix")format("embedded-opentype"),
+    url("../fonts/Helvetica/HelveticaLight.woff") format("woff"),
+    url("../fonts/Helvetica/HelveticaLight.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
