@@ -351,8 +351,16 @@
 				var minutes = d.getMinutes()
 				var day = d.getDay()
 				var lesson = 0
+				var week = 0
+
+				if ((parseInt(d.getTime() / 1000 / 60 / 60 / 24 / 7) % 2) == 0)
+					week = 1
+				else
+					week = 2
+
 				if (day != 0) {
-					$('.day[data-day="' + day + '"]').addClass("current")
+					$('#w--' + week + ' .day[data-day="' + day + '"]').addClass("current")
+					$('#w--' + week).addClass("current")
 					switch (hours) {
 						case 8:
 							if (minutes > 30)

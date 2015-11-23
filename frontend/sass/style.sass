@@ -504,7 +504,8 @@ footer
 	background-image: url('../img/close.png')
 	right: 30px
 	top: 25px
-#groupsblock span
+#groupsblock span,
+#groupsblock--add span
 	text-transform: uppercase
 #teachersblock,
 #roomsblock,
@@ -548,14 +549,18 @@ footer
 	opacity: 0.5
 .week
 	position: relative
-.week:before 
-	display: block
-	content: 'Тиждень 1'
-	font-size: 1.3em
-	font-weight: bold
-	opacity: 0.5
-	margin-left: 10px
-	margin-top: 15px
+	&:before
+		display: block
+		content: 'Тиждень 1'
+		font-size: 1.3em
+		font-weight: bold
+		opacity: 0.5
+		margin-left: 10px
+		margin-top: 15px
+	&.current
+		&:before
+			opacity: 0.8
+			color: rgba(109, 242, 176, 0.83)
 #w--2:before
 	content: 'Тиждень 2'
 #overlay .modal .content input#edit_lesson_name.inputcorrect[type=text],
