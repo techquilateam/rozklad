@@ -23,7 +23,7 @@ MIDDLEWARE_CLASSES = (
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'api/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -37,4 +37,3 @@ TEMPLATES = [
 ROOT_URLCONF = 'api.urls'
 
 CORS_ORIGIN_ALLOW_ALL = True
-

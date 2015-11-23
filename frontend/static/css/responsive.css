@@ -35,7 +35,9 @@
 	header #searchbar input{
 		padding-left: 14px;
 	}
-	.one_half{
+	.one_half,
+	.one_third,
+	.two_third{
 		float: none;
 		width: 90%;
 	}
@@ -51,7 +53,8 @@
         visibility: hidden;
 	}
 	.moregroups,
-	.arrow{
+	.arrow,
+	#summary_content{
 		display: none !important;
 	}
 	.login.exit {
@@ -215,6 +218,9 @@ select::-ms-expand {
 	}
 	footer{
 		position: fixed;
+	}
+	.two_third {
+	    width: 58%;
 	}
 }
 @media only screen and (min-width: 1400px){

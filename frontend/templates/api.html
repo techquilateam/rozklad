@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section id="api_page">
+	<div class="container">
+		<h1>Описание Rozklad API</h1>
+		<p>Добро пожаловать на документацию Rozklad API.<br>
+		Данное API позволит получать данные о расписании с помощью простых GET запросов по протоколу HTTP. API воплощает и следует идеологии REST.</p>
+		<div class="two_third">
+			<h2 id="requests">Запросы</h2>
+			<p>Формат ответа для каждого запроса: <b>JSON</b>.<br>
+			Запросы следует делать по протоколу <b>HTTP</b>.<br>
+			Кодировка ответов: <b>UTF-8</b>.<br>
+			API доступно по домену <a href="http://{{ api_domain }}">{{ api_domain }}</a></p>
+
+			<p>При выполнении запроса из браузера, ответ возвращается в удобной и читабельной форме, стилизованой с помощью <b>HTML</b> и <b>CSS</b>.<br>
+				<ul class="ex">
+					<li><a href="http://{{ api_domain }}/teachers/">http://{{ api_domain }}/teachers/</a></li>
+				</ul>
+			</p>
+		
+			<p>При необходимости получить чистый <b>JSON</b> из браузера без стилизации, следует добавить суффикс <b>.json</b>.<br>
+				<ul class="ex">
+					<li><a href="http://{{ api_domain }}/teachers.json/">http://{{ api_domain }}/teachers.json/</a></li>
+				</ul>
+			</p>
+			<h2 id="essense">Сущности</h2>
+			<ol>
+				<li>Корпуса — <a href="http://{{ api_domain }}/">http://{{ api_domain }}/buildings/</a></li>
+				<li>Аудитории — <a href="http://{{ api_domain }}/">http://{{ api_domain }}/rooms/</a></li>
+				<li>Группы — <a href="http://{{ api_domain }}/">http://{{ api_domain }}/groups/</a></li>
+				<li>Преподаватели — <a href="http://{{ api_domain }}/">http://{{ api_domain }}/teachers/</a></li>
+				<li>Дисциплины — <a href="http://{{ api_domain }}/">http://{{ api_domain }}/disciplines/</a></li>
+				<li>Занятия — <a href="http://{{ api_domain }}/">http://{{ api_domain }}/lessons/</a></li>
+			</ol>
+			<p>Запросы по таким адресам выведут список существующих сущностей.</p>
+			<p>Каждая сущность имеет свой уникальный <b>id</b>. Если его указать в конце адреса, вернется сущность с этим <b>id</b>.<br>
+				<ul class="ex">
+					<li><a href="http://{{ api_domain }}/teachers/1/">http://{{ api_domain }}/teachers/1/</a></li>
+					<li><a href="http://{{ api_domain }}/groups/211/">http://{{ api_domain }}/groups/211/</a></li>
+				</ul>
+			</p>
+			<h2 id="pagination">Пагинация</h2>
+			<p>При запросе списка сущностей вернутся первые <b>10</b> (количество по умолчанию). Для запроса меньшего либо большего количества, используется параметр <b>limit</b>. Максимальное значение <b>limit</b> – <b>100</b>.<br>
+			<ul class="ex">
+				<li><a href="http://{{ api_domain }}/teachers/?limit=45">http://{{ api_domain }}/teachers/?limit=45</a> – первые <b>45</b> преподавателей.</li>
+				<li><a href="http://{{ api_domain }}/groups/?limit=3">http://{{ api_domain }}/groups/?limit=3</a> – первые <b>3</b> группы.</li>
+			</ul></p>
+			<p>Такие запросы возвращают лишь запрошенное количество сущностей от начала списка. Для запроса сущностей из середины, используется параметр <b>offset</b>. Отсчет <b>offset</b> начинается с нуля.<br>
+			<ul class="ex">
+				<li><a href="http://{{ api_domain }}/teachers/?limit=45&offset=67">http://{{ api_domain }}/teachers/?limit=45&offset=67</a> — вернет первые <b>45</b> преподавателей начиная с <b>68</b>-го.</li>
+				<li><a href="http://{{ api_domain }}/groups/?limit=3">http://{{ api_domain }}/groups/?limit=3</a> – вернет первые <b>3</b> группы начиная с <b>36</b>-ой.</li>
+			</ul></p>
+			<h2 id="about_essense">Описание сущностей</h2>
+			<h3 id="building">Корпус</h3>
+			<ul>
+				<li><b>name</b> – имя корпуса</li>
+				<li><b>latitude</b> – широта</li>
+				<li><b>longitude</b> – долгота</li>
+			</ul>
+			<h3 id="room">Аудитория</h3>
+			<ul>
+				<li><b>name</b> – имя аудитории</li>
+				<li><b>full_name</b> – полное имя аудитории (вместе с именем корпуса)</li>
+				<li><b>building</b> – id корпуса, в котором эта аудитория находится</li>
+			</ul>
+			<h3 id="group">Группа</h3>
+			<ul>
+				<li><b>name</b> – имя группы</li>
+				<li><b>okr</b> – квалификация группы. Возможные значения: 0 – бакалавр, 1 – магистр, 2 – специалист</li>
+				<li><b>type</b> – форма обучения группы. Возможные значения: 0 – дневная, 1 – заочная</li>
+			</ul>
+			<h3 id="teacher">Преподаватель</h3>
+			<ul>
+				<li><b>last_name</b> – фамилия (Иванов)</li>
+				<li><b>first_name</b> – имя (Иван)</li>
+				<li><b>middle_name</b> – отчество (Иванович)</li>
+				<li><b>degree</b> – звание (аспирант)</li>
+				<li><b>name</b> – полное ФИО (Иванов Иван Иванович)</li>
+				<li><b>full_name</b> – полное ФИО со званием (аспирант Иванов Иван Иванович)</li>
+				<li><b>short_name</b> – сокращенное ФИО (Иванов И. И.)</li>
+				<li><b>short_name_with_degree</b> – сокращенное ФИО с сокращенным званием (асп. Иванов И. И.)</li>
+			</ul>
+			<h3 id="discipline">Дисциплина</h3>
+			<ul>
+				<li><b>name</b> – имя дисциплины</li>
+				<li><b>full_name</b> – полное имя дисциплины</li>
+			</ul>
+			<h3 id="lesson">Занятие</h3>
+			<ul>
+				<li><b>number</b> – номер (от 1 до 6)</li>
+				<li><b>day</b> – день (от 1 (понедельник) до 6 (суббота))</li>
+				<li><b>week</b> – номер недели (1 или 2)</li>
+				<li><b>type</b> – тип. Возможные значения: 0 – лекция, 1 – практика, 2 – лабораторная, null – не задано</li>
+				<li><b>discipline</b> – id дисциплины</li>
+				<li><b>discipline_name</b> – имя дисциплины</li>
+				<li><b>groups</b> – массив id груп</li>
+				<li><b>groups_names</b> – массив имен групп</li>
+				<li><b>teachers</b> – массив id преподавателей</li>
+				<li><b>teachers_short_names</b> – массив сокращенных ФИО преподавателей</li>
+				<li><b>rooms</b> – массив id аудиторий</li>
+				<li><b>rooms_full_names</b> – массив полных имен аудиторий</li>
+			</ul>
+			<h2 id="filter">Фильтрация</h2>
+			<p>Для списков всех сущностей (кроме корпусов и дисциплин) допустима фильтрация по полям сущности. Для этого нужно определить в адресе запроса параметр <b>URL</b>, совпадающий с именем поля, и дать ему значение для фильтрации.<br>
+			<ul class="ex">
+				<li><a href="http://{{ api_domain }}/lessons/?number=1">http://{{ api_domain }}/lessons/?number=1</a> – все занятия на первой паре</li>
+				<li><a href="http://{{ api_domain }}/lessons/?groups=1">http://{{ api_domain }}/lessons/?groups=1</a> – все занятия у группы <b>АМ-21</b></li>
+				<li><a href="http://{{ api_domain }}/rooms/?building=1">http://{{ api_domain }}/rooms/?building=1</a> – все аудитории в седьмом корпусе</li>
+			</ul></p>
+			<p>Параметры фильтрации можно комбинировать<br>
+			<ul class="ex">
+				<li><a href="http://{{ api_domain }}/lessons/?number=1&day=2">http://{{ api_domain }}/lessons/?number=1&day=2</a> – все занятия на <b>первой</b> паре во <b>вторник</b></li>
+				<li><a href="http://{{ api_domain }}/teachers/?first_name=Олена&middle_name=Володимирівна">http://{{ api_domain }}/teachers/?first_name=Олена&middle_name=Володимирівна</a> – все преподаватели с именем <b>Елена</b> и отчеством <b>Владимировна</b></li>
+			</ul></p>
+			<p>Параметры фильтрации можно комбинировать с параметрами пагинации<br>
+			<ul class="ex">
+				<li><a href="http://{{ api_domain }}/teachers/?first_name=Олена&middle_name=Володимирівна&limit=2">http://{{ api_domain }}/teachers/?first_name=Олена&middle_name=Володимирівна&limit=2</a> – первые два преподавателя с именем Елена и отчеством Владимировна</li>
+			</ul>
+			</p>
+			<h3>Поля, по которым возможна фильтрация:</h3>
+			<ul>
+				<li>Аудитории: <b>name</b>, <b>building</b></li>
+				<li>Группы: <b>name</b>, <b>okr</b>, <b>type</b></li>
+				<li>Преподаватели: <b>last_name</b>, <b>first_name</b>, <b>middle_name</b>, <b>degree</b></li>
+				<li>Занятия: <b>number</b>, <b>day</b>, <b>week</b>, <b>type</b>, <b>discipline</b>, <b>groups</b>, <b>teachers</b>, <b>rooms</b></li>
+			</ul>
+			<h2 id="search">Поиск</h2>
+			<p>Для групп, преподавателей, аудиторий и дисциплин реализована возможность текстового поиска. Для этого необходимо задать параметр <b>search</b> и дать ему значение для поиска. Для групп – поиск с начала имени, для дисциплин – полнотекстовый поиск по <b>name</b> или <b>full_name</b>, для аудиторий – поиск с начала <b>full_name</b>, для преподавателей – поиск с начала <b>last_name</b>, или <b>first_name</b>, или <b>middle_name</b>.<br>
+			<ul class="ex">
+				<li><a href="http://{{ api_domain }}/groups/?search=кв">http://{{ api_domain }}/groups/?search=кв</a> – все группы с префиксом <b>КВ</b>.</li>
+			</ul></p>
+			<p>Параметр <b>search</b> можно комбинировать с параметрами пагинации и фильтрации.</p>
+			<h2 id="full_timetable">Полное расписание</h2>
+			<p>Для групп, преподавателей и аудиторий реализована возможность получить полное расписание в один GET запрос. Ответ представлен в JSON, где вместо id всех сущностей вложены сами сущности. Для этого необходимо добавить timetable в адрес запроса конкретной сущности.<br>
+			<ul class="ex">
+				<li><a href="http://{{ api_domain }}/groups/556/timetable/">http://{{ api_domain }}/groups/556/timetable/</a></li>
+				<li><a href="http://{{ api_domain }}/teachers/2/timetable/">http://{{ api_domain }}/teachers/2/timetable/</a></li>
+				<li><a href="http://{{ api_domain }}/rooms/5/timetable/">http://{{ api_domain }}/rooms/5/timetable/</a></li>
+			</ul></p>
+		</div>
+		<div class="one_third last">
+			<div id="summary_content" class="et-box et-bio">
+				<div class="et-box-content">
+					<h3>Содержание:</h3>
+					<ul>
+						<li><a href="#requests">Запросы</a></li>
+						<li><a href="#essense">Сущности</a></li>
+						<li><a href="#pagination">Пагинация</a></li>
+						<li><a href="#about_essense">Описание Сущностей</a>
+							<ul>
+								<li><a href="#building">Корпус</a></li>
+								<li><a href="#room">Аудитория</a></li>
+								<li><a href="#group">Группа</a></li>
+								<li><a href="#teacher">Преподаватель</a></li>
+								<li><a href="#discipline">Дисциплина</a></li>
+								<li><a href="#lesson">Занятие</a></li>
+							</ul>
+						</li>
+						<li><a href="#filter">Фильтрация</a></li>
+						<li><a href="#search">Поиск</a></li>
+						<li><a href="#full_timetable">Полное расписание</a></li>
+				</div>
+				</ul>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<script>
+		$(document).ready(function () {
+		    $("#summary_content a").click(function () {
+		        var elementClick = $(this).attr("href");
+		        var destination = $(elementClick).offset().top;
+	            $('html, body').animate({ scrollTop: destination }, 700);
+		        return false; 
+		    });
+		    if (!window.isMobile) {
+				var topPos = $('#summary_content').offset().top; //topPos - это значение от верха блока до окна браузера
+				$(window).scroll(function() { 
+					var top = $(document).scrollTop()
+					if (top > topPos) $('#summary_content').addClass('fixed'); 
+					else $('#summary_content').removeClass('fixed');
+				});
+		    }
+		});
+	</script>
+</section>
+
+{% endblock %}
+

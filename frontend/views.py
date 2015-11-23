@@ -10,9 +10,11 @@ from django.core.cache import caches
 from django.core.cache.utils import make_template_fragment_key
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext as _
+from django.conf import settings
 from data.models import *
 from data.search import *
 from .forms import EditUserProfile
+from settings import domains
 
 cache = caches['default']
 
@@ -44,6 +46,14 @@ def index(request):
     context['title'] = page_base_title
     
     return render(request, 'index.html', context)
+
+@ensure_csrf_cookie
+def api(request):
+    context = {}
+    context['title'] = page_base_title + ' | API'
+    context['api_domain'] = domains.API_DOMAIN
+    
+    return render(request, 'api.html', context)
 
 @ensure_csrf_cookie
 def error(request):
@@ -237,16 +247,17 @@ def search(request, type):
 def create_lesson(request):
     request_data = json.loads(request.body.decode('utf-8'))
 
+    week = request_data['week']
+    day = request_data['day']
+    number = request_data['number']
+    another_week = True if request_data['another_week'] == 1 else False
+    another_week_number = (2 if week == 1 else 1) if another_week else None
+
     if request_data['sender'] == 'group':
         current_group = Group.objects.get(id=request_data['id'])
 
         if not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm('data.edit_group_timetable')):
             return forbidden_request
-
-        week = request_data['week']
-        day = request_data['day']
-        number = request_data['number']
-        another_week = True if request_data['another_week'] == 1 else False
         
         if ((not another_week) and Lesson.objects.filter(week=week, day=day, number=number, groups=current_group).exists()):
             return bad_request
@@ -328,120 +339,53 @@ def create_lesson(request):
 
         return JsonResponse({'status': 'OK'})
     else:
-        pass
+        current_teacher = Teacher.objects.get(id=request_data['id'])
 
-@require_http_methods(['POST'])
-def edit_lesson(request):
-    request_data = json.loads(request.body.decode('utf-8'))
-
-    if request_data['sender'] == 'group':
-        current_group = Group.objects.get(id=request_data['id'])
-        current_lesson = Lesson.objects.get(id=request_data['lesson_id'])
-        if current_group not in current_lesson.groups.all():
-            return bad_request
-
-        if not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm(data.edit_group_timetable)):
+        if not (request.user.has_perm('edit_teacher_timetable', current_teacher) or request.user.has_perm('data.edit_teacher_timetable')):
             return forbidden_request
 
-        type_choices_keys = [choice[0] for choice in Lesson.TYPE_CHOICES]
-        
-        current_lesson_type = None
-        if request_data['lesson_type'] == 'None':
-            pass
-        elif int(request_data['lesson_type']) in type_choices_keys:
-            current_lesson_type = int(request_data['lesson_type'])
-        else:
+        if ((not another_week) and Lesson.objects.filter(week=week, day=day, number=number, teachers=current_teacher).exists()):
+            return bad_request
+        elif (another_week and Lesson.objects.filter(day=day, number=number, teachers=current_teacher).exists()):
+            return bad_request
+
+        discipline = Discipline.objects.get(id=request_data['discipline_id'])
+
+        groups = [Group.objects.get(id=id) for id in request_data['groups_id']]
+        if len(groups) == 0:
             return bad_request
 
         conflicts = []
 
-        old_teachers_id = [teacher.id for teacher in current_lesson.teachers.all()]
-        old_rooms_id = [room.id for room in current_lesson.rooms.all()]
-        new_teachers_id = request_data['teachers_id']
-        new_rooms_id = request_data['rooms_id']
-
-        add_teachers_id = [id for id in new_teachers_id if id not in old_teachers_id]
-        remove_teachers_id = [id for id in old_teachers_id if id not in new_teachers_id]
-        static_teachers_id = [id for id in new_teachers_id if id in old_teachers_id]
-        add_rooms_id = [id for id in new_rooms_id if id not in old_rooms_id]
-        remove_rooms_id = [id for id in old_rooms_id if id not in new_rooms_id]
-        static_rooms_id = [id for id in new_rooms_id if id in old_rooms_id]
-
-        group_exclude_lesson_queryset = Lesson.objects.all()
-        for group in current_lesson.groups.all():
-            group_exclude_lesson_queryset = group_exclude_lesson_queryset.filter(~Q(groups=group))
-
-        for teacher_id in new_teachers_id:
-            teacher = Teacher.objects.get(id=teacher_id)
-            if group_exclude_lesson_queryset.filter(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week, teachers=teacher).exists():
+        for group in groups:
+            if Lesson.objects.filter(number=number, day=day, week=week, groups=group).exists():
                 conflicts.append({
-                    'type': 'teacher',
-                    'lesson': group_exclude_lesson_queryset.get(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week, teachers=teacher),
-                    'teacher': teacher,
+                    'lesson': Lesson.objects.get(number=number, day=day, week=week, groups=group),
+                    'group': group,
                 })
 
-        for room_id in new_rooms_id:
-            room = Room.objects.get(id=room_id)
-            if group_exclude_lesson_queryset.filter(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week, rooms=room).exists():
-                conflicts.append({
-                    'type': 'room',
-                    'lesson': group_exclude_lesson_queryset.get(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week, rooms=room),
-                    'room': room,
-                })
-
-        another_week = True if request_data['another_week'] == 1 else False
-
-        current_lesson_2 = None
-        add_teachers_id_2 = None
-        remove_teachers_id_2 = None
-        static_teachers_id_2 = None
-        add_rooms_id_2 = None
-        remove_rooms_id_2 = None
-        static_rooms_id_2 = None
         if another_week:
-            another_week_number = 2 if current_lesson.week == 1 else 1
-
-            current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, groups=current_group)
-
-            old_teachers_id_2 = [teacher.id for teacher in current_lesson_2.teachers.all()]
-            old_rooms_id_2 = [room.id for room in current_lesson_2.rooms.all()]
-
-            add_teachers_id_2 = [id for id in new_teachers_id if id not in old_teachers_id_2]
-            remove_teachers_id_2 = [id for id in old_teachers_id_2 if id not in new_teachers_id]
-            static_teachers_id_2 = [id for id in new_teachers_id if id in old_teachers_id_2]
-            add_rooms_id_2 = [id for id in new_rooms_id if id not in old_rooms_id_2]
-            remove_rooms_id_2 = [id for id in old_rooms_id_2 if id not in new_rooms_id]
-            static_rooms_id_2 = [id for id in new_rooms_id if id in old_rooms_id_2]
-
-            group_exclude_lesson_queryset_2 = Lesson.objects.all()
-            for group in current_lesson_2.groups.all():
-                group_exclude_lesson_queryset_2 = group_exclude_lesson_queryset_2.filter(~Q(groups=group))
-
-            for teacher_id in new_teachers_id:
-                teacher = Teacher.objects.get(id=teacher_id)
-                if group_exclude_lesson_queryset_2.filter(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week, teachers=teacher).exists():
+            for group in groups:
+                if Lesson.objects.filter(number=number, day=day, week=another_week_number, groups=group).exists():
                     conflicts.append({
-                        'type': 'teacher',
-                        'lesson': group_exclude_lesson_queryset_2.get(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week, teachers=teacher),
-                        'teacher': teacher,
-                    })
-
-            for room_id in new_rooms_id:
-                room = Room.objects.get(id=room_id)
-                if group_exclude_lesson_queryset_2.filter(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week, rooms=room).exists():
-                    conflicts.append({
-                        'type': 'room',
-                        'lesson': group_exclude_lesson_queryset_2.get(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week, rooms=room),
-                        'room': room,
+                        'lesson': Lesson.objects.get(number=number, day=day, week=another_week_number, groups=group),
+                        'group': group,
                     })
 
         if conflicts:
             if request_data['y'] == 1:
                 for conflict in conflicts:
-                    if conflict['type'] == 'teacher':
-                        conflict['lesson'].teachers.remove(conflict['teacher'])
+                    for group in conflict['lesson'].groups.all():
+                        delete_timetable_cache('groups', group.id)
+                    for teacher in conflict['lesson'].teachers.all():
+                        delete_timetable_cache('teachers', teacher.id)
+                    for room in conflict['lesson'].rooms.all():
+                        delete_timetable_cache('rooms', room.id)
+
+                    if conflict['lesson'].groups.all().count() == 1:
+                        conflict['lesson'].delete()
                     else:
-                        conflict['lesson'].rooms.remove(conflict['room'])
+                        conflict['lesson'].groups.remove(conflict['group'])
             else:
                 conflict_response = {
                     'status': 'CONFLICT',
@@ -449,133 +393,405 @@ def edit_lesson(request):
                 }
 
                 for conflict in conflicts:
-                    if conflict['type'] == 'teacher':
-                        conflict_response['conflicts'].append({
-                            'type': 'teacher',
-                            'name': conflict['teacher'].name(),
-                            'number': conflict['lesson'].number,
-                            'day': conflict['lesson'].day,
-                            'week': conflict['lesson'].week,
-                            'groups': [{'id': group.id, 'name': group.name} for group in conflict['lesson'].groups.all()],
-                        })
-                    else:
-                        conflict_response['conflicts'].append({
-                            'type': 'room',
-                            'name': conflict['room'].full_name(),
-                            'number': conflict['lesson'].number,
-                            'day': conflict['lesson'].day,
-                            'week': conflict['lesson'].week,
-                            'groups': [{'id': group.id, 'name': group.name} for group in conflict['lesson'].groups.all()],
-                        })
+                    conflict_response['conflicts'].append({
+                        'type': 'group',
+                        'name': conflict['group'].name,
+                        'number': conflict['lesson'].number,
+                        'day': conflict['lesson'].day,
+                        'week': conflict['lesson'].week,
+                        'teachers': [{'id': teacher.id, 'name': teacher.short_name()} for teacher in conflict['lesson'].teachers.all()],
+                    })
 
                 return JsonResponse(conflict_response)
 
-        current_lesson.type = current_lesson_type
-        current_lesson.save()
+        new_lesson = Lesson(number=number, day=day, week=week, discipline=discipline)
+        new_lesson.save()
+        new_lesson.teachers.add(current_teacher)
+        for group in groups:
+            new_lesson.groups.add(group)
+        
+        if another_week:
+            new_lesson_2 = Lesson(number=number, day=day, week=another_week_number, discipline=discipline)
+            new_lesson_2.save()
+            new_lesson_2.teachers.add(current_teacher)
+            for group in groups:
+                new_lesson_2.groups.add(group)
 
+        delete_timetable_cache('teachers', current_teacher.id)
+        for group in groups:
+            delete_timetable_cache('groups', group.id)
+
+        return JsonResponse({'status': 'OK'})
+
+@require_http_methods(['POST'])
+def edit_lesson(request):
+    request_data = json.loads(request.body.decode('utf-8'))
+
+    current_group = Group.objects.get(id=request_data['id']) if request_data['sender'] == 'group' else None
+    current_teacher = Teacher.objects.get(id=request_data['id']) if request_data['sender'] == 'teacher' else None
+
+    if not (current_group or current_teacher):
+        return bad_request
+
+    current_lesson = Lesson.objects.get(id=request_data['lesson_id'])
+
+    if current_group and (current_group not in current_lesson.groups.all()):
+        return bad_request
+    if current_teacher and (current_teacher not in current_lesson.teachers.all()):
+        return bad_request
+
+    if current_group and (not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm('data.edit_group_timetable'))):
+        return forbidden_request
+    if current_teacher and (not (request.user.has_perm('edit_teacher_timetable', current_teacher) or request.user.has_perm('data.edit_teacher_timetable'))):
+        return forbidden_request
+
+    type_choices_keys = [choice[0] for choice in Lesson.TYPE_CHOICES]
+
+    current_lesson_type = None
+    if request_data['lesson_type'] == 'None':
+        pass
+    elif int(request_data['lesson_type']) in type_choices_keys:
+        current_lesson_type = int(request_data['lesson_type'])
+    else:
+        return bad_request
+
+    conflicts = []
+
+    old_groups_id = [group.id for group in current_lesson.groups.all()] if current_teacher else None
+    old_teachers_id = [teacher.id for teacher in current_lesson.teachers.all()] if current_group else None
+    old_rooms_id = [room.id for room in current_lesson.rooms.all()]
+    new_groups_id = request_data['groups_id'] if current_teacher else None
+    new_teachers_id = request_data['teachers_id'] if current_group else None
+    new_rooms_id = request_data['rooms_id']
+
+    if current_teacher and (len(new_groups_id) == 0):
+        return bad_request
+
+    add_groups_id = [id for id in new_groups_id if id not in old_groups_id] if current_teacher else None
+    remove_groups_id = [id for id in old_groups_id if id not in new_groups_id] if current_teacher else None
+    static_groups_id = [id for id in new_groups_id if id in old_groups_id] if current_teacher else None
+    add_teachers_id = [id for id in new_teachers_id if id not in old_teachers_id] if current_group else None
+    remove_teachers_id = [id for id in old_teachers_id if id not in new_teachers_id] if current_group else None
+    static_teachers_id = [id for id in new_teachers_id if id in old_teachers_id] if current_group else None
+    add_rooms_id = [id for id in new_rooms_id if id not in old_rooms_id]
+    remove_rooms_id = [id for id in old_rooms_id if id not in new_rooms_id]
+    static_rooms_id = [id for id in new_rooms_id if id in old_rooms_id]
+
+    exclude_lesson_queryset = Lesson.objects.filter(Q(number=current_lesson.number, day=current_lesson.day, week=current_lesson.week) & ~Q(id=current_lesson.id))
+
+    if new_groups_id:
+        for group_id in new_groups_id:
+            group = Group.objects.get(id=group_id)
+            if exclude_lesson_queryset.filter(groups=group).exists():
+                conflicts.append({
+                    'type': 'group',
+                    'lesson': exclude_lesson_queryset.get(groups=group),
+                    'group': group,
+                })
+
+    if new_teachers_id:
+        for teacher_id in new_teachers_id:
+            teacher = Teacher.objects.get(id=teacher_id)
+            if exclude_lesson_queryset.filter(teachers=teacher).exists():
+                conflicts.append({
+                    'type': 'teacher',
+                    'lesson': exclude_lesson_queryset.get(teachers=teacher),
+                    'teacher': teacher,
+                })
+
+    for room_id in new_rooms_id:
+        room = Room.objects.get(id=room_id)
+        if exclude_lesson_queryset.filter(rooms=room).exists():
+            conflicts.append({
+                'type': 'room',
+                'lesson': exclude_lesson_queryset.get(rooms=room),
+                'room': room,
+            })
+
+    another_week = True if request_data['another_week'] == 1 else False
+
+    current_lesson_2 = None
+    add_groups_id_2 = None
+    remove_groups_id_2 = None
+    static_groups_id_2 = None
+    add_teachers_id_2 = None
+    remove_teachers_id_2 = None
+    static_teachers_id_2 = None
+    add_rooms_id_2 = None
+    remove_rooms_id_2 = None
+    static_rooms_id_2 = None
+    if another_week:
+        another_week_number = 2 if current_lesson.week == 1 else 1
+
+        if current_group:
+            current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, discipline=current_lesson.discipline, groups=current_group)
+        elif current_teacher:
+            current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, discipline=current_lesson.discipline, teachers=current_teacher)
+
+        if not current_lesson_2:
+            return bad_request
+
+        old_groups_id_2 = [group.id for group in current_lesson_2.groups.all()] if current_teacher else None
+        old_teachers_id_2 = [teacher.id for teacher in current_lesson_2.teachers.all()] if current_group else None
+        old_rooms_id_2 = [room.id for room in current_lesson_2.rooms.all()]
+
+        add_groups_id_2 = [id for id in new_groups_id if id not in old_groups_id_2] if current_teacher else None
+        remove_groups_id_2 = [id for id in old_groups_id_2 if id not in new_groups_id] if current_teacher else None
+        static_groups_id_2 = [id for id in new_groups_id if id in old_groups_id_2] if current_teacher else None
+        add_teachers_id_2 = [id for id in new_teachers_id if id not in old_teachers_id_2] if current_group else None
+        remove_teachers_id_2 = [id for id in old_teachers_id_2 if id not in new_teachers_id] if current_group else None
+        static_teachers_id_2 = [id for id in new_teachers_id if id in old_teachers_id_2] if current_group else None
+        add_rooms_id_2 = [id for id in new_rooms_id if id not in old_rooms_id_2]
+        remove_rooms_id_2 = [id for id in old_rooms_id_2 if id not in new_rooms_id]
+        static_rooms_id_2 = [id for id in new_rooms_id if id in old_rooms_id_2]
+
+        exclude_lesson_queryset_2 = Lesson.objects.filter(Q(number=current_lesson_2.number, day=current_lesson_2.day, week=current_lesson_2.week) & ~Q(id=current_lesson_2.id))
+
+        if new_groups_id:
+            for group_id in new_groups_id:
+                group = Group.objects.get(id=group_id)
+                if exclude_lesson_queryset_2.filter(groups=group).exists():
+                    conflicts.append({
+                        'type': 'group',
+                        'lesson': exclude_lesson_queryset_2.get(groups=group),
+                        'group': group,
+                    })
+
+        if new_teachers_id:
+            for teacher_id in new_teachers_id:
+                teacher = Teacher.objects.get(id=teacher_id)
+                if exclude_lesson_queryset_2.filter(teachers=teacher).exists():
+                    conflicts.append({
+                        'type': 'teacher',
+                        'lesson': exclude_lesson_queryset_2.get(teachers=teacher),
+                        'teacher': teacher,
+                    })
+
+        for room_id in new_rooms_id:
+            room = Room.objects.get(id=room_id)
+            if exclude_lesson_queryset_2.filter(rooms=room).exists():
+                conflicts.append({
+                    'type': 'room',
+                    'lesson': exclude_lesson_queryset_2.get(rooms=room),
+                    'room': room,
+                })
+
+    if conflicts:
+        if request_data['y'] == 1:
+            for conflict in conflicts:
+                for group in conflict['lesson'].groups.all():
+                    delete_timetable_cache('groups', group.id)
+                for teacher in conflict['lesson'].teachers.all():
+                    delete_timetable_cache('teachers', teacher.id)
+                for room in conflict['lesson'].rooms.all():
+                    delete_timetable_cache('rooms', room.id)
+
+                if conflict['type'] == 'group':
+                    if conflict['lesson'].groups.all().count() == 1:
+                        conflict['lesson'].delete()
+                    else:
+                        conflict['lesson'].groups.remove(conflict['group'])
+                elif conflict['type'] == 'teacher':
+                    conflict['lesson'].teachers.remove(conflict['teacher'])
+                else:
+                    conflict['lesson'].rooms.remove(conflict['room'])
+        else:
+            conflict_response = {
+                'status': 'CONFLICT',
+                'conflicts': [],
+            }
+
+            for conflict in conflicts:
+                if conflict['type'] == 'group':
+                    conflict_response['conflicts'].append({
+                        'type': 'group',
+                        'name': conflict['group'].name,
+                        'number': conflict['lesson'].number,
+                        'day': conflict['lesson'].day,
+                        'week': conflict['lesson'].week,
+                        'groups': [{'id': group.id, 'name': group.name} for group in conflict['lesson'].groups.all()],
+                        'teachers': [{'id': teacher.id, 'name': teacher.short_name()} for teacher in conflict['lesson'].teachers.all()],
+                    })
+                elif conflict['type'] == 'teacher':
+                    conflict_response['conflicts'].append({
+                        'type': 'teacher',
+                        'name': conflict['teacher'].name(),
+                        'number': conflict['lesson'].number,
+                        'day': conflict['lesson'].day,
+                        'week': conflict['lesson'].week,
+                        'groups': [{'id': group.id, 'name': group.name} for group in conflict['lesson'].groups.all()],
+                        'teachers': [{'id': teacher.id, 'name': teacher.short_name()} for teacher in conflict['lesson'].teachers.all()],
+                    })
+                else:
+                    conflict_response['conflicts'].append({
+                        'type': 'room',
+                        'name': conflict['room'].full_name(),
+                        'number': conflict['lesson'].number,
+                        'day': conflict['lesson'].day,
+                        'week': conflict['lesson'].week,
+                        'groups': [{'id': group.id, 'name': group.name} for group in conflict['lesson'].groups.all()],
+                        'teachers': [{'id': teacher.id, 'name': teacher.short_name()} for teacher in conflict['lesson'].teachers.all()],
+                    })
+
+            return JsonResponse(conflict_response)
+
+    current_lesson.type = current_lesson_type
+    current_lesson.save()
+
+    if remove_groups_id:
+        for group_id in remove_groups_id:
+            current_lesson.groups.remove(Group.objects.get(id=group_id))
+            delete_timetable_cache('groups', group_id)
+    if remove_teachers_id:
         for teacher_id in remove_teachers_id:
             current_lesson.teachers.remove(Teacher.objects.get(id=teacher_id))
             delete_timetable_cache('teachers', teacher_id)
-        for room_id in remove_rooms_id:
-            current_lesson.rooms.remove(Room.objects.get(id=room_id))
-            delete_timetable_cache('rooms', room_id)
+    for room_id in remove_rooms_id:
+        current_lesson.rooms.remove(Room.objects.get(id=room_id))
+        delete_timetable_cache('rooms', room_id)
 
+    if add_groups_id:
+        for group_id in add_groups_id:
+            current_lesson.groups.add(Group.objects.get(id=group_id))
+            delete_timetable_cache('groups', group_id)
+    if add_teachers_id:
         for teacher_id in add_teachers_id:
             current_lesson.teachers.add(Teacher.objects.get(id=teacher_id))
             delete_timetable_cache('teachers', teacher_id)
-        for room_id in add_rooms_id:
-            current_lesson.rooms.add(Room.objects.get(id=room_id))
-            delete_timetable_cache('rooms', room_id)
+    for room_id in add_rooms_id:
+        current_lesson.rooms.add(Room.objects.get(id=room_id))
+        delete_timetable_cache('rooms', room_id)
 
+    if static_groups_id:
+        for group_id in static_groups_id:
+            delete_timetable_cache('groups', group_id)
+    if static_teachers_id:
         for teacher_id in static_teachers_id:
             delete_timetable_cache('teachers', teacher_id)
-        for room_id in static_rooms_id:
-            delete_timetable_cache('rooms', room_id)
+    for room_id in static_rooms_id:
+        delete_timetable_cache('rooms', room_id)
 
+    if current_group:
         for group in current_lesson.groups.all():
             delete_timetable_cache('groups', group.id)
+    if current_teacher:
+        for teacher in current_lesson.teachers.all():
+            delete_timetable_cache('teachers', teacher.id)
 
-        if another_week:
-            current_lesson_2.type = current_lesson_type
-            current_lesson_2.save()
+    if another_week:
+        current_lesson_2.type = current_lesson_type
+        current_lesson_2.save()
 
+        if remove_groups_id_2:
+            for group_id in remove_groups_id_2:
+                current_lesson_2.groups.remove(Group.objects.get(id=group_id))
+                delete_timetable_cache('groups', group_id)
+        if remove_teachers_id_2:
             for teacher_id in remove_teachers_id_2:
                 current_lesson_2.teachers.remove(Teacher.objects.get(id=teacher_id))
                 delete_timetable_cache('teachers', teacher_id)
-            for room_id in remove_rooms_id_2:
-                current_lesson_2.rooms.remove(Room.objects.get(id=room_id))
-                delete_timetable_cache('rooms', room_id)
+        for room_id in remove_rooms_id_2:
+            current_lesson_2.rooms.remove(Room.objects.get(id=room_id))
+            delete_timetable_cache('rooms', room_id)
 
+        if add_groups_id_2:
+            for group_id in add_groups_id_2:
+                current_lesson_2.groups.add(Group.objects.get(id=group_id))
+                delete_timetable_cache('groups', group_id)
+        if add_teachers_id_2:
             for teacher_id in add_teachers_id_2:
                 current_lesson_2.teachers.add(Teacher.objects.get(id=teacher_id))
                 delete_timetable_cache('teachers', teacher_id)
-            for room_id in add_rooms_id_2:
-                current_lesson_2.rooms.add(Room.objects.get(id=room_id))
-                delete_timetable_cache('rooms', room_id)
+        for room_id in add_rooms_id_2:
+            current_lesson_2.rooms.add(Room.objects.get(id=room_id))
+            delete_timetable_cache('rooms', room_id)
 
+        if static_groups_id_2:
+            for group_id in static_groups_id_2:
+                delete_timetable_cache('groups', group_id)
+        if static_teachers_id_2:
             for teacher_id in static_teachers_id_2:
                 delete_timetable_cache('teachers', teacher_id)
-            for room_id in static_rooms_id_2:
-                delete_timetable_cache('rooms', room_id)
+        for room_id in static_rooms_id_2:
+            delete_timetable_cache('rooms', room_id)
 
+        if current_group:
             for group in current_lesson_2.groups.all():
                 delete_timetable_cache('groups', group.id)
+        if current_teacher:
+            for teacher in current_lesson_2.teachers.all():
+                delete_timetable_cache('teachers', teacher.id)
 
-        return JsonResponse({'status': 'OK'})
-    else:
-        pass
+    return JsonResponse({'status': 'OK'})
 
 @require_http_methods(['POST'])
 def remove_lesson(request):
     request_data = json.loads(request.body.decode('utf-8'))
 
-    if request_data['sender'] == 'group':
-        current_group = Group.objects.get(id=request_data['id'])
+    current_group = Group.objects.get(id=request_data['id']) if request_data['sender'] == 'group' else None
+    current_teacher = Teacher.objects.get(id=request_data['id']) if request_data['sender'] == 'teacher' else None
 
-        if not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm('data.edit_group_timetable')):
-            return forbidden_request
+    if not (current_group or current_teacher):
+        return bad_request
 
-        current_lesson = Lesson.objects.get(id=request_data['lesson_id'])
+    if current_group and (not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm('data.edit_group_timetable'))):
+        return forbidden_request
+    if current_teacher and (not (request.user.has_perm('edit_teacher_timetable', current_teacher) or request.user.has_perm('data.edit_teacher_timetable'))):
+        return forbidden_request
 
-        if current_group not in current_lesson.groups.all():
+    current_lesson = Lesson.objects.get(id=request_data['lesson_id'])
+
+    if current_group and (current_group not in current_lesson.groups.all()):
+        return bad_request
+    if current_teacher and (current_teacher not in current_lesson.teachers.all()):
+        return bad_request
+
+    another_week = True if request_data['another_week'] == 1 else False
+
+    current_lesson_2 = None
+    if another_week:
+        another_week_number = 2 if current_lesson.week == 1 else 1
+
+        if current_group:
+            current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, discipline=current_lesson.discipline, groups=current_group)
+        elif current_teacher:
+            current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, discipline=current_lesson.discipline, teachers=current_teacher)
+
+        if not current_lesson_2:
             return bad_request
 
-        another_week = True if request_data['another_week'] == 1 else False
+    for group in current_lesson.groups.all():
+        delete_timetable_cache('groups', group.id)
+    for teacher in current_lesson.teachers.all():
+        delete_timetable_cache('teachers', teacher.id)
+    for room in current_lesson.rooms.all():
+        delete_timetable_cache('rooms', room.id)
 
-        current_lesson_2 = None
-        if another_week:
-            another_week_number = 2 if current_lesson.week == 1 else 1
-
-            current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, groups=current_group)
-
-        for group in current_lesson.groups.all():
-            delete_timetable_cache('groups', group.id)
-        for teacher in current_lesson.teachers.all():
-            delete_timetable_cache('teachers', teacher.id)
-        for room in current_lesson.rooms.all():
-            delete_timetable_cache('rooms', room.id)
-
+    if current_group:
         if current_lesson.groups.all().count() == 1:
             current_lesson.delete()
         else:
             current_lesson.groups.remove(current_group)
+    if current_teacher:
+        current_lesson.teachers.remove(current_teacher)
 
-        if another_week:
-            for group in current_lesson_2.groups.all():
-                delete_timetable_cache('groups', group.id)
-            for teacher in current_lesson_2.teachers.all():
-                delete_timetable_cache('teachers', teacher.id)
-            for room in current_lesson_2.rooms.all():
-                delete_timetable_cache('rooms', room.id)
+    if another_week:
+        for group in current_lesson_2.groups.all():
+            delete_timetable_cache('groups', group.id)
+        for teacher in current_lesson_2.teachers.all():
+            delete_timetable_cache('teachers', teacher.id)
+        for room in current_lesson_2.rooms.all():
+            delete_timetable_cache('rooms', room.id)
 
+        if current_group:
             if current_lesson_2.groups.all().count() == 1:
                 current_lesson_2.delete()
             else:
                 current_lesson_2.groups.remove(current_group)
+        if current_teacher:
+            current_lesson_2.teachers.remove(current_teacher)
 
-        return JsonResponse({'status': 'OK'})
-    else:
-        pass
+    return JsonResponse({'status': 'OK'})
 
 @require_http_methods(['POST'])
 def link_lesson(request):

@@ -15,7 +15,8 @@ urlpatterns = [
     url(r'^link-lesson/$', views.link_lesson),
     url(r'^login/$', views.auth_login),
     url(r'^logout/$', views.auth_logout),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/$', views.api),
+    url(r'^admin/', include(admin.site.urls))
 ]
 
 handler404 = 'frontend.views.error'
