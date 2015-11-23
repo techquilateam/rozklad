@@ -113,6 +113,7 @@
 		</div>
 		{% endif %}
 		<script>
+			var datShitDropdownMenuActive = false
 			function getCookie(name) {
 				var cookieValue = null
 				if (document.cookie && document.cookie != '') {
@@ -291,15 +292,17 @@
 						$("#whatUcanEdit").animate({
 							height: autoHeight,
 							opacity: 1
-						}, 150)
+						}, 150).addClass("active")
 						$(this).attr("data-active", "true")
+						datShitDropdownMenuActive = true
 					} else {
 						$("#whatUcanEdit").animate({
 							height: 0
 						}, 150, function() {
-							$("#whatUcanEdit").animate({opacity: 0}, 150)
+							$("#whatUcanEdit").animate({opacity: 0}, 150).removeClass("active")
 						})
 						$(this).attr("data-active", "false")
+						datShitDropdownMenuActive = false
 					}
 				})
 			})
@@ -310,15 +313,17 @@
 			    	$("#search_proposals ul li").remove()
 			    }
 
-			    var arrow = $(".arrow");
-			    if (arrow.has(e.target).length === 0) {
-			        $("#whatUcanEdit").animate({
-			        	height: 0
-			        }, 150, function() {
-			        	$("#whatUcanEdit").animate({opacity: 0}, 150)
-			        })
-			        arrow.attr("data-active", "false")
-			    } 
+			    //NEED TO FIX THIS
+			    // var arrow = $("#whatUcanEdit");
+			    // if (datShitDropdownMenuActive == true)
+				   //  if (arrow.has(e.target).length === 0) {
+				   //      $("#whatUcanEdit").animate({
+				   //      	height: 0
+				   //      }, 150, function() {
+				   //      	$("#whatUcanEdit").animate({opacity: 0}, 150)
+				   //      })
+				   //      arrow.attr("data-active", "false")
+				   //  } 
 			});
 
 			
