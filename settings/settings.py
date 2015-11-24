@@ -3,8 +3,6 @@ from .settings_secure import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEBUG = True
-
 ANONYMOUS_USER_ID = None
 
 DATABASES = {
