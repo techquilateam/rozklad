@@ -1,7 +1,7 @@
 import json
 import urllib.request
 import urllib.parse
-from django.http import HttpResponse, JsonResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
@@ -10,16 +10,13 @@ from django.core.cache import caches
 from django.core.cache.utils import make_template_fragment_key
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext as _
-from django.conf import settings
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from data.models import *
 from data.search import *
 from .forms import EditUserProfile
 from settings import domains
 
 cache = caches['default']
-
-bad_request = HttpResponseBadRequest('Bad request')
-forbidden_request = HttpResponseForbidden('Forbidden')
 
 page_base_title = 'Розклад КПІ'
 
@@ -41,6 +38,38 @@ def check_captcha(captcha_response):
     return json.loads(urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify', captcha_data).read().decode('utf-8'))['success']
 
 @ensure_csrf_cookie
+def error400(request):
+    return render(request, 'error.html', {
+        'title': page_base_title + ' | 400',
+        'error_text': '400',
+        'error_text2': 'Bad Request',
+    })
+
+@ensure_csrf_cookie
+def error403(request):
+    return render(request, 'error.html', {
+        'title': page_base_title + ' | 403',
+        'error_text': '403',
+        'error_text2': 'Forbidden',
+    })
+
+@ensure_csrf_cookie
+def error404(request):
+    return render(request, 'error.html', {
+        'title': page_base_title + ' | 404',
+        'error_text': '404',
+        'error_text2': 'Нажаль, такої сторінки не існує',
+    })
+
+@ensure_csrf_cookie
+def error500(request):
+    return render(request, 'error.html', {
+        'title': page_base_title + ' | 500',
+        'error_text': '500',
+        'error_text2': 'Server Error',
+    })
+
+@ensure_csrf_cookie
 def index(request):
     context = {}
     context['title'] = page_base_title
@@ -56,18 +85,11 @@ def api(request):
     return render(request, 'api.html', context)
 
 @ensure_csrf_cookie
-def error(request):
-    context = {}
-    context['title'] = page_base_title + ' | 404'
-    context['error_text'] = '404'
-    context['error_text2'] = 'Нажаль, такої сторінки не існує'
-    
-    return render(request, 'error.html', context)
-
-@ensure_csrf_cookie
 def profile(request):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect('/')
+        raise PermissionDenied
+    if request.user.social_auth.all().count() > 0:
+        raise PermissionDenied
 
     context = {}
     context['user_form'] = EditUserProfile(instance=request.user)
@@ -78,7 +100,9 @@ def profile(request):
 @require_http_methods(['POST'])
 def edit_profile(request):
     if not request.user.is_authenticated():
-        return forbidden_request
+        raise PermissionDenied
+    if request.user.social_auth.all().count() > 0:
+        raise PermissionDenied
 
     user_form = EditUserProfile(request.POST, instance=request.user)
     
@@ -222,7 +246,7 @@ max_results = 10
 @require_http_methods(['GET'])
 def search(request, type):
     if 'search' not in request.GET.keys() or request.GET['search'] == '':
-        return bad_request
+        raise SuspiciousOperation
 
     search_str = request.GET['search']
 
@@ -257,12 +281,12 @@ def create_lesson(request):
         current_group = Group.objects.get(id=request_data['id'])
 
         if not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm('data.edit_group_timetable')):
-            return forbidden_request
+            raise PermissionDenied
         
         if ((not another_week) and Lesson.objects.filter(week=week, day=day, number=number, groups=current_group).exists()):
-            return bad_request
+            raise SuspiciousOperation
         elif (another_week and Lesson.objects.filter(day=day, number=number, groups=current_group).exists()):
-            return bad_request
+            raise SuspiciousOperation
 
         discipline = Discipline.objects.get(id=request_data['discipline_id'])
 
@@ -342,18 +366,18 @@ def create_lesson(request):
         current_teacher = Teacher.objects.get(id=request_data['id'])
 
         if not (request.user.has_perm('edit_teacher_timetable', current_teacher) or request.user.has_perm('data.edit_teacher_timetable')):
-            return forbidden_request
+            raise PermissionDenied
 
         if ((not another_week) and Lesson.objects.filter(week=week, day=day, number=number, teachers=current_teacher).exists()):
-            return bad_request
+            raise SuspiciousOperation
         elif (another_week and Lesson.objects.filter(day=day, number=number, teachers=current_teacher).exists()):
-            return bad_request
+            raise SuspiciousOperation
 
         discipline = Discipline.objects.get(id=request_data['discipline_id'])
 
         groups = [Group.objects.get(id=id) for id in request_data['groups_id']]
         if len(groups) == 0:
-            return bad_request
+            raise SuspiciousOperation
 
         conflicts = []
 
@@ -431,19 +455,19 @@ def edit_lesson(request):
     current_teacher = Teacher.objects.get(id=request_data['id']) if request_data['sender'] == 'teacher' else None
 
     if not (current_group or current_teacher):
-        return bad_request
+        raise SuspiciousOperation
 
     current_lesson = Lesson.objects.get(id=request_data['lesson_id'])
 
     if current_group and (current_group not in current_lesson.groups.all()):
-        return bad_request
+        raise SuspiciousOperation
     if current_teacher and (current_teacher not in current_lesson.teachers.all()):
-        return bad_request
+        raise SuspiciousOperation
 
     if current_group and (not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm('data.edit_group_timetable'))):
-        return forbidden_request
+        raise PermissionDenied
     if current_teacher and (not (request.user.has_perm('edit_teacher_timetable', current_teacher) or request.user.has_perm('data.edit_teacher_timetable'))):
-        return forbidden_request
+        raise PermissionDenied
 
     type_choices_keys = [choice[0] for choice in Lesson.TYPE_CHOICES]
 
@@ -453,7 +477,7 @@ def edit_lesson(request):
     elif int(request_data['lesson_type']) in type_choices_keys:
         current_lesson_type = int(request_data['lesson_type'])
     else:
-        return bad_request
+        raise SuspiciousOperation
 
     conflicts = []
 
@@ -465,7 +489,7 @@ def edit_lesson(request):
     new_rooms_id = request_data['rooms_id']
 
     if current_teacher and (len(new_groups_id) == 0):
-        return bad_request
+        raise SuspiciousOperation
 
     add_groups_id = [id for id in new_groups_id if id not in old_groups_id] if current_teacher else None
     remove_groups_id = [id for id in old_groups_id if id not in new_groups_id] if current_teacher else None
@@ -529,7 +553,7 @@ def edit_lesson(request):
             current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, discipline=current_lesson.discipline, teachers=current_teacher)
 
         if not current_lesson_2:
-            return bad_request
+            raise SuspiciousOperation
 
         old_groups_id_2 = [group.id for group in current_lesson_2.groups.all()] if current_teacher else None
         old_teachers_id_2 = [teacher.id for teacher in current_lesson_2.teachers.all()] if current_group else None
@@ -732,19 +756,19 @@ def remove_lesson(request):
     current_teacher = Teacher.objects.get(id=request_data['id']) if request_data['sender'] == 'teacher' else None
 
     if not (current_group or current_teacher):
-        return bad_request
+        raise SuspiciousOperation
 
     if current_group and (not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm('data.edit_group_timetable'))):
-        return forbidden_request
+        raise PermissionDenied
     if current_teacher and (not (request.user.has_perm('edit_teacher_timetable', current_teacher) or request.user.has_perm('data.edit_teacher_timetable'))):
-        return forbidden_request
+        raise PermissionDenied
 
     current_lesson = Lesson.objects.get(id=request_data['lesson_id'])
 
     if current_group and (current_group not in current_lesson.groups.all()):
-        return bad_request
+        raise SuspiciousOperation
     if current_teacher and (current_teacher not in current_lesson.teachers.all()):
-        return bad_request
+        raise SuspiciousOperation
 
     another_week = True if request_data['another_week'] == 1 else False
 
@@ -758,7 +782,7 @@ def remove_lesson(request):
             current_lesson_2 = Lesson.objects.get(number=current_lesson.number, day=current_lesson.day, week=another_week_number, discipline=current_lesson.discipline, teachers=current_teacher)
 
         if not current_lesson_2:
-            return bad_request
+            raise SuspiciousOperation
 
     for group in current_lesson.groups.all():
         delete_timetable_cache('groups', group.id)
@@ -801,7 +825,7 @@ def link_lesson(request):
         current_group = Group.objects.get(id=request_data['id'])
 
         if not (request.user.has_perm('edit_group_timetable', current_group) or request.user.has_perm('data.edit_group_timetable')):
-            return forbidden_request
+            raise PermissionDenied
 
         another_week = True if request_data['another_week'] == 1 else False
 
@@ -813,7 +837,7 @@ def link_lesson(request):
                 first_lesson.day != second_lesson.day or
                 first_lesson.discipline != second_lesson.discipline or
                 len([group for group in first_lesson.groups.all() if group in second_lesson.groups.all()]) == 0):
-                return bad_request
+                raise SuspiciousOperation
 
             first_lesson.groups.add(current_group)
             second_lesson.groups.add(current_group)
