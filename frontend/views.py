@@ -145,12 +145,6 @@ def timetable(request, type, id):
     else:
         queryset = Lesson.objects.filter(rooms=Room.objects.get(id=id))
 
-    if queryset.count() == 0:
-        context['error_text'] = 'Нажаль, розклад відсутній :('
-        context['error_text2'] = 'Зверніться до адміністраторів'
-
-        return render(request, 'error.html', context)
-
     if ((type == 'groups' and (request.user.has_perm('edit_group_timetable', Group.objects.get(id=id)) or request.user.has_perm('data.edit_group_timetable'))) or
         (type == 'teachers' and (request.user.has_perm('edit_teacher_timetable', Teacher.objects.get(id=id)) or request.user.has_perm('data.edit_teacher_timetable')))):
         
@@ -217,6 +211,12 @@ def timetable(request, type, id):
 
         return render(request, 'timetable_edit.html', context)
     else:
+        if queryset.count() == 0:
+            context['error_text'] = 'Нажаль, розклад відсутній :('
+            context['error_text2'] = 'Зверніться до адміністраторів'
+
+            return render(request, 'error.html', context)
+
         if not get_timetable_cache(type, id):
             context['timetable'] = []
 
