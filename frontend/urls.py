@@ -19,4 +19,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls))
 ]
 
-handler404 = 'frontend.views.error'
+handler400 = 'frontend.views.error400'
+handler403 = 'frontend.views.error403'
+handler404 = 'frontend.views.error404'
+handler500 = 'frontend.views.error500'

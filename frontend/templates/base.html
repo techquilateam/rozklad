@@ -106,7 +106,7 @@
 						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
 						<p class="error">Error</p>
 						<button type="submit" class="button" id="login_button">Увійти</button>
-						<button type="button" class="button" id="login_button_vk" onclick="location.href = '/login/vk-oauth2'">Увійти через</buttona>
+						<button type="button" class="button" id="login_button_vk" onclick="location.href = '/login/vk-oauth2/?next={{ request.get_full_path }}'">Увійти через</buttona>
 					</form>
 				</div>
 			</div>
@@ -114,6 +114,7 @@
 		{% endif %}
 		<script>
 			var datShitDropdownMenuActive = false
+			
 			function getCookie(name) {
 				var cookieValue = null
 				if (document.cookie && document.cookie != '') {
@@ -136,10 +137,6 @@
 					}
 				}
 			})
-
-			function vk_avatar_callback(data) {
-				$("#vk_avatar_img").attr("src", data.response[0].photo_50)
-			}
 
 			function mousemove_tooltip_event_handler(eventObject) {
 				$data_tooltip = $(this).data("typename")
@@ -173,9 +170,18 @@
 
 			$(document).ready(function() {
 				{% if backends.associated|length > 0 %}
-					var vk_script = document.createElement("SCRIPT")
-					vk_script.src = "https://api.vk.com/method/users.get?user_ids={{ backends.associated.0.uid }}&fields=photo_50&v=5.40&callback=vk_avatar_callback"
-					document.getElementsByTagName("head")[0].appendChild(vk_script)
+					$.ajax({
+						method: "GET",
+						url: "https://api.vk.com/method/users.get",
+						dataType: "jsonp",
+						data: {
+							user_ids: "{{ backends.associated.0.uid }}",
+							fields: "photo_50",
+							v: "5.40"
+						}
+					}).success(function(data) {
+						$("#vk_avatar_img").attr("src", data.response[0].photo_50)
+					})
 				{% endif %}
 
 				$("#search__input").keyup(function() {
@@ -358,10 +364,7 @@
 				var lesson = 0
 				var week = 0
 
-				if ((parseInt(d.getTime() / 1000 / 60 / 60 / 24 / 7) % 2) == 0)
-					week = 1
-				else
-					week = 2
+				week = parseInt((d.getTime() - 3 * 24 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24 / 7) % 2 + 1
 
 				if (day != 0) {
 					$('#w--' + week + ' .day[data-day="' + day + '"]').addClass("current")

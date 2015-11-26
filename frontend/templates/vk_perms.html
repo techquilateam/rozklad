@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}
+    Register VK permissions | Django site admin
+{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
+{% endblock %}
+
+{% block extrahead %}
+    <script type="text/javascript" src="/admin/jsi18n/"></script>
+    <script type="text/javascript" src="/static/admin/js/core.js"></script>
+    <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+    <script type="text/javascript" src="/static/admin/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+    <script type="text/javascript" src="/static/admin/js/actions.js"></script>
+    <script type="text/javascript" src="/static/admin/js/SelectBox.js"></script>
+    <script type="text/javascript" src="/static/admin/js/SelectFilter2.js"></script>
+    <script type="text/javascript" src="/static/admin/js/related-widget-wrapper.js"></script>
+    <script type="text/javascript" src="/static/js/add_vk_user_permissions_script.js"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>Register VK permissions</h1>
+    <div id="content-main">
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        {% if errors %}
+        <div>
+        <p class="errornote">Please correct the errors below.</p>
+        {% endif %}
+        <fieldset class="module aligned">
+            {% for field in form %}
+                <div class="form-row{% if field.errors %} errors{% endif %} field-{{ field.html_name }}">
+                    <div>
+                        {{ field.errors }}
+                        <label class="required" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                </div>
+            {% endfor %}
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" value="Save" class="default" name="_save">
+            <input type="submit" value="Save and add another" name="_addanother">
+        </div>
+        {% if errors %}
+        </div>
+        {% endif %}
+    </form>
+    </div>
+{% endblock %}
