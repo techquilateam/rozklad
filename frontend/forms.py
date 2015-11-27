@@ -47,7 +47,7 @@ class AddVKUserPermissions(forms.Form):
         if (identifier_str.find('/') != -1):
             identifier_str = identifier_str.split('/')[-1]
 
-        api_data = json.loads(urllib.request.urlopen('https://api.vk.com/method/users.get?user_ids={0}&v=5.40'.format(identifier_str)).read().decode('cp1251'))
+        api_data = json.loads(urllib.request.urlopen('https://api.vk.com/method/users.get?user_ids={0}&v=5.40'.format(identifier_str)).read().decode('utf-8'))
         if ('response' not in api_data) or (len(api_data['response']) == 0):
             raise ValidationError(_('No such user registered in VK'))
 
