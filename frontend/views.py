@@ -11,10 +11,10 @@ from django.core.cache.utils import make_template_fragment_key
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext as _
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.conf import settings
 from data.models import *
 from data.search import *
 from .forms import EditUserProfile
-from settings import domains
 
 cache = caches['default']
 
@@ -80,7 +80,7 @@ def index(request):
 def api(request):
     context = {}
     context['title'] = page_base_title + ' | API'
-    context['api_domain'] = domains.API_DOMAIN
+    context['api_domain'] = settings.API_DOMAIN
     
     return render(request, 'api.html', context)
 
