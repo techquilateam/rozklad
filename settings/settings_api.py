@@ -1,7 +1,4 @@
 from .settings import *
-from . import domains
-
-ALLOWED_HOSTS = [domains.API_DOMAIN]
 
 INSTALLED_APPS = (
     'django.contrib.admin',

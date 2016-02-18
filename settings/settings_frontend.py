@@ -1,7 +1,4 @@
 from .settings import *
-from . import domains
-
-ALLOWED_HOSTS = [domains.FRONTEND_DOMAIN]
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -45,13 +42,6 @@ TEMPLATES = [
 ]
 
 ROOT_URLCONF = 'frontend.urls'
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': 'unix:/var/run/memcached.sock',
-    }
-}
 
 AUTHENTICATION_BACKENDS = (
     'social.backends.vk.VKOAuth2',

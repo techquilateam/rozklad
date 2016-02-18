@@ -3,18 +3,7 @@ from .settings_secure import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ANONYMOUS_USER_ID = None
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'rozklad',
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
-}
+ANONYMOUS_USER_ID = -1
 
 LANGUAGE_CODE = 'en-us'
 
