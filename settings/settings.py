@@ -3,7 +3,7 @@ from .settings_secure import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ANONYMOUS_USER_ID = None
+ANONYMOUS_USER_ID = -1
 
 LANGUAGE_CODE = 'en-us'
 
