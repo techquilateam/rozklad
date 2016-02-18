@@ -25,14 +25,14 @@
 											<p class="lesson__right">
 												{% if type == 'rooms' or type == 'teachers' %}
 													{% for group in lesson.groups.all|slice:":3" %}
-														<a href="/groups/{{ group.id }}" data-id="{{ group.id }}">{{ group.name|upper }}</a>
+														<a href="/groups/{{ group.id }}/" data-id="{{ group.id }}">{{ group.name|upper }}</a>
 														{% if not forloop.last %}
 															<br>
 														{% endif %}
 													{% endfor %}
 												{% else %}
 													{% for room in lesson.rooms.all %}
-														<a href="/rooms/{{ room.id }}" data-id="{{ room.id }}">{{ room.full_name }}</a>
+														<a href="/rooms/{{ room.id }}/" data-id="{{ room.id }}">{{ room.full_name }}</a>
 														<br>
 													{% endfor %}
 												{% endif %}
@@ -40,19 +40,19 @@
 											<p class="lesson__left">
 												{% if type == 'groups' or type == 'rooms' %}
 													{% for teacher in lesson.teachers.all %}
-														<a href="/teachers/{{ teacher.id }}" data-id="{{ teacher.id }}">{{ teacher.short_name }}</a>
+														<a href="/teachers/{{ teacher.id }}/" data-id="{{ teacher.id }}">{{ teacher.short_name }}</a>
 														<br>
 													{% endfor %}
 												{% else %}
 													{% for room in lesson.rooms.all %}
-														<a href="/rooms/{{ room.id }}" data-id="{{ room.id }}">{{ room.full_name }}</a>
+														<a href="/rooms/{{ room.id }}/" data-id="{{ room.id }}">{{ room.full_name }}</a>
 														<br>
 													{% endfor %}
 												{% endif %}
 											</p>
 											<i class="moregroups-detais">
 												{% for group in lesson.groups.all %}
-													&nbsp;<a href="/groups/{{ group.id }}" data-id="{{ group.id }}">{{ group.name|upper }}</a>
+													&nbsp;<a href="/groups/{{ group.id }}"/ data-id="{{ group.id }}">{{ group.name|upper }}</a>
 												{% endfor %}
 											</i>
 										</li>
