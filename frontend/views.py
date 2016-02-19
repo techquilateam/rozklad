@@ -43,7 +43,7 @@ def error400(request):
         'title': page_base_title + ' | 400',
         'error_text': '400',
         'error_text2': 'Bad Request',
-    })
+    }, status=400)
 
 @ensure_csrf_cookie
 def error403(request):
@@ -51,7 +51,7 @@ def error403(request):
         'title': page_base_title + ' | 403',
         'error_text': '403',
         'error_text2': 'Forbidden',
-    })
+    }, status=403)
 
 @ensure_csrf_cookie
 def error404(request):
@@ -59,7 +59,7 @@ def error404(request):
         'title': page_base_title + ' | 404',
         'error_text': '404',
         'error_text2': 'Нажаль, такої сторінки не існує',
-    })
+    }, status=404)
 
 @ensure_csrf_cookie
 def error500(request):
@@ -67,7 +67,7 @@ def error500(request):
         'title': page_base_title + ' | 500',
         'error_text': '500',
         'error_text2': 'Server Error',
-    })
+    }, status=500)
 
 @ensure_csrf_cookie
 def index(request):
