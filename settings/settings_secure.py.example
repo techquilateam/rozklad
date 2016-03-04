@@ -1,0 +1,11 @@
+SECRET_KEY = 'someveryrandomdjangosecretkey98je99rjt8eh!^&^(u(*Y78h78e'
+
+DB_USER = 'someuser'
+DB_PASSWORD = 'somepassword'
+
+SOCIAL_AUTH_VK_OAUTH2_KEY = '1111111'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'qwerty123456ASDFGHJK'
+
+GOOGLE_ANALYTICS_IDENTIFICATOR = 'SOME-IDENTIFICATOR-1'
+GOOGLE_RECAPTCHA_PUBLIC = 'somepublicrecaptchakey'
+GOOGLE_RECAPTCHA_PRIVATE = 'someprivaterecaptchakey'
