@@ -19,20 +19,20 @@
 											<h1 class="lesson__title" data-id="{{ lesson.discipline.id }}" data-fullname="{{ lesson.discipline.full_name }}">{{ lesson.discipline.name|truncatechars:40 }}</h1>
 											{% if type == 'rooms' or type == 'teachers' %}
 												{% if lesson.groups.all.count > 3 %}
-													<a href="#" class="moregroups"></a>
+													<a class="moregroups"></a>
 												{% endif %}
 											{% endif %}
 											<p class="lesson__right">
 												{% if type == 'rooms' or type == 'teachers' %}
 													{% for group in lesson.groups.all|slice:":3" %}
-														<a href="/groups/{{ group.id }}/" data-id="{{ group.id }}">{{ group.name|upper }}</a>
+														<a href="{% url 'timetable' 'groups' group.id %}" data-id="{{ group.id }}">{{ group.name|upper }}</a>
 														{% if not forloop.last %}
 															<br>
 														{% endif %}
 													{% endfor %}
 												{% else %}
 													{% for room in lesson.rooms.all %}
-														<a href="/rooms/{{ room.id }}/" data-id="{{ room.id }}">{{ room.full_name }}</a>
+														<a href="{% url 'timetable' 'rooms' room.id %}" data-id="{{ room.id }}">{{ room.full_name }}</a>
 														<br>
 													{% endfor %}
 												{% endif %}
@@ -40,19 +40,19 @@
 											<p class="lesson__left">
 												{% if type == 'groups' or type == 'rooms' %}
 													{% for teacher in lesson.teachers.all %}
-														<a href="/teachers/{{ teacher.id }}/" data-id="{{ teacher.id }}">{{ teacher.short_name }}</a>
+														<a href="{% url 'timetable' 'teachers' teacher.id %}" data-id="{{ teacher.id }}">{{ teacher.short_name }}</a>
 														<br>
 													{% endfor %}
 												{% else %}
 													{% for room in lesson.rooms.all %}
-														<a href="/rooms/{{ room.id }}/" data-id="{{ room.id }}">{{ room.full_name }}</a>
+														<a href="{% url 'timetable' 'rooms' room.id %}" data-id="{{ room.id }}">{{ room.full_name }}</a>
 														<br>
 													{% endfor %}
 												{% endif %}
 											</p>
 											<i class="moregroups-detais">
 												{% for group in lesson.groups.all %}
-													&nbsp;<a href="/groups/{{ group.id }}"/ data-id="{{ group.id }}">{{ group.name|upper }}</a>
+													&nbsp;<a href="{% url 'timetable' 'groups' group.id %}"/ data-id="{{ group.id }}">{{ group.name|upper }}</a>
 												{% endfor %}
 											</i>
 										</li>
@@ -247,7 +247,7 @@
 							for (var j = 0; j < data_preload.teachers.length; j++)
 								if (lesson__left_arr[i] == data_preload.teachers[j].id)
 									teacherName = data_preload.teachers[j].name
-							teachersBlock += '<span class="left" data-id="' + lesson__left_arr[i] + '">' + teacherName + '<a href="#" class="deletespan"></a></span>'
+							teachersBlock += '<span class="left" data-id="' + lesson__left_arr[i] + '">' + teacherName + '<a class="deletespan"></a></span>'
 						}
 						
 						$("#teachersblock").html(teachersBlock)
@@ -258,7 +258,7 @@
 							for (var j = 0; j < data_preload.rooms.length; j++)
 								if (lesson__left_arr[i] == data_preload.rooms[j].id)
 									roomName = data_preload.rooms[j].name
-							roomsBlock += '<span class="right" data-id="' + lesson__left_arr[i] + '">' + roomName + '<a href="#" class="deletespan"></a></span>'
+							roomsBlock += '<span class="right" data-id="' + lesson__left_arr[i] + '">' + roomName + '<a class="deletespan"></a></span>'
 						}
 						$("#roomsblock").html(roomsBlock)
 					{% endif %}
@@ -270,7 +270,7 @@
 							for (var j = 0; j < data_preload.rooms.length; j++)
 								if (lesson__right_arr[i] == data_preload.rooms[j].id)
 									roomName = data_preload.rooms[j].name
-							roomsBlock += '<span class="right" data-id="' + lesson__right_arr[i] + '">' + roomName + '<a href="#" class="deletespan"></a></span>'
+							roomsBlock += '<span class="right" data-id="' + lesson__right_arr[i] + '">' + roomName + '<a class="deletespan"></a></span>'
 						}
 						$("#roomsblock").html(roomsBlock)
 					{% else %}
@@ -314,7 +314,7 @@
 				if (($(this).val().length >= 2) && (!$("#edit_lesson_name").hasClass("inputcorrect"))) {
 					$.ajax({
 						method: "GET",
-						url: "/disciplines/search/?search="  + $("#edit_lesson_name").val(),
+						url: "{% url 'search' 'disciplines' %}?search="  + $("#edit_lesson_name").val(),
 						dataType: "json"
 					}).done(function(data) {
 						data = data.data
@@ -347,7 +347,7 @@
 				if ($(this).val().length >= 2) {
 					$.ajax({
 						method: "GET",
-						url: "/groups/search/?search=" + $(this).val(),
+						url: "{% url 'search' 'groups' %}?search=" + $(this).val(),
 						dataType: "json"
 					}).done(function(data) {
 						data = data.data
@@ -380,7 +380,7 @@
 				if ($(this).val().length >= 2) {
 					$.ajax({
 						method: "GET",
-						url: "/groups/search/?search=" + $(this).val(),
+						url: "{% url 'search' 'groups' %}?search=" + $(this).val(),
 						dataType: "json"
 					}).done(function(data) {
 						data = data.data
@@ -413,7 +413,7 @@
 				if ($(this).val().length >= 2) {
 					$.ajax({
 						method: "GET",
-						url: "/teachers/search/?search=" + $(this).val(),
+						url: "{% url 'search' 'teachers' %}?search=" + $(this).val(),
 						dataType: "json"
 					}).done(function(data) {
 						data = data.data
@@ -446,7 +446,7 @@
 				if ($(this).val().length >= 2) {
 					$.ajax({
 						method: "GET",
-						url: "/rooms/search/?search="  + $(this).val(),
+						url: "{% url 'search' 'rooms' %}?search="  + $(this).val(),
 						dataType: "json"
 					}).done(function(data) {
 						data = data.data
@@ -501,7 +501,7 @@
 							if 	(lesson__left_arr[i] == $(this).attr("data-id")) 
 								isAlreadyTaken = true
 						if (!isAlreadyTaken) {
-							$("#roomsblock").append('<span class="left" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
+							$("#roomsblock").append('<span class="left" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a class="deletespan"></a></span>')
 							lesson__left_arr.push($(this).attr("data-id"))
 						}
 					{% else %}
@@ -509,7 +509,7 @@
 							if 	(lesson__right_arr[i] == $(this).attr("data-id")) 
 								isAlreadyTaken = true
 						if (!isAlreadyTaken) {
-							$("#roomsblock").append('<span class="right" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
+							$("#roomsblock").append('<span class="right" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a class="deletespan"></a></span>')
 							lesson__right_arr.push($(this).attr("data-id"))
 						}
 					{% endif %}
@@ -521,8 +521,8 @@
 						if 	(lesson__right_arr[i] == $(this).attr("data-id")) 
 							isAlreadyTaken = true
 					if (!isAlreadyTaken) {
-						$("#groupsblock").append('<span class="right"data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
-						$("#groupsblock--add").append('<span class="right"data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
+						$("#groupsblock").append('<span class="right"data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a class="deletespan"></a></span>')
+						$("#groupsblock--add").append('<span class="right"data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a class="deletespan"></a></span>')
 						lesson__right_arr.push($(this).attr("data-id"))
 					}
 					$("#edit_lesson_groups").val('')
@@ -533,7 +533,7 @@
 						if 	(lesson__left_arr[i] == $(this).attr("data-id")) 
 							isAlreadyTaken = true
 					if (!isAlreadyTaken) {
-						$("#teachersblock").append('<span class="left" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a href="#" class="deletespan"></a></span>')
+						$("#teachersblock").append('<span class="left" data-id="' + $(this).attr("data-id") + '">' + $(this).text() + '<a class="deletespan"></a></span>')
 						lesson__left_arr.push($(this).attr("data-id"))
 					}
 					$("#edit_lesson_teachers").val('')
@@ -613,7 +613,7 @@
 
 						$.ajax({
 							method: "POST",
-							url: "/create-lesson/",
+							url: "{% url 'create_lesson' %}",
 							dataType: "json",
 							data: JSON.stringify(ajax_data),
 							contentType: "application/json"
@@ -741,7 +741,7 @@
 
 						$.ajax({
 							method: "POST",
-							url: "/create-lesson/",
+							url: "{% url 'create_lesson' %}",
 							dataType: "json",
 							data: JSON.stringify(ajax_data),
 							contentType: "application/json"
@@ -843,7 +843,7 @@
 
 				$.ajax({
 					method: "POST",
-					url: "/edit-lesson/",
+					url: "{% url 'edit_lesson' %}",
 					dataType: "json",
 					data: JSON.stringify(ajax_data),
 					contentType: "application/json"
@@ -951,7 +951,7 @@
 
 				$.ajax({
 					method: "POST",
-					url: "/remove-lesson/",
+					url: "{% url 'remove_lesson' %}",
 					dataType: "json",
 					data: JSON.stringify(ajax_data),
 					contentType: "application/json"
@@ -989,7 +989,7 @@
 
 					$.ajax({
 						method: "POST",
-						url: "/link-lesson/",
+						url: "{% url 'link_lesson' %}",
 						dataType: "json",
 						data: JSON.stringify(ajax_data),
 						contentType: "application/json"
@@ -1049,7 +1049,7 @@
 
 					$.ajax({
 						method: "POST",
-						url: "/edit-lesson/",
+						url: "{% url 'edit_lesson' %}",
 						dataType: "json",
 						data: JSON.stringify(ajax_data),
 						contentType: "application/json"
@@ -1078,7 +1078,7 @@
 
 						$.ajax({
 							method: "POST",
-							url: "/create-lesson/",
+							url: "{% url 'create_lesson' %}",
 							dataType: "json",
 							data: JSON.stringify(ajax_data),
 							contentType: "application/json"
@@ -1111,7 +1111,7 @@
 
 						$.ajax({
 							method: "POST",
-							url: "/edit-lesson/",
+							url: "{% url 'edit_lesson' %}",
 							dataType: "json",
 							data: JSON.stringify(ajax_data),
 							contentType: "application/json"

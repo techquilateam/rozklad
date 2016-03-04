@@ -3,7 +3,7 @@
 {% block content %}
 	<section id="profile-settings">
 		<div class="container">
-			<form action="/edit-profile/" method="post" id="profile_edit_form">
+			<form action="{% url 'edit_profile' %}" method="post" id="profile_edit_form">
 				<h2 class="title">Редагування аккаунту</h2>
 				<div class="one_half">
 					<h3>Змінити логін: </h3>

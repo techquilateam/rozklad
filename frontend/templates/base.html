@@ -1,53 +1,53 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="uk">
 	<head>
 		<title>{{ title }}</title>
-		<link rel="stylesheet" href="/static/css/normalize.css">
-		<link rel="stylesheet" href="/static/css/style.css">
-		<link rel="stylesheet" href="/static/css/fonts.css">
-		<link rel="stylesheet" href="/static/css/responsive.css">
-		<link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
-		<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+		<link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+		<link rel="stylesheet" href="{% static 'css/style.css' %}">
+		<link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+		<link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+		<link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+		<link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
 		<meta name="format-detection" content="telephone=no">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<meta charset="utf-8">
-		<script src="/static/js/jquery-2.1.4.min.js"></script>
+		<script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
 		<script src='https://www.google.com/recaptcha/api.js'></script>
 		<script>
-		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-		  ga('create', 'UA-69632058-4', 'auto');
-		  ga('send', 'pageview');
+			ga('create', 'UA-69632058-4', 'auto');
+			ga('send', 'pageview');
 		</script>
 	</head>
 	<body>
 		<header>
 			<div class="container">
 				<div id="logo">
-					<a href="/">Новий Розклад КПІ</a>
+					<a href="{% url 'index' %}">Новий Розклад КПІ</a>
 				</div>
-				<form action="" id="searchbar">
+				<form action="{{ request.get_full_path }}" id="searchbar">
 					<select name="">
 						<option class="groups" value="groups" {% if not type or type == 'groups' %}selected="selected"{% endif %}>Група</option>
 						<option class="teachers" value="teachers" {% if type == 'teachers' %}selected="selected"{% endif %}>Викладач</option>
 						<option class="rooms" value="rooms" {% if type == 'rooms' %}selected="selected"{% endif %}>Аудиторія</option>
-						<option style="display: none" class="disciplines" value="disciplines" {% if type == 'disciplines' %}selected="selected"{% endif %}>Предмет</option>
 					</select>
 					<input type="text" placeholder="Введіть запит" name="" id="search__input" autocomplete="off" value="{{ top_menu_str }}">
 					<button class="button">знайти</button>
 				</form>
 				{% if user.is_authenticated %}
 					{% if user_edit_allowed.groups or user_edit_allowed.teachers %}
-						<a href="#" class="arrow" data-active="false"></a>
+						<a class="arrow" data-active="false" style="cursor: pointer"></a>
 						<div id="whatUcanEdit">
 							{% if user_edit_allowed.groups %}
 								<ul class="groups">
 									<span class="title">Групи</span>
 									{% for group in user_edit_allowed.groups %}
-										<li><a href="/groups/{{ group.id }}">{{ group.name|upper }}</a></li>
+										<li><a href="{% url 'timetable' 'groups' group.id %}">{{ group.name|upper }}</a></li>
 									{% endfor %}
 								</ul>
 							{% endif %}
@@ -55,7 +55,7 @@
 								<ul class="teachers">
 									<span class="title">Викладачі</span>
 									{% for teacher in user_edit_allowed.teachers %}
-										<li><a href="/teachers/{{ teacher.id }}">{{ teacher.short_name|upper }}</a></li>
+										<li><a href="{% url 'timetable' 'teachers' group.id %}">{{ teacher.short_name|upper }}</a></li>
 									{% endfor %}
 								</ul>
 							{% endif %}
@@ -63,7 +63,7 @@
 					{% endif %}
 					<a class="login exit" style="cursor: pointer">Вийти</a>
 					{% if backends.associated|length == 0 %}
-						<a href="/profile/" class="login">
+						<a href="{% url 'profile' %}" class="login">
 							{{ user.username }}
 						</a>
 					{% else %}
@@ -86,7 +86,7 @@
 		<footer>
 			<div class="container">
 				<div class="links">
-					<a href="/api">API</a> &nbsp; <a href="http://bot.hub.kpi.ua" class="foretelegram">КПИ Бот</a>  &nbsp; <a href="http://hub.kpi.ua" class="foretelegram">КПИ hub</a>
+					<a href="{% url 'api' %}">API</a> &nbsp; <a href="http://bot.hub.kpi.ua" class="foretelegram">КПИ Бот</a>  &nbsp; <a href="http://hub.kpi.ua" class="foretelegram">КПИ hub</a>
 				</div>
 				<div class="createdby">
 					created by <a href="http://vk.com/antontimenko">Anton Timenko</a>, <a href="http://vk.com/vladkampov">Vlad Kampov</a> and <a href="http://vk.com/vlad_sidorenko">Vlad Sidorenko</a>
@@ -100,13 +100,13 @@
 				<h1 class="maintitle">Вікно логіну</h1>
 				<i class="closeicon"></i>
 				<div class="content">
-					<form action="/login/" method="post" id="login_form">
+					<form action="{% url 'login' %}" method="post" id="login_form">
 						<input type="text" placeholder="Ім'я користувача" name="username">
 						<input type="password" placeholder="Пароль" name="password">
 						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
 						<p class="error">Error</p>
 						<button type="submit" class="button" id="login_button">Увійти</button>
-						<button type="button" class="button" id="login_button_vk" onclick="location.href = '/login/vk-oauth2/?next={{ request.get_full_path }}'">Увійти через</buttona>
+						<button type="button" class="button" id="login_button_vk" onclick="location.href = '{% url 'social:begin' backend='vk-oauth2' %}?next={{ request.get_full_path }}'">Увійти через</button>
 					</form>
 				</div>
 			</div>
@@ -211,7 +211,7 @@
 									$("#search_proposals ul").append(li)
 								})
 								
-								$("#searchbar").attr("action", base_url + data[0].id) + "/"
+								$("#searchbar").attr("action", base_url + data[0].id + "/")
 							}
 						})
 					} else {
@@ -265,7 +265,7 @@
 				$(".exit").click(function() {
 					$.ajax({
 						method: "POST",
-						url: "/logout/",
+						url: "{% url 'logout' %}",
 						dataType: "json"
 					}).done(function(data) {
 						if (data.status == "OK") {
@@ -312,48 +312,35 @@
 					}
 				})
 			})
+
 			$(document).click(function (e) {
-			    var search = $("#search_proposals");
-			    if (search.has(e.target).length === 0) {
-			    	$("#search_proposals").fadeOut(300)
-			    	$("#search_proposals ul li").remove()
-			    }
+				var search = $("#search_proposals");
+				if (search.has(e.target).length === 0) {
+					$("#search_proposals").fadeOut(300)
+					$("#search_proposals ul li").remove()
+				}
+			})
 
-			    //NEED TO FIX THIS
-			    // var arrow = $("#whatUcanEdit");
-			    // if (datShitDropdownMenuActive == true)
-				   //  if (arrow.has(e.target).length === 0) {
-				   //      $("#whatUcanEdit").animate({
-				   //      	height: 0
-				   //      }, 150, function() {
-				   //      	$("#whatUcanEdit").animate({opacity: 0}, 150)
-				   //      })
-				   //      arrow.attr("data-active", "false")
-				   //  } 
-			});
-
-			
-			//HOW TIME IS IT, BIATCH?!
 			$(document).ready(function() {
 				window.mobileDetection = {
-				    Android:function () {
-				        return navigator.userAgent.match(/Android/i);
-				    },
-				    BlackBerry:function () {
-				        return navigator.userAgent.match(/BlackBerry/i);
-				    },
-				    iOS:function () {
-				        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-				    },
-				    Opera:function () {
-				        return navigator.userAgent.match(/Opera Mini/i);
-				    },
-				    Windows:function () {
-				        return navigator.userAgent.match(/IEMobile/i);
-				    },
-				    any:function () {
-				        return (this.Android() || this.BlackBerry() || this.iOS() || this.Opera() || this.Windows());
-				    }
+					Android:function () {
+						return navigator.userAgent.match(/Android/i);
+					},
+					BlackBerry:function () {
+						return navigator.userAgent.match(/BlackBerry/i);
+					},
+					iOS:function () {
+						return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+					},
+					Opera:function () {
+						return navigator.userAgent.match(/Opera Mini/i);
+					},
+					Windows:function () {
+						return navigator.userAgent.match(/IEMobile/i);
+					},
+					any:function () {
+						return (this.Android() || this.BlackBerry() || this.iOS() || this.Opera() || this.Windows());
+					}
 				};
 				window.isMobile = mobileDetection.any()
 				{% if type == 'rooms' or type == 'teachers' or type = 'groups' %}
@@ -423,7 +410,7 @@
 
 					var destination = $(".day.current").offset().top;
 					if (isMobile)
-				   		$('html, body').animate({ scrollTop: destination }, 1100);
+						$('html, body').animate({ scrollTop: destination }, 1100);
 				}
 				{% endif %}
 			})

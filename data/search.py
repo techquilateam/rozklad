@@ -11,7 +11,7 @@ def search_room(str, queryset):
         left_str = str[:str.rfind('-')]
         right_str = str[str.rfind('-')+1:]
 
-        return queryset.filter(Q(name=left_str, building__name__istartswith=right_str) | Q(name__istartswith=str))
+        return queryset.filter(Q(name__iexact=left_str, building__name__istartswith=right_str) | Q(name__istartswith=str))
 
 def search_teacher(str, queryset):
     search_parts = str.split(' ')

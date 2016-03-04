@@ -6,7 +6,7 @@
 			<h1>Ой! Щось пішло не так!</h1>
 			<h3>{{ error_text }}</h3>
 			<p>{{ error_text2 }}</p>
-			<p><button class="button"  onclick="location.href = 'http://rozklad.hub.kpi.ua/'">повернутися на головну</button></p>
+			<p><button class="button"  onclick="location.href = '{% url 'index' %}'">повернутися на головну</button></p>
 			<div class="panda">
 				<span class="eyes">
 					<span class="eye left"><span class="ball"></span></span>
