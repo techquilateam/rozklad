@@ -35,6 +35,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'social.apps.django_app.context_processors.backends',
                 'social.apps.django_app.context_processors.login_redirect',
+                'frontend.context_processors.google_keys',
                 'frontend.context_processors.user_edit_allowed',
             ],
         },

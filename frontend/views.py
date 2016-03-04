@@ -14,7 +14,7 @@ page_base_title = 'Розклад КПІ'
 
 def check_captcha(captcha_response):
     captcha_data = bytes(urllib.parse.urlencode({
-        'secret': '6LeqARETAAAAAAsp5Ek43imvW5Ryey-0r5DRWG-g',
+        'secret': settings.GOOGLE_RECAPTCHA_PRIVATE,
         'response': captcha_response,
     }).encode())
     return json.loads(urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify', captcha_data).read().decode('utf-8'))['success']

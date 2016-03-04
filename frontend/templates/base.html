@@ -20,7 +20,7 @@
 			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-			ga('create', 'UA-69632058-4', 'auto');
+			ga('create', '{{ google_analytics_identificator }}', 'auto');
 			ga('send', 'pageview');
 		</script>
 	</head>
@@ -103,7 +103,7 @@
 					<form action="{% url 'login' %}" method="post" id="login_form">
 						<input type="text" placeholder="Ім'я користувача" name="username">
 						<input type="password" placeholder="Пароль" name="password">
-						<div class="g-recaptcha" data-sitekey="6LeqARETAAAAAL2RGxJ7Pm6XQjrmVyX_nk6tumdZ"></div>
+						<div class="g-recaptcha" data-sitekey="{{ google_recaptcha_public }}"></div>
 						<p class="error">Error</p>
 						<button type="submit" class="button" id="login_button">Увійти</button>
 						<button type="button" class="button" id="login_button_vk" onclick="location.href = '{% url 'social:begin' backend='vk-oauth2' %}?next={{ request.get_full_path }}'">Увійти через</button>
